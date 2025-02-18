@@ -1,25 +1,21 @@
 from django.db import models
-
+import uuid
 # Create your models here.
 
+
 class Users(models.Model):
-    userId = models.AutoField(primary_key=True)
-    userName = models.CharField(max_length=100)
-    firstName = models.CharField(max_length=100)
-    lastName = models.CharField(max_length=100)
-    age = models.IntegerField()
-    email = models.EmailField(max_length=100)
-    password = models.CharField(max_length=100)
-    phone = models.CharField(max_length=100)
-    address = models.CharField(max_length=100)
-    city = models.CharField(max_length=100)
-    state = models.CharField(max_length=100)
-    country = models.CharField(max_length=100)
-    zip = models.CharField(max_length=100)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    user_id = models.CharField(primary_key=True, max_length=36, default=uuid.uuid4, editable=False)  # Set user_id as primary key
+    user_name = models.CharField(max_length=45)
+    first_name = models.CharField(max_length=45)
+    last_name = models.CharField(max_length=45)
+    email = models.CharField(max_length=45, unique=True)  # Ensure email is unique
+    password = models.CharField(max_length=255)  # Ensure enough length for hashed password
+    current_user_type = models.CharField(max_length=45)
+    have_interest_membership = models.BooleanField(default=False)
+
     class Meta:
         db_table = 'users'
+
     
 
 class UserTypes(models.Model):
