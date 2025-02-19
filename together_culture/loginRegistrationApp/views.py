@@ -24,7 +24,7 @@ def validateUser(request):
         else:
             logger.warning('User authentication failed. User Email: ' + email)
             return JsonResponse({'statusCode': 401, 'message': 'User authentication failed. Wrong Password!'}, status=401)
-    except User.DoesNotExist:
+    except Users.DoesNotExist:
         logger.warning('User does not exist. User Email: ' + email)
         return JsonResponse({'statusCode': 404, 'message': 'User with this email does not exist. Please click on Register.'}, status=404)
     except Exception as e:
