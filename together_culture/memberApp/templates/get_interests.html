@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enter Initial Interests</title>
+    <!-- <link rel="stylesheet" href="pop_up_style.css"> -->
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(to bottom, #3a1c71, #d76d77, #ffaf7b);
+        }
+        .form-container {
+            display: flex;
+            column-gap: 20px;
+            text-align: center;
+        }
+        .popup-form {
+            background: rgba(255, 255, 255, 0.852);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            margin-bottom: 15px;
+            margin-left: 40px;
+            margin-top: 15px;
+        }
+        .form-group label {
+            color: rgb(67, 67, 67);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .button-group {
+            display: flex;
+            margin-top: 15px;
+        }
+        button {
+            flex-grow: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: #cf59a2;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 5px;
+        }
+    </style>
+       
+</head>
+<body>
+    <div class="popup-form">
+        <p id="popup-text">Please select the interests you are <br> initially interested in below.</p>
+        <form name="initial_interests" method="GET"> <!-- onsubmit="(event);" -->
+            <div class="form-container">
+                <div class="form-group">
+                    <label><input type="checkbox" id="happening" name="happening" value=1> Happening</label>
+                    <label><input type="checkbox" id="caring" name="caring" value=3> Caring</label>
+                    <label><input type="checkbox" id="learning" name="learning" value=5> Learning</label>
+                    <label><input type="checkbox" id="democracy" name="democracy" value=7> Democracy</label>
+                </div>
+                <div class="form-group">
+                    <label><input type="checkbox" id="member_led" name="member_led" value=2> Member Led</label>
+                    <label><input type="checkbox" id="sharing" name="sharing" value=4> Sharing</label>
+                    <label><input type="checkbox" id="working" name="working" value=6> Working</label>
+                </div>
+            </div>
+            <div class="button-group">
+                <button type="submit"  id="save_interests" name="save_interests">Save</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
