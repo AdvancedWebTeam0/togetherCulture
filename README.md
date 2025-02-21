@@ -35,12 +35,18 @@ Now, open a web browser and go to “/djangoadmin/” on your local domain – e
 
 For development, use the local database. For production use or before assigment submission, use the database server hosted on Azure. 
 
-## Local database
+## Local database using docker
 
 When you start the containers by running the command in docker section, it also runs a local database container. In order to connect to it for development purposes, change the database section in settings.py to following.
 
 ```
 HOST': 'db',
+```
+
+## Local database without docker
+
+```
+HOST': '127.0.0.1',
 ```
 
 ## Database server
