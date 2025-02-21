@@ -3,7 +3,7 @@ Together Culture website
 
 # Docker
 
-In order to dockerize this project, download the 3 files Dockerfile, compose.yml and requirements.txt from Teams. Put the files into the root directory of the project (the folder that contains manage.py). Then run the following command.
+In order to dockerize this project, download the 3 files Dockerfile, compose.yml and requirements.txt from Teams. Put the files into the root directory of the project (the folder that contains manage.py). Then run the following command. Note that below code is just for starting the container. See the database section for how to connect to database.
 
 ```
 docker compose up --build
@@ -34,3 +34,19 @@ Now, open a web browser and go to “/djangoadmin/” on your local domain – e
 # Database connection
 
 For development, use the local database. For production use or before assigment submission, use the database server hosted on Azure. 
+
+## Local database
+
+When you start the containers by running the command in docker section, it also runs a local database container. In order to connect to it for development purposes, change the database section in settings.py to following.
+
+```
+HOST': 'db',
+```
+
+## Database server
+
+Use the following in settings.py to connect to database server.
+
+```
+
+```
