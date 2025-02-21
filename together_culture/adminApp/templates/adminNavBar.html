@@ -111,19 +111,14 @@
 </head>
 <body>
     <div class="sidebar">
-        <a href="/insights/">📊 Insights</a>
-        <a href="/events/">📅 Events</a>
+        <a href="{% url 'insights' %}">📊 Insights</a>
+        <a href="{% url 'events' %}">📅 Events</a>
         <a onclick="toggleSubMenu()">👥 Manage Members <span id="triangleIcon" class="triangle"></span></a>
         <div class="submenu" id="manageMembersSubMenu">
             <a href="/add-member/">➕ Add Member</a>
             <a href="/members-list/">📋 Members List</a>
         </div>
-        <a href="/membership/">🎟 Membership</a>
-    </div>
-    <div class="content">
-        <div class="header">🚀 Dashboard</div>
-        <h1>Welcome to Your Dashboard</h1>
-        <p>Manage your insights, events, members, and memberships efficiently with an intuitive interface.</p>
+        <a href="{% url 'membership' %}">🎟 Membership</a>
     </div>
 </body>
 </html>
