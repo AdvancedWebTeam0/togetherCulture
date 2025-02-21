@@ -37,15 +37,11 @@ def insertUser(request):
 def dashBoard(request):
     return render(request, 'Dashboard.html')
 
-
-def insights(request):
-    return render(request, 'insights.html')
-
-def events(request):
-    return render(request, 'events.html')
-
 def manage_member(request):
     return render(request, 'manage_member.html')
 
 def membership(request):
     return render(request, 'membership.html')
+
+def logout(request):
+    return render(request, 'Login.html')
