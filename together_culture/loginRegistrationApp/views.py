@@ -42,3 +42,6 @@ def manage_member(request):
 
 def membership(request):
     return render(request, 'membership.html')
+
+def logout(request):
+    return render(request, 'Login.html')
