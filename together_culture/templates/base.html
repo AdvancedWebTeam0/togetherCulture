@@ -11,24 +11,7 @@
 </head>
 
 <body>
-    <nav class="sidebar">
-        {% for item in nav_items %}
-        {% if not item.submenu %}
-        <a href="{% url item.url %}">{{ item.name }}</a>
-        {% endif %}
-        {% if item.submenu %}
-        <a onclick="toggleSubMenu()">{{ item.name }}<span id="triangleIcon" class="triangle"></span></a>
-        <div class="submenu" id="subitemNav">
-            {% for subitem in item.submenu %}
-            <a href="{% url subitem.url %}">{{ subitem.name }}</a>
-            {% endfor %}
-        </div>
-        {% endif %}
-        {% endfor %}
-        <div class="logout-container">
-            <a href="{% url 'logout' %}" class="logout-button">🚪 Logout</a>
-        </div>
-    </nav>
+    {% include 'nav.html' %}
     <div class="content">
         <h1 class="header">{{ title }}</h1>
         {% block content %}{% endblock %}
