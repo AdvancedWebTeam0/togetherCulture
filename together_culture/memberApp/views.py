@@ -16,19 +16,25 @@ def index(request):
     return HttpResponse("Hello, world. This is the index for members.")
 
 def memberdashBoard(request):
-    return render(request, 'memberDashboard.html')
+    title = 'Member Dashboard'
+    return render(request, 'memberDashboard.html', {'title': title, 'nav_items': nav_items})
 
 def events(request):
-    return render(request, 'events.html')
+    title = 'Events'
+    return render(request, 'events.html', {'title': title, 'nav_items': nav_items})
 
 def benefits(request):
-    return render(request, 'benefits.html')
+    title = 'Benefits'
+    return render(request, 'benefits.html', {'title': title, 'nav_items': nav_items})
 
 def digitalContent(request):
-    return render(request, 'digitalContent.html')
+    title = 'Digital Content'
+    return render(request, 'digitalContent.html', {'title': title, 'nav_items': nav_items})
 
 def profile(request):
-    return render(request, 'profile.html')
+    title = 'Profile'
+    return render(request, 'profile.html', {'title': title, 'nav_items': nav_items})
 
 def settings(request):
-    return render(request, 'settings.html')
+    title = 'Settings'
+    return render(request, 'settings.html', {'title': title, 'nav_items': nav_items})
