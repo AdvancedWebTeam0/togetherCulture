@@ -6,17 +6,19 @@ from django.http import HttpResponse
 
 nav_items = [
         {'name': '📊 Insights', 'url': 'insights', 'submenu': None},
-        {'name': '📅 Events', 'url': 'events', 'submenu': None},
+        {'name': '📅 Manage Events', 'url': 'manage-events', 'submenu': None},
         {'name': '👥 Manage Members', 'url': '#', 'submenu': [
-            {'name': '➕ Add Member', 'url': 'add-member'},
-            {'name': '📋 Members List', 'url': 'manage-member'},
+            {'name': '➕ Add Member', 'url': 'add-members'},
+            {'name': '📋 Members List', 'url': 'manage-members'},
         ]},
-        {'name': '🎟 Membership', 'url': 'membership', 'submenu': None},
+        {'name': '🎟 Membership', 'url': 'manage-membership', 'submenu': None},
     ]
     
 
 def index(request):
-    return HttpResponse("Hello, world. This is the index for admin.")
+    # define the title for page
+    title = "Admin Dashboard"
+    return render(request, 'admin_dashboard.html', {'title': title, 'nav_items': nav_items})
 
 def insights(request):
     # define the title for page
