@@ -23,7 +23,7 @@ def insights(request):
     title = "Insights"
     return render(request, 'insights.html', {'title': title, 'nav_items': nav_items})
 
-def events(request):
+def manage_events(request):
     # define the title for page
     title = "Manage Events"
     return render(request, 'manage_events.html', {'title': title, 'nav_items': nav_items})
