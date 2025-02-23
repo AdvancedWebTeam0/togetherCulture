@@ -14,13 +14,13 @@
     <nav class="sidebar">
         {% for item in nav_items %}
         {% if not item.submenu %}
-        <a href="{% url item.url %}">{{ item.name }}</a>
+        <a href="{{ item.url }}">{{ item.name }}</a>
         {% endif %}
         {% if item.submenu %}
         <a onclick="toggleSubMenu()">{{ item.name }}<span id="triangleIcon" class="triangle"></span></a>
         <div class="submenu" id="subitemNav">
             {% for subitem in item.submenu %}
-            <a href="{% url subitem.url %}">{{ subitem.name }}</a>
+            <a href="{{ subitem.url }}">{{ subitem.name }}</a>
             {% endfor %}
         </div>
         {% endif %}
