@@ -4,13 +4,13 @@ from django.http import HttpResponse
 # Create your views here.
 
 nav_items = [
-        {'name': '📊 Insights', 'url': '/home/', 'submenu': None},
-        {'name': '📅 Events', 'url': '/about/', 'submenu': None},
-        {'name': '👥 Manage Members', 'url': '#', 'submenu': [
-            {'name': '➕ Add Member', 'url': '/services/web-design/'},
-            {'name': '📋 Members List', 'url': '/services/seo/'},
+        {'name': '📊 Insights', 'url': 'insights', 'submenu': None},
+        {'name': '📅 Events', 'url': 'events', 'submenu': None},
+        {'name': '👥 Manage Members', 'url': 'manage-member/', 'submenu': [
+            {'name': '➕ Add Member', 'url': 'add-member'},
+            {'name': '📋 Members List', 'url': 'members-list'},
         ]},
-        {'name': '🎟 Membership', 'url': '/contact/', 'submenu': None},
+        {'name': '🎟 Membership', 'url': 'membership/', 'submenu': None},
     ]
     
 
