@@ -21,3 +21,18 @@ def insights(request):
     # define the title for page
     title = "Insights"
     return render(request, 'insights.html', {'title': title, 'nav_items': nav_items})
+
+def events(request):
+    # define the title for page
+    title = "Manage Events"
+    return render(request, 'manage_events.html', {'title': title, 'nav_items': nav_items})
+
+def add_members(request):
+    # define the title for page
+    title = "Add Members"
+    return render(request, 'add_members.html', {'title': title, 'nav_items': nav_items})
+
+def manage_members(request):
+    # define the title for page
+    title = "Manage Members"
+    return render(request, 'manage_members.html', {'title': title, 'nav_items': nav_items})
