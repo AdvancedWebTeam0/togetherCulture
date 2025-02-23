@@ -1,6 +1,6 @@
-{% include 'navigationBar.html' %}  
+{% extends 'base.html' %}
 
-<div class="content">
+{% block content %}
     <div class="header">📚 Digital Content</div>
     <h1>Access Exclusive Content</h1>
     <p>Unlock premium digital content and resources with your membership.</p>
@@ -13,3 +13,4 @@
         </div>
         {% endfor %}
     </div>
+    {% endblock %}

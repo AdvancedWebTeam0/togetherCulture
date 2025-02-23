@@ -1,7 +1,7 @@
-{% include 'navigationBar.html' %}  
+{% extends 'base.html' %}
 
 <!--you can remove below code-->
-<div class="content">
+{% block content %}
     <div class="header">📅 Events</div>
     <h1>Upcoming Events</h1>
     <p>Check out the latest events and RSVP to save your spot!</p>
@@ -16,3 +16,4 @@
         </div>
         {% endfor %}
     </div>
+    {% endblock %}
