@@ -5,6 +5,8 @@ Together Culture website
 
 Use snake_case for filenames, variables and functions.
 
+Use kebab-case for url and url names. Should have / at the end of url.
+
 # Useful info
 
 # Docker
