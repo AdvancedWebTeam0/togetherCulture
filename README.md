@@ -3,7 +3,7 @@ Together Culture website
 
 # Coding guideline
 
-Use camelCase for filenames.
+Use snake_case for filenames, variables and functions.
 
 # Useful info
 
