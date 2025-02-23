@@ -34,8 +34,8 @@ def validateUser(request):
 def insertUser(request):
     return render(request, 'Register.html')
 
-def dashBoard(request):
-    return render(request, 'Dashboard.html')
+def adminDashboard(request):
+    return render(request, 'adminDashboard.html')
 
 def manage_member(request):
     return render(request, 'manage_member.html')
