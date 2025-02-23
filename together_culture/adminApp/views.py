@@ -5,6 +5,7 @@ from django.http import HttpResponse
 # the url should be the name that is used in urls.py
 
 nav_items = [
+        {'name': 'Dashboard', 'url': 'admin-dashboard', 'submenu': None},
         {'name': '📊 Insights', 'url': 'insights', 'submenu': None},
         {'name': '📅 Manage Events', 'url': 'manage-events', 'submenu': None},
         {'name': '👥 Manage Members', 'url': '#', 'submenu': [
@@ -15,7 +16,7 @@ nav_items = [
     ]
     
 
-def index(request):
+def admin_dashboard(request):
     # define the title for page
     title = "Admin Dashboard"
     return render(request, 'admin_dashboard.html', {'title': title, 'nav_items': nav_items})

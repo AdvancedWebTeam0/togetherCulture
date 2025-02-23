@@ -12,9 +12,6 @@ nav_items = [
         {'name': '⚙️ Settings', 'url': 'settings', 'submenu': None},
     ]
 
-def index(request):
-    return HttpResponse("Hello, world. This is the index for members.")
-
 def member_dashboard(request):
     title = 'Member Dashboard'
     return render(request, 'member_dashboard.html', {'title': title, 'nav_items': nav_items})
