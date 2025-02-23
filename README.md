@@ -1,6 +1,12 @@
 # togetherCulture
 Together Culture website
 
+# Coding guideline
+
+Use camelCase for filenames.
+
+# Useful info
+
 # Docker
 
 In order to dockerize this project, download the 3 files Dockerfile, compose.yml and requirements.txt from Teams. Put the files into the root directory of the project (the folder that contains manage.py). Then run the following command. Note that below code is just for starting the container. See the database section for how to connect to database.
