@@ -34,7 +34,7 @@ def validate_user(request):
 def insert_user(request):
     return render(request, 'register.html')
 
-def admin_dashboard(request):
+def dashboard(request):
     return render(request, 'admin_dashboard.html')
 
 def manage_member(request):
