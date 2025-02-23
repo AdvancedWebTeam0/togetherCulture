@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <script src="{% static 'layout.js' %}"></script>
+</head>
+
+<body>
+    <nav class="sidebar">
+        {% for item in nav_items %}
+        {% if not item.submenu %}
+        <a href="{% url item.url %}">{{ item.name }}</a>
+        {% endif %}
+        {% if item.submenu %}
+        <a onclick="toggleSubMenu()">{{ item.name }}<span id="triangleIcon" class="triangle"></span></a>
+        <div class="submenu" id="subitemNav">
+            {% for subitem in item.submenu %}
+            <a href="{% url subitem.url %}">{{ subitem.name }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endfor %}
+        <div class="logout-container">
+            <a href="{% url 'logout' %}" class="logout-button">🚪 Logout</a>
+        </div>
+    </nav>
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+
+</html>
