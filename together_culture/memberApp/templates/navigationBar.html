@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Members Dashboard</title>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f9;
+        }
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(to bottom, #3a1c71, #d76d77, #ffaf7b);
+            color: white;
+            height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            transition: 0.3s;
+            font-size: 18px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            width: 90%;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+        .content {
+            flex-grow: 1;
+            background: #ffffff;
+            padding: 50px;
+            text-align: center;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            margin: 20px;
+        }
+        .header {
+            width: 100%;
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 26px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <a href="{% url 'memberDashboard' %}">🎟 My Membership</a>
+        <a href="{% url 'benefits' %}">🎁 My Benefits</a>
+        <a href="{% url 'events' %}">📅 Events</a>
+        <a href="{% url 'digitalContent' %}">📚 Digital Content</a>
+        <a href="{% url 'profile' %}">👤 My Profile</a>
+        <a href="{% url 'settings' %}">⚙️ Settings</a>
+    </div>
+</body>
+</html>

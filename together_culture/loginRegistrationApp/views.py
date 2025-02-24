@@ -8,12 +8,12 @@ from django.contrib.auth.hashers import make_password, check_password
 logger = logging.getLogger('landing')
 
 def login(request):
-    return render(request, 'login.html')
+    return render(request, 'Login.html')
 
 def register(request):
-    return render(request, 'register.html')
+    return render(request, 'Register.html')
 
-def validate_user(request):
+def validateUser(request):
     email = request.GET['email']
     password = request.GET['password']
     try:
@@ -31,11 +31,11 @@ def validate_user(request):
         logger.error(f'Unexpected error during login: {e}')
         return JsonResponse({'statusCode': 500, 'message': f'Unexpected error during login: {e}'}, status=500)
 
-def insert_user(request):
-    return render(request, 'register.html')
+def insertUser(request):
+    return render(request, 'Register.html')
 
-def dashboard(request):
-    return render(request, 'admin_dashboard.html')
+def dashBoard(request):
+    return render(request, 'Dashboard.html')
 
 def manage_member(request):
     return render(request, 'manage_member.html')
@@ -44,4 +44,4 @@ def membership(request):
     return render(request, 'membership.html')
 
 def logout(request):
-    return render(request, 'login.html')
+    return render(request, 'Login.html')

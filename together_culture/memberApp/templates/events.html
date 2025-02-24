@@ -1,18 +1,18 @@
-{% extends 'base.html' %}
+{% include 'navigationBar.html' %}  
 
 <!--you can remove below code-->
-{% block content %}
-<h1>Upcoming Events</h1>
-<p>Check out the latest events and RSVP to save your spot!</p>
-<div class="events">
-    {% for event in events %}
-    <div class="event">
-        <h2>{{ event.title }}</h2>
-        <p>{{ event.date }}</p>
-        <p>{{ event.location }}</p>
-        <p>{{ event.description }}</p>
-        <button>RSVP</button>
+<div class="content">
+    <div class="header">📅 Events</div>
+    <h1>Upcoming Events</h1>
+    <p>Check out the latest events and RSVP to save your spot!</p>
+    <div class="events">
+        {% for event in events %}
+        <div class="event">
+            <h2>{{ event.title }}</h2>
+            <p>{{ event.date }}</p>
+            <p>{{ event.location }}</p>
+            <p>{{ event.description }}</p>
+            <button>RSVP</button>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
-{% endblock %}

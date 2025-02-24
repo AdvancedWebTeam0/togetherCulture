@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <style>
+        body {
+            display: flex;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f9;
+            overflow: hidden;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(to bottom, #3a1c71, #d76d77, #ffaf7b);
+            color: white;
+            height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .sidebar a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            border-radius: 8px;
+            transition: 0.3s;
+            font-size: 18px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            width: 90%;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+        .sidebar a:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+        .submenu {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 10px;
+            padding-top: 5px;
+        }
+        .submenu a {
+            width: 90%;
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 12px;
+            font-size: 16px;
+        }
+        .logout-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-top: 20px;
+        }
+        .logout-button {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            padding: 12px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            text-align: center;
+            width: 90%;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+        }
+        .logout-button:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
+        }
+    </style>
+    <script>
+        function toggleSubMenu() {
+            var submenu = document.getElementById("manageMembersSubMenu");
+            var triangle = document.getElementById("triangleIcon");
+            if (submenu.style.display === "flex") {
+                submenu.style.display = "none";
+                triangle.classList.remove("rotate");
+            } else {
+                submenu.style.display = "flex";
+                triangle.classList.add("rotate");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="sidebar">
+        <div style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+            <a href="{% url 'insights' %}">📊 Insights</a>
+            <a href="{% url 'events' %}">📅 Events</a>
+            <a onclick="toggleSubMenu()">👥 Manage Members <span id="triangleIcon" class="triangle"></span></a>
+            <div class="submenu" id="manageMembersSubMenu">
+                <a href="/add-member/">➕ Add Member</a>
+                <a href="/members-list/">📋 Members List</a>
+            </div>
+            <a href="{% url 'membership' %}">🎟 Membership</a>
+        </div>
+        <div class="logout-container">
+            <a href="{% url 'logout' %}" class="logout-button">🚪 Logout</a>
+        </div>
+    </div>
+</body>
+</html>
