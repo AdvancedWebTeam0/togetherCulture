@@ -10,4 +10,6 @@ urlpatterns = [
     path('digitalContent/', views.digitalContent, name='digitalContent'),
     path('profile/', views.profile, name='profile'),
     path('settings/', views.settings, name='settings'),
+    path('get_interests/', views.getInitialInterests, name='getInitialInterests'),
+    path('saveInitialInterests/', views.saveInitialInterests, name='saveInitialInterests'),
 ]
