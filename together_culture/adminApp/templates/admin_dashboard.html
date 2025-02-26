@@ -1,6 +1,17 @@
 {% extends 'base.html' %}
 
+
+{% block style %}
+{% load static %}
+    <link rel="stylesheet" href="{% static 'css/cards.css' %}">
+{% endblock %}
+
 {% block content %}
 <h1>Welcome to Your Dashboard</h1>
 <p>Manage your insights, events, members, and memberships efficiently with an intuitive interface.</p>
+
+<div class="dashboard-container">
+    {% include 'cards.html' with cards=cards %}
+</div>
+
 {% endblock %}

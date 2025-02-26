@@ -15,11 +15,18 @@ nav_items = [
         {'name': '🎟 Membership', 'url': 'manage-membership', 'submenu': None},
     ]
     
+cards = [
+        {"title": "Total Events", "value": 120, "footer": "Updated 2 hours ago"},
+        {"title": "Active Tags", "value": 45, "footer": "Updated 3 hours ago"},
+        {"title": "Upcoming Events", "value": 15, "footer": "Updated 5 hours ago"}
+    ]
 
 def admin_dashboard(request):
     # define the title for page
     title = "Admin Dashboard"
-    return render(request, 'admin_dashboard.html', {'title': title, 'nav_items': nav_items})
+    return render(request, 'admin_dashboard.html', {'title': title, 
+                                                    'nav_items': nav_items, 
+                                                    'cards': cards})
 
 def insights(request):
     # define the title for page
