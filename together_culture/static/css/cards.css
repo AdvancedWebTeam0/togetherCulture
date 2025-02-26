@@ -15,7 +15,7 @@
 
 .card-container {
     display: flex;
-    gap: 20px;
+    gap: 10px;
     padding: 20px;
     flex-wrap: wrap;
     justify-content: center;
@@ -64,4 +64,93 @@
     font-size: 12px;
     text-align: center;
     color: #6c757d;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 30px;
+}
+
+/* Dashboard Sections Styling */
+.dashboard-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* This allows flexible columns */
+    gap: 20px;  /* Space between sections */
+    margin-top: 20px;
+}
+
+section {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+section h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+section ul {
+    list-style: none;
+}
+
+section ul li {
+    margin-bottom: 10px;
+}
+
+/* Make it responsive */
+@media (max-width: 768px) {
+    .dashboard-sections {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-sections {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Style the chart container */
+.chart-container {
+    position: relative; /* To ensure the canvas element stays within its bounds */
+    width: 100%; /* 100% of the parent container's width */
+    height: 400px; /* Set a specific height for the chart */
+}
+
+/* Make the canvas responsive */
+.chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* Parent container with Flexbox */
+.parent-container {
+    display: flex;
+    gap: 1; /* Space between containers */
+    flex-wrap: wrap; /* Allows the containers to wrap on smaller screens */
+    justify-content: space-between; /* Space between items */
+}
+
+/* Individual containers (items inside the parent) */
+.child-container {
+    width: 40%; /* Adjust width to control how many fit side by side */
+    padding: 1px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Make it responsive */
+@media (max-width: 768px) {
+    .child-container {
+        width: 50%; /* On medium screens, 2 items per row */
+    }
+}
+
+@media (max-width: 480px) {
+    .child-container {
+        width: 100%; /* On mobile screens, 1 item per row */
+    }
 }

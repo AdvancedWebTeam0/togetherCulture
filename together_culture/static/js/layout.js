@@ -10,25 +10,23 @@ function toggleSubMenu() {
     }
 }
 
-// static/js/dashboard.js
-
 document.addEventListener("DOMContentLoaded", function() {
-    // Polling for cards with dynamic card IDs (assuming they follow a similar structure)
-    const cards = document.querySelectorAll('.card');
-    
-    cards.forEach(card => {
-        const cardId = card.getAttribute('id').split('-')[1]; // Extracts card ID (e.g., '1' from 'card-1')
+    // Loop through each card and set up its individual interval
+    document.querySelectorAll('.card').forEach(function(card) {
+        const cardId = card.id.split('-')[1]; // Extract card ID from 'card-1', 'card-2', etc.
+        const interval = card.getAttribute('data-interval');  // Get the interval for this card
 
+        // Set polling for this card with its own interval
         setInterval(function() {
-            fetch(`./update-card/${cardId}/`)  // Dynamic URL based on card ID
+            fetch(`./update-card/${cardId}/`)
                 .then(response => response.json())
                 .then(data => {
                     const cardValueElement = card.querySelector('.card-body .card-value');
                     if (cardValueElement && data.new_value) {
-                        cardValueElement.textContent = data.new_value;  // Update the card value
+                        cardValueElement.textContent = data.new_value;  // Update the card value with new data
                     }
                 })
                 .catch(error => console.error(`Error updating card ${cardId}:`, error));
-        }, 10000);  // Poll every 60 seconds for each card
+        }, parseInt(interval));  // Use the unique interval for this card
     });
 });

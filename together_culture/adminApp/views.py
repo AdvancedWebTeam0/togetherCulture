@@ -16,9 +16,9 @@ nav_items = [
     ]
     
 cards = [
-        {"id": 1, "title": "Total Events", "value": 120, "footer": "Updated 2 hours ago"},
-        {"id": 2, "title": "Active Tags", "value": 45, "footer": "Updated 3 hours ago"},
-        {"id": 3, "title": "Upcoming Events", "value": 15, "footer": "Updated 5 hours ago"}
+        {'id': 1, 'title': 'Card 1', 'value': 100, 'interval': 10000},  # 10 seconds
+        {'id': 2, 'title': 'Card 2', 'value': 200, 'interval': 5000},  
+        {'id': 3, 'title': 'Card 3', 'value': 300, 'interval': 90000},
     ]
 
 def admin_dashboard(request):

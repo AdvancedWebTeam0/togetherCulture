@@ -9,9 +9,53 @@
 {% block content %}
 <h1>Welcome to Your Dashboard</h1>
 <p>Manage your insights, events, members, and memberships efficiently with an intuitive interface.</p>
-
-<div class="dashboard-container">
-    {% include 'cards.html' with cards=cards %}
+<div class="main-content">
+    <section class="cards-container">
+        {% include 'cards.html' with cards=cards %}
+    </section>
 </div>
+
+<div class="main-content">
+    <section class="cards-container">
+        <div class="parent-container">
+            <div class="child-container">
+                <section class="cards-container">
+                   <!-- tags-->
+                    
+                </section>
+            </div>
+            <div class="child-container">
+                <section class="cards-container">
+                    <!-- labels-->
+
+                </section>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="main-content">
+    <section class="chart-container">
+        <canvas id="myChart"></canvas>
+    </section>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['January', 'February', 'March', 'April'],
+            datasets: [{
+                label: 'Sales',
+                data: [12, 19, 3, 5],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        }
+    });
+</script>
 
 {% endblock %}
