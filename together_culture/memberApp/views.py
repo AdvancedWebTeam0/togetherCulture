@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.template import RequestContext
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 # Create your views here.
 
@@ -30,7 +30,8 @@ def getInitialInterests(request):
     return render(request, 'get_interests.html')
 
 def saveInitialInterests(request):
-    return HttpResponse("Request is here")
+    data = {"message": "Success"}  # Ensure this is a dictionary
+    return JsonResponse(data)
 
     email = request.GET['email']
     password = request.GET['password']

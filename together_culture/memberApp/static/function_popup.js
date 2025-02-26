@@ -1,4 +1,8 @@
 function handleInitialInterests(event){
+    
+
+
+
     print("Here!!!");
     event.preventDefault();
     var checkboxes = document.getElementsByName("interest_checkbox");
@@ -10,7 +14,7 @@ function handleInitialInterests(event){
         }
     }
 
-    const url = `../saveInitialInterests`;
+    const url = `../saveInitialInterests/`;
     /*const url = `../saveInitialInterests/?interests=${encodeURIComponent(checkboxesChecked)}`;*/
 
     fetch(url, {

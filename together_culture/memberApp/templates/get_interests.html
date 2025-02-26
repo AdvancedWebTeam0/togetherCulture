@@ -6,6 +6,35 @@
     <title>Enter Initial Interests</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'pop_up_style.css' %}">
+    <script>
+        function getCSRFToken() {
+            return document.querySelector('[name=csrfmiddlewaretoken]').value;
+        }
+
+        function handleInitialInterests(event){
+            event.preventDefault();
+            var checkboxes = document.getElementsByName("interest_checkbox");
+            var checkboxesChecked = [];
+
+            for (var i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    checkboxesChecked.push(checkboxes[i]);
+                }
+            }
+
+            const url = `../saveInitialInterests/`;
+            /*const url = `../saveInitialInterests/?interests=${encodeURIComponent(checkboxesChecked)}`;*/
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCSRFToken(),
+                },
+                body: JSON.stringify({ key: 'value' })
+            })
+        }
+    </script>
 </head>
 <body>
     <div class="popup-form">
@@ -31,7 +60,7 @@
         </form>
     </div>
 
-    {% load static %}
-    <script src="{% static 'function_popup.js' %}"></script>
+    <!--{% load static %}
+    <script src="{% static 'function_popup.js' %}"></script>-->
 </body>
 </html>
