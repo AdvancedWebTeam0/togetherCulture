@@ -1,16 +1,16 @@
-{% include 'navigationBar.html' %}
+{% extends 'base.html' %}
 
-<div class="content">
-    <div class="header">🎁 My Benefits</div>
-    <h1>Member Benefits</h1>
-    <p>Unlock exclusive benefits and discounts with your membership.</p>
-    <div class="benefits">
-        {% for benefit in benefits %}
-        <div class="benefit">
-            <h2>{{ benefit.title }}</h2>
-            <p>{{ benefit.description }}</p>
-            <p>{{ benefit.discount }}</p>
-            <button>Redeem</button>
-        </div>
-        {% endfor %}
+{% block content %}
+<h1>Member Benefits</h1>
+<p>Unlock exclusive benefits and discounts with your membership.</p>
+<div class="benefits">
+    {% for benefit in benefits %}
+    <div class="benefit">
+        <h2>{{ benefit.title }}</h2>
+        <p>{{ benefit.description }}</p>
+        <p>{{ benefit.discount }}</p>
+        <button>Redeem</button>
     </div>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,173 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #e6e6e6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header styles */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    background-color: white;
+}
+
+.logo-container {
+    width: 200px;
+    height: 80px;
+    background-color: #d74141; /* Red logo area */
+}
+
+.main-navigation ul {
+    display: flex;
+    list-style: none;
+}
+
+.main-navigation li {
+    margin: 0 15px;
+}
+
+.main-navigation a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.auth-buttons {
+    display: flex;
+}
+
+.btn {
+    padding: 10px 20px;
+    margin-left: 10px;
+    background-color: #aaa;
+    color: white;
+    text-decoration: none;
+    border-radius: 3px;
+}
+
+/* Main content styles */
+main {
+    background-color: white;
+    border: 2px solid #4b83db; /* Blue border */
+    margin: 20px 0;
+}
+
+/* Events carousel section */
+.events-carousel {
+    padding: 40px;
+    text-align: center;
+}
+
+.events-carousel h2 {
+    margin-bottom: 40px;
+    font-size: 24px;
+}
+
+.carousel-container {
+    position: relative;
+    height: 200px; /* Adjust as needed */
+}
+
+.carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #ddd;
+    border: none;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.carousel-nav.prev {
+    left: 0;
+}
+
+.carousel-nav.next {
+    right: 0;
+}
+
+/* Info boxes section */
+.info-boxes {
+    display: flex;
+    border-top: 1px solid #ddd;
+}
+
+.info-box {
+    width: 50%;
+    padding: 40px;
+    text-align: center;
+}
+
+.info-box:first-child {
+    border-right: 1px solid #ddd;
+}
+
+.info-box h2 {
+    margin-bottom: 20px;
+}
+
+/* Footer styles */
+footer {
+    background-color: #aaa;
+    padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.footer-links {
+    display: flex;
+    width: 70%;
+}
+
+.footer-column {
+    margin-right: 40px;
+}
+
+.footer-column ul {
+    list-style: none;
+}
+
+.footer-column a {
+    text-decoration: none;
+    color: #333;
+    line-height: 1.8;
+}
+
+.footer-social {
+    display: flex;
+    align-items: center;
+}
+
+.social-icons {
+    display: flex;
+    margin-left: 10px;
+}
+
+.social-icons a {
+    margin: 0 5px;
+    color: #333;
+    font-size: 20px;
+}
+
+.footer-tagline {
+    width: 100%;
+    text-align: right;
+    margin-top: 20px;
+    font-style: italic;
+}
