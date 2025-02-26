@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 # Create your views here.
 # the url should be the name that is used in urls.py
@@ -16,9 +16,9 @@ nav_items = [
     ]
     
 cards = [
-        {"title": "Total Events", "value": 120, "footer": "Updated 2 hours ago"},
-        {"title": "Active Tags", "value": 45, "footer": "Updated 3 hours ago"},
-        {"title": "Upcoming Events", "value": 15, "footer": "Updated 5 hours ago"}
+        {"id": 1, "title": "Total Events", "value": 120, "footer": "Updated 2 hours ago"},
+        {"id": 2, "title": "Active Tags", "value": 45, "footer": "Updated 3 hours ago"},
+        {"id": 3, "title": "Upcoming Events", "value": 15, "footer": "Updated 5 hours ago"}
     ]
 
 def admin_dashboard(request):
@@ -27,6 +27,20 @@ def admin_dashboard(request):
     return render(request, 'admin_dashboard.html', {'title': title, 
                                                     'nav_items': nav_items, 
                                                     'cards': cards})
+    
+def update_card(request, card_id):
+    # Simulate fetching the updated value for the card from the database
+    if card_id == '1':
+        new_value = 130  # Updated value for card 1
+    elif card_id == '2':
+        new_value = 50   # Updated value for card 2
+    elif card_id == '3':
+        new_value = 200   # Updated value for card 3
+    else:
+        return JsonResponse({'error': 'Invalid card ID'}, status=400)
+    
+    # Return the updated value for the card
+    return JsonResponse({'new_value': new_value})
 
 def insights(request):
     # define the title for page
