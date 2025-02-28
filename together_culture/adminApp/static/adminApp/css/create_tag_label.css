@@ -1,0 +1,78 @@
+/* Add styles for the add tag button */
+.add-tag-btn {
+    font-size: 24px;
+    background-color: #4CAF50; /* Green */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-block;
+    margin: 20px 0;
+}
+
+.add-tag-btn:hover {
+    background-color: #45a049;
+}
+
+/* Style the new tag form */
+#new-tag-form {
+    margin-top: 20px;
+}
+
+#new-tag-form input {
+    padding: 5px;
+    margin-right: 10px;
+}
+
+#new-tag-form button {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#new-tag-form button:hover {
+    background-color: #45a049;
+}
+
+/* afsdfa */
+
+.add-label-btn {
+    font-size: 24px;
+    background-color: #4CAF50; /* Green */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: inline-block;
+    margin: 20px 0;
+}
+
+.add-label-btn:hover {
+    background-color: #45a049;
+}
+
+/* Style the new tag form */
+#new-label-form {
+    margin-top: 20px;
+}
+
+#new-label-form input {
+    padding: 5px;
+    margin-right: 10px;
+}
+
+#new-label-form button {
+    padding: 5px 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+#new-label-form button:hover {
+    background-color: #45a049;
+}

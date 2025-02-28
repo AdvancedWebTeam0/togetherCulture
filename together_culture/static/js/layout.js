@@ -10,14 +10,14 @@ function toggleSubMenu() {
     }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
     // Loop through each card and set up its individual interval
-    document.querySelectorAll('.card').forEach(function(card) {
+    document.querySelectorAll('.card').forEach(function (card) {
         const cardId = card.id.split('-')[1]; // Extract card ID from 'card-1', 'card-2', etc.
         const interval = card.getAttribute('data-interval');  // Get the interval for this card
 
         // Set polling for this card with its own interval
-        setInterval(function() {
+        setInterval(function () {
             fetch(`./update-card/${cardId}/`)
                 .then(response => response.json())
                 .then(data => {

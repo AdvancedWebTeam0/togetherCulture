@@ -10,4 +10,7 @@ urlpatterns = [
     path('add-members/', views.add_members, name='add-members'),
     path('manage-members/', views.manage_members, name='manage-members'),
     path('manage-membership/', views.manage_membership, name='manage-membership'),
+    path('save-tag/', views.save_tag, name='save-tag'),
+    path('save-label/', views.save_label, name='save-label'),
+    path('event-search/', views.event_search, name='event_search'),
 ]

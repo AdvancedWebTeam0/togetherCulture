@@ -4,30 +4,66 @@
 {% block style %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/cards.css' %}">
+<link rel="stylesheet" href="{% static 'css/charts.css' %}">
+<link rel="stylesheet" href="{% static 'adminApp/css/create_tag_label.css' %}">
+<link rel="stylesheet" href="{% static 'adminApp/css/search.css' %}">
 {% endblock %}
-
+{% block js %}
+<script src="{% static 'adminApp/js/event_search.js' %}"></script>
+<script src="{% static 'adminApp/js/scripts.js' %}"></script>
+{% endblock %}
 {% block content %}
 <h1>Welcome to Your Dashboard</h1>
 <p>Manage your insights, events, members, and memberships efficiently with an intuitive interface.</p>
+
+<!-- Cards for information section -->
 <div class="main-content">
     <section class="cards-container">
         {% include 'cards.html' with cards=cards %}
     </section>
 </div>
 
+<!-- Creating tags and labels section -->
 <div class="main-content">
     <section class="cards-container">
         <div class="parent-container">
             <div class="child-container">
                 <section class="cards-container">
-                   <!-- tags-->
-                    
+                    <!-- tags-->
+                    <h2>Create Tag</h2>
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Button to trigger the tag creation form -->
+                        <button type="button" class="add-tag-btn" id="add-tag-btn">+</button>
+
+                        <!-- Hidden tag creation form -->
+                        <div id="new-tag-form" style="display: none;">
+                            <label for="new-tag-name">Tag Name:</label>
+                            <input type="text" id="new-tag-name" name="new_tag_name" placeholder="Enter new tag name">
+                            <button type="button" id="save-new-tag-btn">Save Tag</button>
+                        </div>
+                    </form>
                 </section>
             </div>
             <div class="child-container">
                 <section class="cards-container">
-                    <!-- labels-->
+                    <!-- tags-->
+                    <h2>Create Label</h2>
+                    <form method="post">
+                        {% csrf_token %}
 
+                        <!-- Button to trigger the tag creation form -->
+                        <button type="button" class="add-label-btn" id="add-label-btn">+</button>
+
+                        <!-- Hidden tag creation form -->
+                        <div id="new-label-form" style="display: none;">
+                            <label for="new-label-name">Label Name:</label>
+                            <input type="text" id="new-label-name" name="new_label_name"
+                                placeholder="Enter new label name">
+                            <button type="button" id="save-new-label-btn">Save Label</button>
+                        </div>
+                    </form>
                 </section>
             </div>
         </div>
@@ -35,27 +71,50 @@
 </div>
 
 <div class="main-content">
-    <section class="chart-container">
-        <canvas id="myChart"></canvas>
+    <h2>Search for events using filters</h2>
+    <section>
+        <div class="parent-container">
+            <div class="child-container">
+                <section>
+                    <form method="get" id="event-search-form">
+                        <h3>Select Tags</h3>
+                        <select name="tags" id="tags" multiple style="overflow-y: scroll;">
+                            {% for tag in tags %}
+                            <option value="{{ tag.id }}">{{ tag.eventTagName }}</option>
+                            {% empty %}
+                            <option>No tags available</option>
+                            {% endfor %}
+                        </select>
+                </section>
+            </div>
+
+            <div class="child-container">
+                <section>
+                    <h3>Select Labels</h3>
+
+                    <select name="labels" id="labels" multiple style="overflow-y: scroll;">
+                        {% for label in labels %}
+                        <option value="{{ label.id }}">{{ label.eventLabelName }}</option>
+                        {% empty %}
+                        <option>No labels available</option>
+                        {% endfor %}
+                    </select>
+                </section>
+            </div>
+        </div>
+        <button type="submit">Search</button>
+        </form>
+        <div id="event-results"></div>
     </section>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var salesChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['January', 'February', 'March', 'April'],
-            datasets: [{
-                label: 'Sales',
-                data: [12, 19, 3, 5],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        }
-    });
-</script>
+<div class="main-content">
+    <section class="chart-container">
+        <canvas id="chart"></canvas>
+    </section>
+</div>
 
+<!-- charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'adminApp/js/charts.js' %}"></script>
 {% endblock %}

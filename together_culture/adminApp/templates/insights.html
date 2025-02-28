@@ -2,59 +2,23 @@
 
 {% block style %}
 {% load static %}
-<link rel="stylesheet" href="{% static 'css/cards.css' %}">
+<link rel="stylesheet" href="{% static 'css/charts.css' %}">
+{% endblock %}
+{% block js %}
 {% endblock %}
 
 {% block content %}
 <h1>Welcome to Insights</h1>
 <p>Analyze data and track your progress.</p>
-<div class="main-content">
-    <section class="chart-container">
-        <canvas id="myChart1"></canvas>
-    </section>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    var ctx = document.getElementById('myChart1').getContext('2d');
-    var salesChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['January', 'February', 'March', 'April'],
-            datasets: [{
-                label: 'Sales',
-                data: [12, 19, 3, 5],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        }
-    });
-</script>
-
 
 <div class="main-content">
     <section class="chart-container">
-        <canvas id="myChart2"></canvas>
+        <canvas id="chart"></canvas>
     </section>
 </div>
 
+<!-- charts -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    var ctx = document.getElementById('myChart2').getContext('2d');
-    var salesChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: ['January', 'February'],
-            datasets: [{
-                label: 'Sales',
-                data: [12, 19, 3, 5],
-                backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        }
-    });
-</script>
+<script src="{% static 'adminApp/js/charts.js' %}"></script>
 
 {% endblock %}
