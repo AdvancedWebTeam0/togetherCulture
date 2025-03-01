@@ -112,7 +112,6 @@ body {
     transform: scale(1.05);
 }
 
-/* Dashboard Sections Styling */
 .dashboard-sections {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* This allows flexible columns */

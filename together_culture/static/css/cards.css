@@ -22,13 +22,13 @@
     overflow: visible;
 }
 
-/* Card styling */
 .card {
     background-color: #fff;
     position: relative;
     z-index: 1;
     border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);  /* More pronounced shadow */    width: 300px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    width: 300px;
     overflow: hidden;
     transition: transform 0.3s ease-in-out;
 }

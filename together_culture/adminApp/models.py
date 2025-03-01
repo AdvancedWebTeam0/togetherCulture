@@ -5,7 +5,7 @@ from django.db import models
 
 class EventTag(models.Model):
     eventTagName = models.CharField(max_length=100, unique=True)
-    required = False,  # This makes the field optional
+    required = models.BooleanField(default=False)
 
     def __str__(self):
         return self.eventTagName
@@ -16,7 +16,7 @@ class EventTag(models.Model):
 
 class EventLabel(models.Model):
     eventLabelName = models.CharField(max_length=100, unique=True)
-    required = False,  # This makes the field optional
+    required = models.BooleanField(default=False)
 
     def __str__(self):
         return self.eventLabelName

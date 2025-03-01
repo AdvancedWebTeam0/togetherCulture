@@ -1,4 +1,3 @@
-/* Add styles for the add tag button */
 .add-tag-btn {
     font-size: 24px;
     background-color: #4CAF50; /* Green */
@@ -15,7 +14,6 @@
     background-color: #45a049;
 }
 
-/* Style the new tag form */
 #new-tag-form {
     margin-top: 20px;
 }
@@ -37,8 +35,6 @@
     background-color: #45a049;
 }
 
-/* afsdfa */
-
 .add-label-btn {
     font-size: 24px;
     background-color: #4CAF50; /* Green */
@@ -55,7 +51,6 @@
     background-color: #45a049;
 }
 
-/* Style the new tag form */
 #new-label-form {
     margin-top: 20px;
 }

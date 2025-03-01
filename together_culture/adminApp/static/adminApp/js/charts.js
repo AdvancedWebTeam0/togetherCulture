@@ -1,5 +1,3 @@
-// charts.js
-
 // Get the context of the canvas element we want to use
 var ctx = document.getElementById('chart').getContext('2d');
 
