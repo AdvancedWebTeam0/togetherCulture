@@ -1,5 +1,7 @@
 from django.db import models
 import uuid
+from adminApp.models import EventTag, EventLabel
+
 # Create your models here.
 
 
@@ -36,6 +38,8 @@ class Events(models.Model):
     numberOfAttenders = models.IntegerField(auto_created=0)
     shortDescription = models.CharField(max_length=50)
     longDescription = models.CharField(max_length=500)
+    tags = models.ManyToManyField(EventTag, blank=True, related_name="events")
+    labels = models.ManyToManyField(EventLabel, blank=True, related_name="events")
 
     class EventType(models.TextChoices):
         HAPPENING = "HA", "Happening"

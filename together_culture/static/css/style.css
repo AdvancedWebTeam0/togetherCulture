@@ -111,3 +111,80 @@ body {
     background-color: rgba(255, 255, 255, 0.4);
     transform: scale(1.05);
 }
+
+.dashboard-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* This allows flexible columns */
+    gap: 20px;  /* Space between sections */
+    margin-top: 20px;
+}
+
+section {
+    position: relative;
+    background-color: white;
+    padding: 20px;
+    border: 2px solid #ddd;  /* Temporary border for debugging */
+    border-radius: 8px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Stronger shadow for visibility */
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 30px;
+}
+
+section h2 {
+    font-size: 22px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+section ul {
+    list-style: none;
+}
+
+section ul li {
+    margin-bottom: 10px;
+}
+
+/* Make it responsive */
+@media (max-width: 768px) {
+    .dashboard-sections {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-sections {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Parent container with Flexbox */
+.parent-container {
+    display: flex;
+    gap: 1; /* Space between containers */
+    flex-wrap: wrap; /* Allows the containers to wrap on smaller screens */
+    justify-content: space-between; /* Space between items */
+}
+
+/* Individual containers (items inside the parent) */
+.child-container {
+    width: 40%; /* Adjust width to control how many fit side by side */
+    padding: 1px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Make it responsive */
+@media (max-width: 768px) {
+    .child-container {
+        width: 50%; /* On medium screens, 2 items per row */
+    }
+}
+
+@media (max-width: 480px) {
+    .child-container {
+        width: 100%; /* On mobile screens, 1 item per row */
+    }
+}

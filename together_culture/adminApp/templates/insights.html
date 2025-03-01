@@ -1,6 +1,24 @@
 {% extends 'base.html' %}
 
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/charts.css' %}">
+{% endblock %}
+{% block js %}
+{% endblock %}
+
 {% block content %}
 <h1>Welcome to Insights</h1>
 <p>Analyze data and track your progress.</p>
+
+<div class="main-content">
+    <section class="chart-container">
+        <canvas id="chart"></canvas>
+    </section>
+</div>
+
+<!-- charts -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'adminApp/js/charts.js' %}"></script>
+
 {% endblock %}
