@@ -1,7 +1,9 @@
+from loginRegistrationApp.models import Users, UserTypes
+from loginRegistrationApp.models import Users
 from django.test import TestCase, Client
 import json
 from django.http import JsonResponse
-from loginRegistrationApp.models import Events
+from loginRegistrationApp.models import Events, Users
 from django.urls import reverse
 from django.test import TestCase
 from .models import EventTag, EventLabel
@@ -10,6 +12,7 @@ import json
 from django.utils import timezone
 from datetime import time
 from django.contrib.auth.models import User
+
 
 class EventTagModelTest(TestCase):
     def test_create_event_tag(self):
@@ -54,15 +57,6 @@ class EventLabelModelTest(TestCase):
 
 
 class ViewTests(TestCase):
-    def setUp(self):
-        # Create test data for EventTag and EventLabel
-        self.tag1 = EventTag.objects.create(eventTagName="Music")
-        self.tag2 = EventTag.objects.create(eventTagName="Dance")
-        self.label1 = EventLabel.objects.create(eventLabelName="VIP")
-        self.label2 = EventLabel.objects.create(eventLabelName="General")
-
-        # Set up the test client
-        self.client = Client()
 
     def test_admin_dashboard_view(self):
         # Test access to admin dashboard
@@ -72,7 +66,7 @@ class ViewTests(TestCase):
         self.assertIn('tags', response.context)
         self.assertIn('labels', response.context)
         self.assertIn('cards', response.context)
-        
+
     def test_admin_dashboard_view_requires_login(self):
         response = self.client.get(reverse('admin-dashboard'))
         self.assertEqual(response.status_code, 302)  # Redirect to login page
@@ -84,72 +78,37 @@ class ViewTests(TestCase):
         response = self.client.get(reverse('insights'))
         self.assertEqual(response.status_code, 200)
 
-    def test_update_card_view_valid(self):
-        # Test valid card_id
-        response = self.client.get(reverse('update-card', args=[1]))
 
+class InsightsViewTest(TestCase):
+
+    def test_insights_view(self):
+        response = self.client.get(reverse('insights'))
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content.decode(), '{"new_value": 130}')
+        self.assertTemplateUsed(response, 'insights.html')
 
-    def test_update_card_view_invalid(self):
-        # Test invalid card_id
-        response = self.client.get(reverse('update-card', args=['invalid']))
-        self.assertEqual(response.status_code, 400)
-        self.assertJSONEqual(response.content.decode(),
-                             '{"error": "Invalid card ID"}')
+    def test_insights_view_requires_login(self):
+        response = self.client.get(reverse('insights'))
+        self.assertEqual(response.status_code, 302)  # Redirect to login page
 
-    def test_update_card_view_non_existent(self):
-        response = self.client.get(reverse('update-card', args=[999]))
-        self.assertEqual(response.status_code, 400)
-        self.assertJSONEqual(response.content.decode(),
-                             '{"error": "Invalid card ID"}')
-
-    def test_save_tag_view_valid(self):
-        # Test valid POST request to save a tag
-        response = self.client.post(reverse('save-tag'),
-                                    data=json.dumps({'tag_name': 'Festival'}),
-                                    content_type='application/json')
+    def test_insights_view_authenticated(self):
+        user = User.objects.create_user(
+            username='testuser', password='testpass')
+        self.client.login(username='testuser', password='testpass')
+        response = self.client.get(reverse('insights'))
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content.decode(),
-                             '{"success": true, "tag": "Festival"}')
-        self.assertEqual(EventTag.objects.count(), 3)  # Ensure tag was created
 
-    def test_save_tag_view_invalid(self):
-        # Test POST with missing tag name
-        response = self.client.post(reverse('save-tag'),
-                                    data=json.dumps({}),
-                                    content_type='application/json')
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content.decode(
-        ), '{"success": false, "error": "No tag name provided"}')
 
-    def test_save_label_view_valid(self):
-        # Test valid POST request to save a label
-        response = self.client.post(reverse('save-label'),
-                                    data=json.dumps({'label_name': 'Premium'}),
-                                    content_type='application/json')
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content.decode(),
-                             '{"success": true, "label": "Premium"}')
-        # Ensure label was created
-        self.assertEqual(EventLabel.objects.count(), 3)
+class EventSearchViewTest(TestCase):
 
-    def test_save_label_view_invalid(self):
-        # Test POST with missing label name
-        response = self.client.post(reverse('save-label'),
-                                    data=json.dumps({}),
-                                    content_type='application/json')
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content.decode(
-        ), '{"success": false, "error": "No label name provided"}')
+    def setUp(self):
+        # Create test data for EventTag and EventLabel
+        self.tag1 = EventTag.objects.create(eventTagName="Music")
+        self.tag2 = EventTag.objects.create(eventTagName="Dance")
+        self.label1 = EventLabel.objects.create(eventLabelName="VIP")
+        self.label2 = EventLabel.objects.create(eventLabelName="General")
 
-    def test_save_tag_view_invalid_json(self):
-        response = self.client.post(reverse('save-tag'),
-                                    data="invalid-json-string",
-                                    content_type='application/json')
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content.decode(
-        ), '{"success": false, "error": "Invalid JSON data"}')
+        # Set up the test client
+        self.client = Client()
 
     def test_event_search_view_valid(self):
 
@@ -221,18 +180,153 @@ class ViewTests(TestCase):
         self.assertEqual(response_data['error'],
                          'No events found matching the criteria.')
 
-    def test_insights_view(self):
-        response = self.client.get(reverse('insights'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'insights.html')
 
-    def test_insights_view_requires_login(self):
-        response = self.client.get(reverse('insights'))
-        self.assertEqual(response.status_code, 302)  # Redirect to login page
+class CreateTagLabelTest(TestCase):
 
-    def test_insights_view_authenticated(self):
-        user = User.objects.create_user(
-            username='testuser', password='testpass')
-        self.client.login(username='testuser', password='testpass')
-        response = self.client.get(reverse('insights'))
+    def test_save_tag_view_valid(self):
+        # Test valid POST request to save a tag
+        response = self.client.post(reverse('save-tag'),
+                                    data=json.dumps({'tag_name': 'Festival'}),
+                                    content_type='application/json')
         self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode(),
+                             '{"success": true, "tag": "Festival"}')
+        self.assertEqual(EventTag.objects.count(), 1)  # Ensure tag was created
+
+    def test_save_tag_view_invalid(self):
+        # Test POST with missing tag name
+        response = self.client.post(reverse('save-tag'),
+                                    data=json.dumps({}),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode(
+        ), '{"success": false, "error": "No tag name provided"}')
+
+    def test_save_label_view_valid(self):
+        # Test valid POST request to save a label
+        response = self.client.post(reverse('save-label'),
+                                    data=json.dumps({'label_name': 'Premium'}),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode(),
+                             '{"success": true, "label": "Premium"}')
+        # Ensure label was created
+        self.assertEqual(EventLabel.objects.count(), 1)
+
+    def test_save_label_view_invalid(self):
+        # Test POST with missing label name
+        response = self.client.post(reverse('save-label'),
+                                    data=json.dumps({}),
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode(
+        ), '{"success": false, "error": "No label name provided"}')
+
+    def test_save_tag_view_invalid_json(self):
+        response = self.client.post(reverse('save-tag'),
+                                    data="invalid-json-string",
+                                    content_type='application/json')
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode(
+        ), '{"success": false, "error": "Invalid JSON data"}')
+
+
+class UpdateCardViewTest(TestCase):
+
+    def setUp(self):
+        """
+        This method will set up the test data, creating Users
+        with `current_user_type='member'` and other necessary data.
+        """
+        # Create users with 'member' as current_user_type
+        Users.objects.bulk_create(
+            [Users(user_name=f'User{i}', first_name=f'First{i}', last_name=f'Last{i}',
+                   email=f'user{i}@example.com', password='password', current_user_type='member') for i in range(130)]
+        )
+        # Create a few users with non-'member' user_type (e.g., 'admin')
+        Users.objects.bulk_create(
+            [Users(user_name=f'Admin{i}', first_name=f'AdminFirst{i}', last_name=f'AdminLast{i}',
+                   email=f'admin{i}@example.com', password='password', current_user_type='admin') for i in range(5)]
+        )
+
+    def test_update_card_view_valid(self):
+        """
+        Test case for the valid card_id (1: Total number of members)
+        which should return 130 members.
+        """
+        # Test valid card_id (card 1 for Total number of members)
+        response = self.client.get(reverse('update-card', args=[1]))
+
+        # Ensure the response is successful and returns the correct new_value
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode(), '{"new_value": 130}')
+
+    def test_update_card_view_no_members(self):
+        """
+        Test case when there are no members in the Users table.
+        """
+        # Remove all users and re-run the test
+        Users.objects.all().delete()
+
+        # Test valid card_id (card 1 for Total number of members) with no members
+        response = self.client.get(reverse('update-card', args=[1]))
+
+        # Ensure the response is successful and returns the correct new_value
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode(), '{"new_value": 0}')
+
+    def test_update_card_view_invalid_card_id(self):
+        """
+        Test case for an invalid card_id (should return a 400 error).
+        """
+        # Test with an invalid card_id (e.g., card_id=999 which doesn't exist)
+        response = self.client.get(reverse('update-card', args=[999]))
+
+        # Ensure the response status is 400 for an invalid card_id
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content.decode(),
+                             '{"error": "Invalid card ID"}')
+
+    def test_update_card_view_with_date_filter(self):
+        """
+        Test case for filtering based on a specific date for upcoming events.
+        """
+        # Create an event that is in the future
+        future_event = Events.objects.create(
+            eventName="Future event",
+            startTime=time(10, 0),      # event start time: 10:00 AM
+            endTime=time(12, 0),        # event end time: 12:00 PM
+            location="Test Venue",
+            numberOfAttenders=1,        # initial number of attendees
+            shortDescription="A short description for testing.",
+            longDescription="A longer, detailed description for the test event.",
+            eventType=Events.EventType.HAPPENING,  # using the defined text choice
+            eventDate=timezone.now() + timezone.timedelta(days=1)  # Tomorrow's date
+        )
+
+        # Create an event that is in the past
+        past_event = Events.objects.create(
+            eventName="Past event",
+            startTime=time(10, 0),      # event start time: 10:00 AM
+            endTime=time(12, 0),        # event end time: 12:00 PM
+            location="Test Venue",
+            numberOfAttenders=1,        # initial number of attendees
+            shortDescription="A short description for testing.",
+            longDescription="A longer, detailed description for the test event.",
+            eventType=Events.EventType.HAPPENING,  # using the defined text choice
+            eventDate=timezone.now() - timezone.timedelta(days=1)  # Yesterday's date
+        )
+
+        # Test card 2 (Number of upcoming events)
+        response = self.client.get(reverse('update-card', args=[2]))
+
+        # Ensure the response is successful and returns 1 upcoming event (the future event)
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content.decode(), '{"new_value": 1}')
+
+    def test_update_card_view_invalid(self):
+        # Test invalid card_id
+        response = self.client.get(reverse('update-card', args=['invalid']))
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content.decode(),
+                             '{"error": "Invalid card ID"}')

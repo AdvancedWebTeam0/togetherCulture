@@ -15,18 +15,23 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('.card').forEach(function (card) {
         const cardId = card.id.split('-')[1]; // Extract card ID from 'card-1', 'card-2', etc.
         const interval = card.getAttribute('data-interval');  // Get the interval for this card
-
-        // Set polling for this card with its own interval
-        setInterval(function () {
+        // Function to update the card value
+        function updateCard() {
             fetch(`./update-card/${cardId}/`)
                 .then(response => response.json())
                 .then(data => {
                     const cardValueElement = card.querySelector('.card-body .card-value');
-                    if (cardValueElement && data.new_value) {
+                    if (cardValueElement && data.new_value !== undefined) {
                         cardValueElement.textContent = data.new_value;  // Update the card value with new data
                     }
                 })
                 .catch(error => console.error(`Error updating card ${cardId}:`, error));
-        }, parseInt(interval));  // Use the unique interval for this card
+        }
+
+        // Update the card immediately when the page loads
+        updateCard();
+
+        // Set polling for this card with its unique interval
+        setInterval(updateCard, parseInt(interval));  // Use the unique interval for this card
     });
 });

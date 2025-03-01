@@ -2,10 +2,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import EventTag, EventLabel
-from loginRegistrationApp.models import Events
+from loginRegistrationApp.models import Events, Users
 from .forms import EventSearchForm
 import json
-
+from django.utils import timezone
 # Create your views here.
 # the url should be the name that is used in urls.py
 
@@ -21,9 +21,11 @@ nav_items = [
 ]
 
 cards = [
-    {'id': 1, 'title': 'Card 1', 'value': 100, 'interval': 10000},  # 10 seconds
-    {'id': 2, 'title': 'Card 2', 'value': 200, 'interval': 5000},
-    {'id': 3, 'title': 'Card 3', 'value': 300, 'interval': 90000},
+    {'id': 1, 'title': 'Total number of members',
+        'value': 0, 'interval': 10000},  # 10 seconds
+    {'id': 2, 'title': 'Number of upcoming events', 'value': 0, 'interval': 10000},
+    {'id': 3, 'title': 'Total number of tags', 'value': 0, 'interval': 90000},
+    {'id': 4, 'title': 'Total number of labels', 'value': 0, 'interval': 90000},
 ]
 
 
@@ -52,14 +54,16 @@ def update_card(request, card_id):
         return JsonResponse({'error': 'Invalid card ID'}, status=400)
     # Simulate fetching the updated value for the card from the database
     if card_id == 1:
-        new_value = 130  # Updated value for card 1
+        new_value = Users.objects.filter(current_user_type='member').count()
     elif card_id == 2:
-        new_value = 50   # Updated value for card 2
+        current_time = timezone.now()
+        new_value = Events.objects.filter(eventDate__gt=current_time).count()
     elif card_id == 3:
-        new_value = 200   # Updated value for card 3
+        new_value = EventTag.objects.count()
+    elif card_id == 4:
+        new_value = EventLabel.objects.count()
     else:
         return JsonResponse({'error': 'Invalid card ID'}, status=400)
-
     # Return the updated value for the card
     return JsonResponse({'new_value': new_value})
 
@@ -128,7 +132,7 @@ def event_search(request):
 
     # Initialize form with the corrected GET data
     form = EventSearchForm(request.GET)
-    
+
     # Check if the form is valid and the request is AJAX
     if form.is_valid():
         tags = form.cleaned_data.get('tags', [])
