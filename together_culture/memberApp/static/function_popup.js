@@ -1,76 +1,37 @@
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]').value;
+}
+
 function handleInitialInterests(event){
-    
-
-
-
-    print("Here!!!");
     event.preventDefault();
     var checkboxes = document.getElementsByName("interest_checkbox");
+    console.log(checkboxes);  
     var checkboxesChecked = [];
 
-    for (var i = 0; i < checkboxes.length; i++) {
-        if (checkboxes[i].checked) {
-            checkboxesChecked.push(checkboxes[i]);
+    for (let i = 0; i < checkboxes.length; i++) {
+        const curr_checkbox = checkboxes[i];
+        if(curr_checkbox.checked){
+            checkboxesChecked.push({
+                id: curr_checkbox.value,
+                value: curr_checkbox.checked
+            });
         }
     }
+    console.log(checkboxesChecked);  
 
     const url = `../saveInitialInterests/`;
-    /*const url = `../saveInitialInterests/?interests=${encodeURIComponent(checkboxesChecked)}`;*/
 
     fetch(url, {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCSRFToken(),
+        },
+        body: JSON.stringify({ interests : checkboxesChecked })
     })
-    .then(response => {
-        if (response.ok) {
-            if (response.redirected) {
-                window.location.href = response.url;
-                return null;
-            }
-            return response.text();
-        }
-        return response.json().then(errorData => {
-            throw new Error(errorData.message);
-        });
-    })
-    .then(data => {
-        if (data) {
-            document.open();
-            document.write(data);
-            document.close();
-        }
-    })
-    .catch(error => {
-        alert(`Unexpected error: ${error.message}`);
-    });
-
-
-    /*event.preventDefault();
-    var checkboxes = document.getElementsByName("interest_checkbox");
-    var checkboxesChecked = [];
-
-    for (var i = 0; i < checkboxes.length; i++) {
-        if (checkboxes[i].checked) {
-            checkboxesChecked.push(checkboxes[i]);
-        }
-    }
-
-    const url = `../saveInitialInterests/?interests=${encodeURIComponent(checkboxesChecked)}`;
-
-    fetch(url, {
-        method: 'POST'
-    })
-    .catch(error => {
-        alert(`Unexpected error: ${error.message}`);
-    });
-
-    /*if(checkboxesChecked.length > 0){
-        const requestObject = new XMLHttpRequest()
-        requestObject.open("GET", "/saveInitialInterests/");
-        requestObject.send(checkboxesChecked);
-    }
-    else{
-        print("NULL")
-    }*/
+    .then(response => response.json())
+    .then(data => console.log(data))
+    .catch(error => console.error('Error:', error));
 }
 
 function openPopup(){
