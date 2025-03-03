@@ -1,11 +1,18 @@
+from datetime import timedelta
+from django.db.models.functions import TruncDate, TruncMonth
+from django.db.models import Count
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import EventTag, EventLabel
-from loginRegistrationApp.models import Events, Users
+from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests, Interests
 from .forms import EventSearchForm
 import json
 from django.utils import timezone
+from django.db.models import Count
+from django.db.models.functions import TruncWeek
+from django.core.paginator import Paginator
+
 # Create your views here.
 # the url should be the name that is used in urls.py
 
@@ -39,12 +46,19 @@ def admin_dashboard(request):
 
     form = EventSearchForm(request.GET)  # Prefill form with GET data if any
 
+    event_data = Events.objects.annotate(month=TruncMonth('eventDate')).values(
+        'month').annotate(total=Count('eventId')).order_by('month')
+    event_labels = [event['month'].strftime('%Y-%m') for event in event_data]
+    data = [event['total'] for event in event_data]
+
     return render(request, 'admin_dashboard.html', {'title': title,
                                                     'nav_items': nav_items,
                                                     'form': form,
                                                     'tags': tags,
                                                     'labels': labels,
-                                                    'cards': cards})
+                                                    'cards': cards,
+                                                    'event_labels': json.dumps(event_labels),
+                                                    'data': json.dumps(data), })
 
 
 def update_card(request, card_id):
@@ -166,9 +180,82 @@ def event_search(request):
 
 
 def insights(request):
-    # define the title for page
     title = "Insights"
-    return render(request, 'insights.html', {'title': title, 'nav_items': nav_items})
+
+    # Number of events per month
+    event_data = Events.objects.annotate(month=TruncMonth('eventDate')).values(
+        'month').annotate(total=Count('eventId')).order_by('month')
+    event_labels = [event['month'].strftime('%Y-%m') for event in event_data]
+    event_counts = [event['total'] for event in event_data]
+
+    # Number of attendees per event
+    attendee_data = UserAttendingEvent.objects.values(
+        'eventId').annotate(total=Count('userId'))
+    event_ids = [attendee['eventId'] for attendee in attendee_data]
+    attendee_counts = [attendee['total'] for attendee in attendee_data]
+
+    print(title)
+    print(event_data)
+    print(event_labels)
+    print(event_counts)
+    print(attendee_data)
+    print(event_ids)
+    print(attendee_counts)
+    
+    return render(request, 'insights.html', {
+        'title': title,
+        'nav_items': nav_items,
+        'event_labels': event_labels,
+        'event_counts': event_counts,
+        'event_ids': event_ids,
+        'attendee_counts': attendee_counts,
+    })
+
+
+def get_insights_data(request):
+    # Events per month
+    event_data = Events.objects.annotate(month=TruncMonth('eventDate')).values(
+        'month').annotate(total=Count('eventId')).order_by('month')
+    event_labels = [event['month'].strftime('%Y-%m') for event in event_data]
+    event_counts = [event['total'] for event in event_data]
+
+    # Attendees per event
+    attendee_data = UserAttendingEvent.objects.values(
+        'eventId').annotate(total=Count('userId'))
+    event_ids = [attendee['eventId'] for attendee in attendee_data]
+    attendee_counts = [attendee['total'] for attendee in attendee_data]
+
+    # Event type distribution
+    event_types = Events.objects.values(
+        'eventType').annotate(total=Count('eventId'))
+    event_type_labels = [event['eventType'] for event in event_types]
+    event_type_counts = [event['total'] for event in event_types]
+
+    # User interest distribution
+    interest_data = UserInterests.objects.values(
+        'interestId').annotate(total=Count('userId'))
+    interest_labels = [Interests.objects.get(
+        interestId=interest['interestId']).name for interest in interest_data]
+    interest_counts = [interest['total'] for interest in interest_data]
+
+    # Active vs. Inactive Users (Active users attended at least one event)
+    active_users = Users.objects.filter(
+        user_id__in=UserAttendingEvent.objects.values('userId')).count()
+    total_users = Users.objects.count()
+    inactive_users = total_users - active_users
+
+    return JsonResponse({
+        'event_labels': event_labels,
+        'event_counts': event_counts,
+        'event_ids': event_ids,
+        'attendee_counts': attendee_counts,
+        'event_type_labels': event_type_labels,
+        'event_type_counts': event_type_counts,
+        'interest_labels': interest_labels,
+        'interest_counts': interest_counts,
+        'active_users': active_users,
+        'inactive_users': inactive_users,
+    })
 
 
 def manage_events(request):
