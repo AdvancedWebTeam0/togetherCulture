@@ -5,20 +5,46 @@
 <link rel="stylesheet" href="{% static 'css/charts.css' %}">
 {% endblock %}
 {% block js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% endblock %}
 
 {% block content %}
 <h1>Welcome to Insights</h1>
 <p>Analyze data and track your progress.</p>
 
+<div>
+    <h3>Statistics</h3>
+    <p>Total Users: {{ num_users }}</p>
+    <p>Total Events: {{ num_events }}</p>
+    <p>Events Attended: {{ num_attending_events }}</p>
+    <p>Total User Interests: {{ num_user_interests }}</p>
+</div>
+
 <div class="main-content">
     <section class="chart-container">
-        <canvas id="chart"></canvas>
+        <canvas id="eventTypeChart" data-url="{% url 'event-type-data' %}"></canvas>
     </section>
 </div>
 
-<!-- charts -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<div class="main-content">
+    <section class="chart-container">
+        <canvas id="eventTagChart" data-url="{% url 'event-tag-data' %}"></canvas>
+    </section>
+</div>
+
+
+<div class="main-content">
+    <section class="chart-container">
+        <canvas id="eventLabelChart" data-url="{% url 'event-label-data' %}"></canvas>
+    </section>
+</div>
+
+<div class="main-content">
+    <section class="chart-container">
+        <canvas id="eventChart" data-url="{% url 'event-per-month' %}"></canvas>
+    </section>
+</div>
+
 <script src="{% static 'adminApp/js/charts.js' %}"></script>
 
 {% endblock %}
