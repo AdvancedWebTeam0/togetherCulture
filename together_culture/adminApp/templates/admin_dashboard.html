@@ -107,4 +107,84 @@
         <div id="event-results"></div>
     </section>
 </div>
+
+<div class="main-content">
+    <section class="cards-container">
+        <h1>Search for events using date</h1>
+
+        <form id="eventSearchDateForm">
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" required>
+
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date" required>
+
+            <button type="submit">Search</button>
+        </form>
+
+        <h2>Results</h2>
+        <table id="resultsTable" class="table">
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Total Attendees</th>
+                    <th>Attendees</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody">
+                
+            </tbody>
+        </table>
+    </section>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("eventSearchDateForm");
+        const resultsBody = document.getElementById("resultsBody");
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const startDate = document.getElementById("start_date").value;
+            const endDate = document.getElementById("end_date").value;
+
+            if (!startDate || !endDate) {
+                alert("Please select both start and end dates.");
+                return;
+            }
+
+            fetch(`/admin/event-search-date/?start_date=${startDate}&end_date=${endDate}`, {
+                headers: { "X-Requested-With": "XMLHttpRequest" } // Identifies this as an AJAX request
+            })
+                .then(response => response.json())
+                .then(data => {
+                    resultsBody.innerHTML = "";  // Clear previous results
+
+                    if (data.events.length === 0) {
+                        resultsBody.innerHTML = "<tr><td colspan='5'>No events found.</td></tr>";
+                        return;
+                    }
+
+                    data.events.forEach(event => {
+                        const row = document.createElement("tr");
+
+                        row.innerHTML = `
+                        <td>${event.eventName}</td>
+                        <td>${event.eventDate}</td>
+                        <td>${event.location}</td>
+                        <td>${event.totalAttendees}</td>
+                        <td>
+                            <ul>${event.attendees.map(a => `<li>${a.name} (${a.email})</li>`).join("")}</ul>
+                        </td>
+                    `;
+
+                        resultsBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error("Error fetching data:", error));
+        });
+    });
+</script>
 {% endblock %}

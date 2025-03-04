@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.db.models import Count
 from django.db.models.functions import ExtractMonth
 import calendar
+from django.core.paginator import Paginator
 
 # Create your views here.
 # the url should be the name that is used in urls.py
@@ -44,11 +45,6 @@ def admin_dashboard(request):
     labels = EventLabel.objects.all()
 
     form = EventSearchForm(request.GET)  # Prefill form with GET data if any
-
-    event_data = Events.objects.annotate(month=TruncMonth('eventDate')).values(
-        'month').annotate(total=Count('eventId')).order_by('month')
-    event_labels = [event['month'].strftime('%Y-%m') for event in event_data]
-    data = [event['total'] for event in event_data]
 
     event_data = Events.objects.annotate(month=TruncMonth('eventDate')).values(
         'month').annotate(total=Count('eventId')).order_by('month')
@@ -287,6 +283,41 @@ def events_per_month(request):
         'months': months,
         'event_counts': event_counts
     })
+
+
+def event_search_date(request):
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':  # AJAX Request
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+
+        if start_date and end_date:
+            # Convert to timezone-aware datetime
+            start_date = timezone.make_aware(
+                timezone.datetime.strptime(start_date, "%Y-%m-%d"))
+            end_date = timezone.make_aware(
+                timezone.datetime.strptime(end_date, "%Y-%m-%d"))
+
+            events = Events.objects.filter(
+                eventDate__range=[start_date, end_date]).order_by('eventDate')
+
+            data = []
+            for event in events:
+                attendees = Users.objects.filter(
+                    user_id__in=UserAttendingEvent.objects.filter(
+                        eventId=event.eventId).values_list('userId', flat=True)
+                )
+
+                event_data = {
+                    'eventName': event.eventName,
+                    'eventDate': event.eventDate.strftime('%Y-%m-%d'),
+                    'location': event.location,
+                    'totalAttendees': attendees.count(),
+                    'attendees': [{'name': f"{attendee.first_name} {attendee.last_name}", 'email': attendee.email} for attendee in attendees]
+                }
+
+                data.append(event_data)
+
+            return JsonResponse({'events': data})
 
 
 def manage_events(request):

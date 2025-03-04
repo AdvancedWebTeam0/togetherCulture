@@ -128,7 +128,7 @@ function updateEventLabelChart() {
         .catch(error => console.error('Error fetching event label data:', error));
 }
 
-// Function to fetch event label data
+// Function to fetch event per month data
 function updateEventsChart() {
     const url = document.getElementById('eventChart').getAttribute('data-url');
     fetch(url)

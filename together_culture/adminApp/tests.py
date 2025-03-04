@@ -3,7 +3,7 @@ from loginRegistrationApp.models import Users
 from django.test import TestCase, Client
 import json
 from django.http import JsonResponse
-from loginRegistrationApp.models import Events, Users
+from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests
 from django.urls import reverse
 from django.test import TestCase
 from .models import EventTag, EventLabel
@@ -12,6 +12,7 @@ import json
 from django.utils import timezone
 from datetime import time
 from django.contrib.auth.models import User
+import datetime
 
 
 class EventTagModelTest(TestCase):
@@ -80,11 +81,98 @@ class ViewTests(TestCase):
 
 
 class InsightsViewTest(TestCase):
+    def setUp(self):
+        self.tag1 = EventTag.objects.create(
+            eventTagName="Music", required=True)
+        self.tag2 = EventTag.objects.create(eventTagName="Sports")
+
+        self.label1 = EventLabel.objects.create(
+            eventLabelName="Outdoor", required=False)
+        self.label2 = EventLabel.objects.create(eventLabelName="Online")
+
+        self.event1 = Events.objects.create(
+            eventName="Concert",
+            eventDate=timezone.make_aware(datetime.datetime(2025, 5, 17)),
+            startTime="18:00",
+            endTime="22:00",
+            location="Stadium",
+            numberOfAttenders=100,
+            shortDescription="A live concert",
+            longDescription="A great live music experience",
+            eventType="HA"
+        )
+        self.event2 = Events.objects.create(
+            eventName="Football Match",
+            eventDate=timezone.make_aware(datetime.datetime(2025, 4, 15)),
+            startTime="15:00",
+            endTime="17:00",
+            location="Sports Arena",
+            numberOfAttenders=200,
+            shortDescription="A local match",
+            longDescription="A thrilling football match",
+            eventType="SP"
+        )
+
+        self.event1.tags.add(self.tag1)
+        self.event2.tags.add(self.tag2)
+        self.event1.labels.add(self.label1)
+        self.event2.labels.add(self.label2)
+
+        self.user1 = Users.objects.create(
+            user_id="1", user_name="testuser1", first_name="John", last_name="Doe",
+            email="john@example.com", password="password", current_user_type="Admin"
+        )
+        self.user2 = Users.objects.create(
+            user_id="2", user_name="testuser2", first_name="Jane", last_name="Doe",
+            email="jane@example.com", password="password", current_user_type="Member"
+        )
+
+        self.attending1 = UserAttendingEvent.objects.create(
+            userId=self.user1.user_id, eventId=self.event1.eventId, isUserAttended=True
+        )
+        self.attending2 = UserAttendingEvent.objects.create(
+            userId=self.user2.user_id, eventId=self.event2.eventId, isUserAttended=True
+        )
+
+        self.interest1 = UserInterests.objects.create(
+            userId=self.user1.user_id, interestId=1)
+        self.interest2 = UserInterests.objects.create(
+            userId=self.user2.user_id, interestId=2)
+
+        self.event3 = Events.objects.create(
+            eventName="New Year Party", eventDate=timezone.make_aware(datetime.datetime(2025, 1, 5)),
+            startTime="18:00", endTime="23:00", location="Club A",
+            numberOfAttenders=20, shortDescription="Celebration",
+            longDescription="New Year Event", eventType="HA"
+        )
+        self.event4 = Events.objects.create(
+            eventName="Spring Fest", eventDate=timezone.make_aware(datetime.datetime(2025, 3, 15)),
+            startTime="14:00", endTime="20:00", location="Park B",
+            numberOfAttenders=50, shortDescription="Spring Celebration",
+            longDescription="Spring Festival Event", eventType="ML"
+        )
+
+        self.attending1 = UserAttendingEvent.objects.create(
+            userId=self.user1.user_id, eventId=self.event3.eventId, isUserAttended=True
+        )
+        self.attending2 = UserAttendingEvent.objects.create(
+            userId=self.user2.user_id, eventId=self.event4.eventId, isUserAttended=True
+        )
 
     def test_insights_view(self):
+        # Ensure the correct URL name
         response = self.client.get(reverse('insights'))
+        # Check if the page loads successfully
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'insights.html')
+
+        # Verify that the correct counts are passed to the context
+        self.assertEqual(response.context['num_users'], 2)
+        self.assertEqual(response.context['num_events'], 4)
+        self.assertEqual(response.context['num_attending_events'], 4)
+        self.assertEqual(response.context['num_user_interests'], 2)
+
+        # Check if the title is correctly passed
+        self.assertEqual(response.context['title'], "Admin Insights")
 
     def test_insights_view_requires_login(self):
         response = self.client.get(reverse('insights'))
@@ -96,6 +184,78 @@ class InsightsViewTest(TestCase):
         self.client.login(username='testuser', password='testpass')
         response = self.client.get(reverse('insights'))
         self.assertEqual(response.status_code, 200)
+
+    def test_event_type_data(self):
+        response = self.client.get(reverse('event-type-data'))
+        # Ensure API returns 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        self.assertIn('eventTypes', data)
+        self.assertIn('eventTypeValues', data)
+
+        # Verify event types match created events
+        self.assertEqual(len(data['eventTypes']), 3)
+        self.assertEqual(len(data['eventTypeValues']), 3)
+
+    def test_event_tag_data(self):
+        response = self.client.get(reverse('event-tag-data'))
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        self.assertIn('eventTags', data)
+        self.assertIn('eventTagValues', data)
+
+        # Verify tags are counted correctly
+        self.assertEqual(len(data['eventTags']), 2)
+        self.assertEqual(len(data['eventTagValues']), 2)
+
+    def test_event_label_data(self):
+        response = self.client.get(reverse('event-label-data'))
+        self.assertEqual(response.status_code, 200)
+
+        data = response.json()
+        self.assertIn('eventLabels', data)
+        self.assertIn('eventLabelValues', data)
+
+        # Verify labels are counted correctly
+        self.assertEqual(len(data['eventLabels']), 2)
+        self.assertEqual(len(data['eventLabelValues']), 2)
+
+    def test_events_per_month(self):
+        response = self.client.get(reverse('events-per-month'))
+        self.assertEqual(response.status_code, 200)
+
+        data = json.loads(response.content)
+        self.assertIn('months', data)
+        self.assertIn('event_counts', data)
+
+        # Check if January and March have events
+        self.assertEqual(data['event_counts'][0], 1)  # January
+        self.assertEqual(data['event_counts'][2], 1)  # March
+
+    def test_event_search_date(self):
+        url = reverse('event-search-date')
+        params = {
+            'start_date': '2025-01-01',
+            'end_date': '2025-01-31'
+        }
+
+        response = self.client.get(
+            url, params, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.assertEqual(response.status_code, 200)
+
+        data = json.loads(response.content)
+        self.assertIn('events', data)
+
+        self.assertEqual(len(data['events']), 1)
+        self.assertEqual(data['events'][0]['eventName'], "New Year Party")
+        self.assertEqual(data['events'][0]['totalAttendees'], 1)
+
+        # Check attendee details
+        self.assertEqual(data['events'][0]['attendees'][0]['name'], "John Doe")
+        self.assertEqual(data['events'][0]['attendees']
+                         [0]['email'], "john@example.com")
 
 
 class EventSearchViewTest(TestCase):
