@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+        .form-container {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 350px;
+            animation: fadeIn 1s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .form-container h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            transition: 0.3s;
+        }
+        .form-group input:focus {
+            transform: scale(1.05);
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .checkbox-container input {
+            margin-right: 10px;
+        }
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+        }
+        button {
+            flex-grow: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: #cf59a2;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.3s;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #b7247f;
+            transform: scale(1.05);
+        }
+        .form-container button:nth-child(2) {
+            background-color: #6f55cf;
+        }
+        .form-container button:nth-child(2):hover {
+            background-color: #a168d7;
+        }
+    </style>
+    <script>
+        function handleRegister(event) {
+            event.preventDefault();
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const terms = document.getElementById('terms').checked?'on':'off';
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            const url = `../insertUser/`;
+            const formData = new URLSearchParams();
+            formData.append('firstName', firstName);
+            formData.append('lastName', lastName);
+            formData.append('email', email);
+            formData.append('password', password);
+            formData.append('terms', terms);
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                        return null;
+                    }
+                    return response.text();
+                }
+                return response.json().then(errorData => {
+                    throw new Error(errorData.message);
+                });
+            })
+            .then(data => {
+                if (data && (data.includes('<html') || data.includes('<!DOCTYPE html>'))) {
+                    document.open();
+                    document.write(data);
+                    document.close();
+                }
+            })
+            .catch(error => {
+                alert(`Unexpected error: ${error.message}`);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="form-container">
+        <h2>New User</h2>
+        <form name="register" method="POST" onsubmit="handleRegister(event);">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName" name="firstName" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName" name="lastName" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Choose Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="terms" name="terms">
+                <label for="terms">Choose to be a member?</label>
+            </div>
+            <div class="button-group">
+                <button type="submit" name="reg">Register</button>
+                <button type="button" onclick="window.location.href='../login/'">Login</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
