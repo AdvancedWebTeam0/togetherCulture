@@ -147,7 +147,6 @@ updateEventTagChart();
 updateEventLabelChart();
 updateEventsChart();
 
-// Optionally, you can set an interval to update the charts periodically (e.g., every 30 seconds)
 setInterval(() => {
     updateEventTypeChart();
     updateEventTagChart();
