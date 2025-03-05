@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 
-
 nav_items = [
         {'name': '🎟 My Membership', 'url': 'member-dashboard', 'submenu': None},
         {'name': '🎁 My Benefits', 'url': 'benefits', 'submenu': None},
@@ -10,7 +9,6 @@ nav_items = [
         {'name': '👤 My Profile', 'url': 'profile', 'submenu': None},
         {'name': '⚙ Settings', 'url': 'settings', 'submenu': None},
     ]
-
 
 # Create your views here.
 

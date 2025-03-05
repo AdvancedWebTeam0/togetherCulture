@@ -1,6 +1,190 @@
 {% extends 'base.html' %}
 
+
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cards.css' %}">
+<link rel="stylesheet" href="{% static 'css/charts.css' %}">
+<link rel="stylesheet" href="{% static 'adminApp/css/create_tag_label.css' %}">
+<link rel="stylesheet" href="{% static 'adminApp/css/search.css' %}">
+{% endblock %}
+{% block js %}
+<script src="{% static 'adminApp/js/event_search.js' %}"></script>
+<script src="{% static 'adminApp/js/scripts.js' %}"></script>
+{% endblock %}
 {% block content %}
 <h1>Welcome to Your Dashboard</h1>
 <p>Manage your insights, events, members, and memberships efficiently with an intuitive interface.</p>
+
+<!-- Cards for information section -->
+<div class="main-content">
+    <section class="cards-container">
+        {% include 'cards.html' with cards=cards %}
+    </section>
+</div>
+
+<!-- Creating tags and labels section -->
+<div class="main-content">
+    <section class="cards-container">
+        <div class="parent-container">
+            <div class="child-container">
+                <section class="cards-container">
+                    <!-- tags-->
+                    <h2>Create Tag</h2>
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Button to trigger the tag creation form -->
+                        <button type="button" class="add-tag-btn" id="add-tag-btn">+</button>
+
+                        <!-- Hidden tag creation form -->
+                        <div id="new-tag-form" style="display: none;">
+                            <label for="new-tag-name">Tag Name:</label>
+                            <input type="text" id="new-tag-name" name="new_tag_name" placeholder="Enter new tag name">
+                            <button type="button" id="save-new-tag-btn">Save Tag</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+            <div class="child-container">
+                <section class="cards-container">
+                    <!-- tags-->
+                    <h2>Create Label</h2>
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Button to trigger the tag creation form -->
+                        <button type="button" class="add-label-btn" id="add-label-btn">+</button>
+
+                        <!-- Hidden tag creation form -->
+                        <div id="new-label-form" style="display: none;">
+                            <label for="new-label-name">Label Name:</label>
+                            <input type="text" id="new-label-name" name="new_label_name"
+                                placeholder="Enter new label name">
+                            <button type="button" id="save-new-label-btn">Save Label</button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="main-content">
+    <section>
+        <h2>Search for events using filters</h2>
+        <div class="parent-container">
+            <div class="child-container">
+                <section>
+                    <form method="get" id="event-search-form">
+                        <h3>Select Tags</h3>
+                        <select name="tags" id="tags" multiple style="overflow-y: scroll;">
+                            {% for tag in tags %}
+                            <option value="{{ tag.id }}">{{ tag.eventTagName }}</option>
+                            {% empty %}
+                            <option>No tags available</option>
+                            {% endfor %}
+                        </select>
+                </section>
+            </div>
+
+            <div class="child-container">
+                <section>
+                    <h3>Select Labels</h3>
+
+                    <select name="labels" id="labels" multiple style="overflow-y: scroll;">
+                        {% for label in labels %}
+                        <option value="{{ label.id }}">{{ label.eventLabelName }}</option>
+                        {% empty %}
+                        <option>No labels available</option>
+                        {% endfor %}
+                    </select>
+                </section>
+            </div>
+        </div>
+        <button type="submit">Search</button>
+        </form>
+        <div id="event-results"></div>
+    </section>
+</div>
+
+<div class="main-content">
+    <section class="cards-container">
+        <h1>Search for events using date</h1>
+
+        <form id="eventSearchDateForm">
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" required>
+
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date" required>
+
+            <button type="submit">Search</button>
+        </form>
+
+        <h2>Results</h2>
+        <table id="resultsTable" class="table">
+            <thead>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Date</th>
+                    <th>Location</th>
+                    <th>Total Attendees</th>
+                    <th>Attendees</th>
+                </tr>
+            </thead>
+            <tbody id="resultsBody">
+                
+            </tbody>
+        </table>
+    </section>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("eventSearchDateForm");
+        const resultsBody = document.getElementById("resultsBody");
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            const startDate = document.getElementById("start_date").value;
+            const endDate = document.getElementById("end_date").value;
+
+            if (!startDate || !endDate) {
+                alert("Please select both start and end dates.");
+                return;
+            }
+
+            fetch(`/admin/event-search-date/?start_date=${startDate}&end_date=${endDate}`, {
+                headers: { "X-Requested-With": "XMLHttpRequest" } // Identifies this as an AJAX request
+            })
+                .then(response => response.json())
+                .then(data => {
+                    resultsBody.innerHTML = "";  // Clear previous results
+
+                    if (data.events.length === 0) {
+                        resultsBody.innerHTML = "<tr><td colspan='5'>No events found.</td></tr>";
+                        return;
+                    }
+
+                    data.events.forEach(event => {
+                        const row = document.createElement("tr");
+
+                        row.innerHTML = `
+                        <td>${event.eventName}</td>
+                        <td>${event.eventDate}</td>
+                        <td>${event.location}</td>
+                        <td>${event.totalAttendees}</td>
+                        <td>
+                            <ul>${event.attendees.map(a => `<li>${a.name} (${a.email})</li>`).join("")}</ul>
+                        </td>
+                    `;
+
+                        resultsBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error("Error fetching data:", error));
+        });
+    });
+</script>
 {% endblock %}
