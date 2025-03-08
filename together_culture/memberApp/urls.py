@@ -1,5 +1,4 @@
 from django.urls import path
-
 from memberApp import views
 
 urlpatterns = [
@@ -7,6 +6,7 @@ urlpatterns = [
     path('events/', views.events, name='events'),
     path('benefits/', views.benefits, name='benefits'),
     path('digital-content/', views.digital_content, name='digital-content'),
+    path('digital-content/book/<int:module_id>/', views.book_module, name='book-module'),
     path('profile/', views.profile, name='profile'),
     path('settings/', views.settings, name='settings'),
 ]
