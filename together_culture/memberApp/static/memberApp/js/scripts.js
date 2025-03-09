@@ -25,3 +25,35 @@ function bookModule(moduleId) {
             console.error('Error:', error);
         });
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".use-benefit-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            let benefitId = this.getAttribute("data-id");
+            const url = document.getElementById('benefits').getAttribute('data-url');
+
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    let messageContainer = document.querySelector(`.benefit-message[data-id='${benefitId}']`);
+                    messageContainer.style.display = "block"; // Show message
+                    messageContainer.textContent = data.message;
+
+                    if (data.success) {
+                        messageContainer.style.color = "green"; // Success message color
+                        document.querySelector(`.benefit-card[data-id='${benefitId}'] .remaining`).textContent = data.remaining;
+                    } else {
+                        messageContainer.style.color = "red"; // Error message color
+                    }
+                })
+                .catch(error => console.error("Fetch Error:", error));
+        });
+    });
+});

@@ -1,16 +1,31 @@
 {% extends 'base.html' %}
-
+{% block js %}
+{% load static %}
+<script src="{% static 'memberApp/js/scripts.js' %}"></script>
+{% endblock %}
 {% block content %}
-<h1>Member Benefits</h1>
-<p>Unlock exclusive benefits and discounts with your membership.</p>
-<div class="benefits">
-    {% for benefit in benefits %}
-    <div class="benefit">
-        <h2>{{ benefit.title }}</h2>
-        <p>{{ benefit.description }}</p>
-        <p>{{ benefit.discount }}</p>
-        <button>Redeem</button>
+<div class="container mt-5">
+    <h2>Your Membership Benefits</h2>
+    <div id="benefits-container">
+        {% for benefit in benefits %}
+        <div class="main-content">
+            <section class="cards-container">
+                <div class="benefit-card" data-id="{{ benefit.id }}" id="benefits"
+                    data-url="{% url 'use-benefit' benefit.id %}">
+                    <h4>{{ benefit.name }}</h4>
+                    <p>{{ benefit.description }}</p>
+                    <p>Remaining Uses: <span class="remaining">{{ benefit.remaining }}</span></p>
+                    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                    <span class="message"></span>
+                    <button class="use-benefit-btn" data-id="{{ benefit.id }}">Use Benefit</button>
+                    <!-- Message container (initially hidden) -->
+                    <p class="benefit-message" data-id="{{ benefit.id }}" style="display: none;"></p>
+                </div>
+            </section>
+        </div>
+        {% empty %}
+        <p>You have no available benefits.</p>
+        {% endfor %}
     </div>
 </div>
-{% endfor %}
 {% endblock %}

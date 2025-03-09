@@ -69,7 +69,7 @@ class DigitalContentViewTestCase(TestCase):
     def test_digital_content_view(self):
         """Test if digital_content view loads correctly and contains modules."""
         response = self.client.get(
-            reverse('digital-content'))  # Update with the actual URL name
+            reverse('digital-content')) 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'digital_content.html')
         # Check if module title is in response
