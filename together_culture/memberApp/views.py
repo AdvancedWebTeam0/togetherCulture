@@ -1,8 +1,6 @@
 from django.shortcuts import render, redirect
 from django.template import RequestContext
 from django.http import HttpResponse, JsonResponse
-import json
-from .models import UserInterests
 
 nav_items = [
         {'name': '🎟 My Membership', 'url': 'member-dashboard', 'submenu': None},
@@ -36,22 +34,3 @@ def profile(request):
 def settings(request):
     return render(request, 'settings.html')
 
-#Will be deleted later, only written to adjust functionality.
-def getInitialInterests(request):
-    return render(request, 'get_interests.html')
-
-def saveInitialInterests(request):
-    if request.method == "POST":
-        try:
-            data = json.loads(request.body)  # Parse JSON body
-            interests = data.get("interests", [])  # Extract list from request
-            for interest in interests:
-                curr_initial_interest = UserInterests(userId= 0, interestId=interest['id']) #update user id!
-                curr_initial_interest.save()  # This will save the data to the database
-
-            return JsonResponse({"message": "success"})
-        
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON"}, status=400)
-
-    return JsonResponse({"error": "Only POST method allowed"}, status=405)

@@ -9,6 +9,4 @@ urlpatterns = [
     path('digital-content/', views.digital_content, name='digital-content'),
     path('profile/', views.profile, name='profile'),
     path('settings/', views.settings, name='settings'),
-    path('get_interests/', views.getInitialInterests, name='getInitialInterests'),
-    path('saveInitialInterests/', views.saveInitialInterests, name='saveInitialInterests'),
 ]
