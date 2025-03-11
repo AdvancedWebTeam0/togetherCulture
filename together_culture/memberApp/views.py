@@ -4,7 +4,6 @@ from django.http import HttpResponse, JsonResponse
 import json
 from .models import UserInterests
 
-
 nav_items = [
         {'name': '🎟 My Membership', 'url': 'member-dashboard', 'submenu': None},
         {'name': '🎁 My Benefits', 'url': 'benefits', 'submenu': None},
@@ -13,7 +12,6 @@ nav_items = [
         {'name': '👤 My Profile', 'url': 'profile', 'submenu': None},
         {'name': '⚙ Settings', 'url': 'settings', 'submenu': None},
     ]
-
 
 # Create your views here.
 
