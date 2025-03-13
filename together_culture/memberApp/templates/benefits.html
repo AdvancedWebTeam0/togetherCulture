@@ -16,10 +16,6 @@
                     <p>{{ benefit.description }}</p>
                     <p>Remaining Uses: <span class="remaining">{{ benefit.remaining }}</span></p>
                     <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-                    <span class="message"></span>
-                    <button class="use-benefit-btn" data-id="{{ benefit.id }}">Use Benefit</button>
-                    <!-- Message container (initially hidden) -->
-                    <p class="benefit-message" data-id="{{ benefit.id }}" style="display: none;"></p>
                 </div>
             </section>
         </div>

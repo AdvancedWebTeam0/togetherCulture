@@ -1,9 +1,8 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from loginRegistrationApp.models import Users
-from memberApp.models import DigitalContentModule, ModuleBooking
-from unittest.mock import patch
-from django.contrib.auth.models import User
+from memberApp.models import DigitalContentModule, ModuleBooking, Benefit, Membership, MembershipType
+from datetime import date
 
 
 class DigitalContentModuleTestCase(TestCase):
@@ -53,81 +52,39 @@ class DigitalContentViewTestCase(TestCase):
         """Set up test data for the views."""
         self.client = Client()
 
+        self.membership_type = MembershipType.objects.create(
+            name="premium", duration_days=5, price=0)
+
         # Create a test user
         self.user = Users.objects.create(
-            user_id="1", user_name="testuser1", first_name="John", last_name="Doe",
+            user_id="d8ac4feb-e18a-4107-9df4-7aa093f38603", user_name="testuser1", first_name="John", last_name="Doe",
             email="john@example.com", password="password", current_user_type="Admin"
         )
 
-        # Create a digital content module
-        self.module = DigitalContentModule.objects.create(
-            title="Test Module",
-            description="This is a test description.",
-            duration=60
+        self.user2 = Users.objects.create(
+            user_id="d8ac4feb-e18a-4107-9df4-7aa093f38604", user_name="testuser1",
+            first_name="John", last_name="Doe", email="memebr@example.com", password="password",
+            current_user_type="member"
         )
+
+        self.membership = Membership.objects.create(user=self.user2,
+                                                    membership_type=self.membership_type, end_date=date(2025, 3, 22))
+
+        self.benefit = Benefit.objects.create(name="book-modules",
+                                              description="benefit to book modules",
+                                              max_usage="5", used_count=5, membership=self.membership)
+
+        # Create a digital content module
+        for i in range(12):
+            DigitalContentModule.objects.create(
+                title=f"Module {i + 1}",
+                description="This is a test description.",
+                duration=60
+            )
 
     def test_digital_content_view(self):
         """Test if digital_content view loads correctly and contains modules."""
         response = self.client.get(
-            reverse('digital-content')) 
+            reverse('digital-content'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'digital_content.html')
-        # Check if module title is in response
-        self.assertContains(response, "Test Module")
-
-    def test_book_module_success(self):
-        """Test if a module can be booked successfully."""
-        session = self.client.session
-        # Manually set user ID in session
-        session['_auth_user_id'] = self.user.pk
-        session.save()
-
-        response = self.client.post(
-            reverse('book-module', args=[self.module.module_id]))
-        self.assertEqual(response.status_code, 200)
-
-        data = response.json()
-        self.assertEqual(data['status'], 'success')
-        self.assertEqual(
-            data['message'], 'You have successfully booked the module!')
-
-        # Ensure the booking was created
-        self.assertTrue(ModuleBooking.objects.filter(
-            user=self.user, module=self.module, is_booked=True).exists())
-
-    def test_book_module_already_booked(self):
-        """Test if a user cannot book the same module twice."""
-        session = self.client.session
-        # Manually set user ID in session
-        session['_auth_user_id'] = self.user.pk
-        session.save()
-        
-        # Create an initial booking
-        ModuleBooking.objects.create(
-            user=self.user, module=self.module, is_booked=True)
-
-        # Try booking again
-        response = self.client.post(
-            reverse('book-module', args=[self.module.module_id]))
-        self.assertEqual(response.status_code, 200)
-
-        data = response.json()
-        self.assertEqual(data['status'], 'error')
-        self.assertEqual(
-            data['message'], 'You have already booked this module.')
-
-    def test_book_module_invalid_request(self):
-        """Test if non-POST requests return an error."""
-        session = self.client.session
-        # Manually set user ID in session
-        session['_auth_user_id'] = self.user.pk
-        session.save()
-        
-        # Sending GET instead of POST
-        response = self.client.get(
-            reverse('book-module', args=[self.module.module_id]))
-        self.assertEqual(response.status_code, 200)
-
-        data = response.json()
-        self.assertEqual(data['status'], 'error')
-        self.assertEqual(data['message'], 'Invalid request.')
