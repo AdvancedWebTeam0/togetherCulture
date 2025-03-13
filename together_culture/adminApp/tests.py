@@ -1,11 +1,6 @@
-from loginRegistrationApp.models import Users, UserTypes
-from loginRegistrationApp.models import Users
 from django.test import TestCase, Client
-import json
-from django.http import JsonResponse
 from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests
 from django.urls import reverse
-from django.test import TestCase
 from .models import EventTag, EventLabel
 from django.db import IntegrityError
 import json

@@ -1,15 +1,52 @@
 {% extends 'base.html' %}
+{% block meta %}
+<meta name="csrf-token" content="{{ csrf_token }}">
+{% endblock %}
+{% block js %}
+{% load static %}
+<script src="{% static 'memberApp/js/scripts.js' %}"></script>
+{% endblock %}
 
 {% block content %}
-<h1>Access Exclusive Content</h1>
-<p>Unlock premium digital content and resources with your membership.</p>
-<div class="content">
-    {% for content in digitalContent %}
-    <div class="content">
-        <h2>{{ content.title }}</h2>
-        <p>{{ content.description }}</p>
-        <a href="{{ content.link }}">View Content</a>
+<h1>Available Digital Content Modules</h1>
+<ul>
+    {% for module in page_obj %}
+    <div class="main-content">
+        <section class="cards-container">
+            <h2>{{ module.title }}</h2>
+            <p>{{ module.description }}</p>
+            <p><strong>Duration:</strong> {{ module.duration }} minutes</p>
+
+            {% if module.is_booked %}
+            <p id="message{{ module.module_id }}" style="color: red;">Already Booked</p>
+            {% else %}
+            <button id="bookButton{{ module.module_id }}" onclick="bookModule({{ module.module_id }})">
+                Book This Module
+            </button>
+            <p id="message{{ module.module_id }}"></p>
+            {% endif %}
+        </section>
     </div>
     {% endfor %}
+</ul>
+
+<!-- Pagination controls -->
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+        <a href="?page=1">&laquo; first</a>
+        <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
 </div>
+
 {% endblock %}
