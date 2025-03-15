@@ -1,6 +1,7 @@
 from django.db import models
 import uuid
 from adminApp.models import EventTag, EventLabel
+from django.utils.text import slugify
 
 # Create your models here.
 
@@ -14,14 +15,14 @@ class Users(models.Model):
     password = models.CharField(max_length=255)  # Ensure enough length for hashed password
     current_user_type = models.CharField(max_length=45)
     have_interest_membership = models.BooleanField(default=False)
-
+    userSlug = models.SlugField(unique=True)
     class Meta:
         db_table = 'users'
 
     
 
 class UserTypes(models.Model):
-    userId = models.IntegerField()
+    user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name="user_types")
     userType = models.CharField(max_length=100)
     date = models.DateTimeField()
     class Meta:
@@ -35,11 +36,13 @@ class Events(models.Model):
     startTime = models.TimeField()
     endTime = models.TimeField()
     location = models.CharField(max_length=100)
-    numberOfAttenders = models.IntegerField(auto_created=0)
+    numberOfAttendees = models.IntegerField(auto_created=0)
     shortDescription = models.CharField(max_length=50)
     longDescription = models.CharField(max_length=500)
     tags = models.ManyToManyField(EventTag, blank=True, related_name="events")
     labels = models.ManyToManyField(EventLabel, blank=True, related_name="events")
+    attendees = models.ManyToManyField(Users, through="UserAttendingEvent", related_name="events")
+    eventSlug = models.SlugField(unique=True)
 
     class EventType(models.TextChoices):
         HAPPENING = "HA", "Happening"
@@ -63,8 +66,8 @@ class Events(models.Model):
 
 
 class UserAttendingEvent(models.Model):
-    userId = models.IntegerField()
-    eventId = models.IntegerField()
+    user = models.ForeignKey(Users, on_delete=models.CASCADE)
+    event = models.ForeignKey(Events, on_delete=models.CASCADE)
     isUserAttended = models.BooleanField(default=False)
     class Meta:
         db_table = 'user_attending_event'
@@ -78,7 +81,7 @@ class Interests(models.Model):
 
 
 class UserInterests(models.Model):
-    userId = models.IntegerField()
-    interestId = models.IntegerField()
+    user = models.ForeignKey(Users, on_delete=models.CASCADE, related_name="user_interests")
+    interest = models.ForeignKey(Interests, on_delete=models.CASCADE)
     class Meta:
         db_table = 'user_interests'
