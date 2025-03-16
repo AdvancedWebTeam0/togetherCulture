@@ -91,7 +91,7 @@ class InsightsViewTest(TestCase):
             startTime="18:00",
             endTime="22:00",
             location="Stadium",
-            numberOfAttenders=100,
+            numberOfAttendees=100,
             shortDescription="A live concert",
             longDescription="A great live music experience",
             eventType="HA"
@@ -102,7 +102,7 @@ class InsightsViewTest(TestCase):
             startTime="15:00",
             endTime="17:00",
             location="Sports Arena",
-            numberOfAttenders=200,
+            numberOfAttendees=200,
             shortDescription="A local match",
             longDescription="A thrilling football match",
             eventType="SP"
@@ -137,13 +137,13 @@ class InsightsViewTest(TestCase):
         self.event3 = Events.objects.create(
             eventName="New Year Party", eventDate=timezone.make_aware(datetime.datetime(2025, 1, 5)),
             startTime="18:00", endTime="23:00", location="Club A",
-            numberOfAttenders=20, shortDescription="Celebration",
+            numberOfAttendees=20, shortDescription="Celebration",
             longDescription="New Year Event", eventType="HA"
         )
         self.event4 = Events.objects.create(
             eventName="Spring Fest", eventDate=timezone.make_aware(datetime.datetime(2025, 3, 15)),
             startTime="14:00", endTime="20:00", location="Park B",
-            numberOfAttenders=50, shortDescription="Spring Celebration",
+            numberOfAttendees=50, shortDescription="Spring Celebration",
             longDescription="Spring Festival Event", eventType="ML"
         )
 
@@ -274,7 +274,7 @@ class EventSearchViewTest(TestCase):
             startTime=time(10, 0),      # event start time: 10:00 AM
             endTime=time(12, 0),        # event end time: 12:00 PM
             location="Test Venue",
-            numberOfAttenders=1,        # initial number of attendees
+            numberOfAttendees=1,        # initial number of attendees
             shortDescription="A short description for testing.",
             longDescription="A longer, detailed description for the test event.",
             eventType=Events.EventType.HAPPENING,  # using the defined text choice
@@ -452,7 +452,7 @@ class UpdateCardViewTest(TestCase):
             startTime=time(10, 0),      # event start time: 10:00 AM
             endTime=time(12, 0),        # event end time: 12:00 PM
             location="Test Venue",
-            numberOfAttenders=1,        # initial number of attendees
+            numberOfAttendees=1,        # initial number of attendees
             shortDescription="A short description for testing.",
             longDescription="A longer, detailed description for the test event.",
             eventType=Events.EventType.HAPPENING,  # using the defined text choice
@@ -465,7 +465,7 @@ class UpdateCardViewTest(TestCase):
             startTime=time(10, 0),      # event start time: 10:00 AM
             endTime=time(12, 0),        # event end time: 12:00 PM
             location="Test Venue",
-            numberOfAttenders=1,        # initial number of attendees
+            numberOfAttendees=1,        # initial number of attendees
             shortDescription="A short description for testing.",
             longDescription="A longer, detailed description for the test event.",
             eventType=Events.EventType.HAPPENING,  # using the defined text choice
