@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import Users, UserInterests
 from django.contrib.auth.hashers import make_password, check_password
+from django.utils.text import slugify
 import json
 
 logger = logging.getLogger('landing')
@@ -44,6 +45,15 @@ def insert_user(request):
             currentUserType = "NORMAL_USER"
             haveInterestMembership = request.POST.get('terms') == 'on'
 
+            # Generate a slug based on the user name
+            userSlug = slugify(userName)
+
+            # Ensure the slug is unique
+            # If the slug already exists, you could append a number to make it unique
+            slug_count = Users.objects.filter(userSlug=userSlug).count()
+            if slug_count > 0:
+                userSlug = f"{userSlug}-{slug_count + 1}"
+        
             us = Users(
                 user_id=userId,
                 user_name=userName,
@@ -52,11 +62,12 @@ def insert_user(request):
                 email=email,
                 password=password,
                 current_user_type=currentUserType,
-                have_interest_membership=haveInterestMembership
+                have_interest_membership=haveInterestMembership,
+                userSlug=userSlug  
             )
             us.save()
             logger.info('User registered successfully')
-            return redirect('http://127.0.0.1:8000/')
+            return redirect(getInitialInterests)
         except Exception as e:
             logger.error(f'User registration failed: {e}')
             return JsonResponse({'statusCode': 500, 'message': 'User registration failed: User with this email already exists.'}, status=500)
