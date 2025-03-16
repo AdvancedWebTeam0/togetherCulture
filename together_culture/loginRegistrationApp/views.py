@@ -44,7 +44,12 @@ def insert_user(request):
             password = make_password(request.POST['password'])
             currentUserType = "NORMAL_USER"
             haveInterestMembership = request.POST.get('terms') == 'on'
-
+            # New Fields
+            phone_number = request.POST.get('phone_number', '') 
+            address = request.POST.get('address', '') 
+            gender = request.POST.get('gender', '')  
+            date_of_birth = request.POST.get('date_of_birth', None)
+            
             # Generate a slug based on the user name
             userSlug = slugify(userName)
 
@@ -63,7 +68,11 @@ def insert_user(request):
                 password=password,
                 current_user_type=currentUserType,
                 have_interest_membership=haveInterestMembership,
-                userSlug=userSlug  
+                userSlug=userSlug,
+                phone_number=phone_number,
+                address=address,
+                gender=gender,
+                date_of_birth=date_of_birth
             )
             us.save()
             logger.info('User registered successfully')
