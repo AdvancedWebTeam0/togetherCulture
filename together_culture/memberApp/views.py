@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from .models import DigitalContentModule, ModuleBooking, Membership, Benefit, MembershipType
-from django.http import JsonResponse
 from loginRegistrationApp.models import Users
 from django.core.paginator import Paginator
+from django.http import JsonResponse
 
 nav_items = [
     {'name': '🎟 My Membership', 'url': 'member-dashboard', 'submenu': None},
