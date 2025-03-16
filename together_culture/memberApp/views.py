@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.template import RequestContext
+from django.http import HttpResponse, JsonResponse
 
 nav_items = [
         {'name': '🎟 My Membership', 'url': 'member-dashboard', 'submenu': None},
@@ -32,3 +33,4 @@ def profile(request):
 
 def settings(request):
     return render(request, 'settings.html')
+

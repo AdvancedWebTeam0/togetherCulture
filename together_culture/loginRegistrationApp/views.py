@@ -2,8 +2,9 @@ import uuid
 import logging
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from .models import Users
+from .models import Users, UserInterests
 from django.contrib.auth.hashers import make_password, check_password
+import json
 
 logger = logging.getLogger('landing')
 
@@ -71,3 +72,24 @@ def membership(request):
 
 def logout(request):
     return render(request, 'Login.html')
+
+
+#Will be deleted later, only written to adjust functionality.
+def getInitialInterests(request):
+    return render(request, 'get_interests.html')
+
+def saveInitialInterests(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)  # Parse JSON body
+            interests = data.get("interests", [])  # Extract list from request
+            for interest in interests:
+                curr_initial_interest = UserInterests(userId= 0, interestId=interest['id']) #update user id!
+                curr_initial_interest.save()  # This will save the data to the database
+
+            return JsonResponse({"message": "success"})
+        
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid JSON"}, status=400)
+
+    return JsonResponse({"error": "Only POST method allowed"}, status=405)
