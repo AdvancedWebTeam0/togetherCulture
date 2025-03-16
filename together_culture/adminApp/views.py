@@ -304,7 +304,7 @@ def event_search_date(request):
             for event in events:
                 attendees = Users.objects.filter(
                     user_id__in=UserAttendingEvent.objects.filter(
-                        eventId=event.eventId).values_list('userId', flat=True)
+                        event=event).values_list('user_id', flat=True)
                 )
 
                 event_data = {

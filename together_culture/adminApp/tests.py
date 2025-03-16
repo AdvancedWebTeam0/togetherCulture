@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests
+from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests, Interests
 from django.urls import reverse
 from .models import EventTag, EventLabel
 from django.db import IntegrityError
@@ -123,16 +123,23 @@ class InsightsViewTest(TestCase):
         )
 
         self.attending1 = UserAttendingEvent.objects.create(
-            userId=self.user1.user_id, eventId=self.event1.eventId, isUserAttended=True
+            user_id=self.user1.user_id, event=self.event1, isUserAttended=True
         )
         self.attending2 = UserAttendingEvent.objects.create(
-            userId=self.user2.user_id, eventId=self.event2.eventId, isUserAttended=True
+            user_id=self.user2.user_id, event=self.event2, isUserAttended=True
+        )
+        
+        self.interest1 = Interests.objects.create(
+            interestId = 998, name = "stuff 1"
+        )
+        self.interest2 = Interests.objects.create(
+            interestId = 999, name = "stuff 2"
         )
 
-        self.interest1 = UserInterests.objects.create(
-            userId=self.user1.user_id, interestId=1)
-        self.interest2 = UserInterests.objects.create(
-            userId=self.user2.user_id, interestId=2)
+        self.userinterest1 = UserInterests.objects.create(
+            user_id=self.user1.user_id, interest=self.interest1)
+        self.userinterest2 = UserInterests.objects.create(
+            user_id=self.user2.user_id, interest=self.interest2)
 
         self.event3 = Events.objects.create(
             eventName="New Year Party", eventDate=timezone.make_aware(datetime.datetime(2025, 1, 5)),
@@ -148,10 +155,10 @@ class InsightsViewTest(TestCase):
         )
 
         self.attending1 = UserAttendingEvent.objects.create(
-            userId=self.user1.user_id, eventId=self.event3.eventId, isUserAttended=True
+            user_id=self.user1.user_id, event=self.event3, isUserAttended=True
         )
         self.attending2 = UserAttendingEvent.objects.create(
-            userId=self.user2.user_id, eventId=self.event4.eventId, isUserAttended=True
+            user_id=self.user2.user_id, event=self.event4, isUserAttended=True
         )
 
     def test_insights_view(self):
