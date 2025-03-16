@@ -2,7 +2,7 @@ import uuid
 import logging
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from .models import Users, UserInterests
+from .models import Users, UserInterests, Interests
 from django.contrib.auth.hashers import make_password, check_password
 import json
 
@@ -57,8 +57,10 @@ def saveInitialInterests(request):
         try:
             data = json.loads(request.body)  # Parse JSON body
             interests = data.get("interests", [])  # Extract list from request
+            curr_user = Users.objects.first() #update user!
             for interest in interests:
-                curr_initial_interest = UserInterests(userId= 0, interestId=interest['id']) #update user id!
+                curr_interest = Interests.objects.get(interestId=interest['id'])
+                curr_initial_interest = UserInterests(user= curr_user, interest=curr_interest)
                 curr_initial_interest.save()  # This will save the data to the database
 
             return JsonResponse({"message": "success"})
