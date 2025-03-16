@@ -1,0 +1,16 @@
+
+<div class="card-container">
+    {% for card in cards %}
+        <div class="card" id="card-{{ card.id }}" data-interval="{{ card.interval }}">
+            <div class="card-header">
+                <h3 class="card-title">{{ card.title }}</h3>
+            </div>
+            <div class="card-body">
+                <p class="card-value">{{ card.value }}</p>
+            </div>
+            <div class="card-footer">
+                <p class="card-footer-text">{{ card.footer }}</p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
