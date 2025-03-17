@@ -21,7 +21,7 @@
             border-radius: 15px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             text-align: center;
-            width: 350px;
+            width: 450px;
             animation: fadeIn 1s ease-in-out;
         }
         @keyframes fadeIn {
@@ -38,28 +38,35 @@
             text-align: left;
             margin-bottom: 15px;
         }
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
         .form-group label {
             color: white;
             font-size: 14px;
             margin-bottom: 5px;
         }
-        .form-group input {
-            padding: 12px;
+        .form-group input, 
+        .form-group select {
+            padding: 10px;
             border: none;
             border-radius: 5px;
             outline: none;
             transition: 0.3s;
         }
-        .form-group input:focus {
+        .form-group input:focus, 
+        .form-group select:focus {
             transform: scale(1.05);
         }
         .checkbox-container {
             display: flex;
             align-items: center;
+            gap: 10px;
             margin-bottom: 15px;
-        }
-        .checkbox-container input {
-            margin-right: 10px;
+            color: white;
+            font-size: 14px;
         }
         .button-group {
             display: flex;
@@ -89,82 +96,69 @@
             background-color: #a168d7;
         }
     </style>
-    <script>
-        function handleRegister(event) {
-            event.preventDefault();
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const terms = document.getElementById('terms').checked?'on':'off';
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-            const url = `../insertUser/`;
-            const formData = new URLSearchParams();
-            formData.append('firstName', firstName);
-            formData.append('lastName', lastName);
-            formData.append('email', email);
-            formData.append('password', password);
-            formData.append('terms', terms);
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': csrfToken
-                },
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    if (response.redirected) {
-                        window.location.href = response.url;
-                        return null;
-                    }
-                    return response.text();
-                }
-                return response.json().then(errorData => {
-                    throw new Error(errorData.message);
-                });
-            })
-            .then(data => {
-                if (data && (data.includes('<html') || data.includes('<!DOCTYPE html>'))) {
-                    document.open();
-                    document.write(data);
-                    document.close();
-                }
-            })
-            .catch(error => {
-                alert(`Unexpected error: ${error.message}`);
-            });
-        }
-    </script>
 </head>
 <body>
     <div class="form-container">
         <h2>New User</h2>
-        <form name="register" method="POST" onsubmit="handleRegister(event);">
+        <form name="register" method="POST" onsubmit="handleRegister(event);" enctype="multipart/form-data">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="firstName">First Name:</label>
-                <input type="text" id="firstName" name="firstName" required>
+            
+            <!-- First Name and Last Name Side by Side -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" name="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName" required>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="lastName">Last Name:</label>
-                <input type="text" id="lastName" name="lastName" required>
-            </div>
+
             <div class="form-group">
                 <label for="email">Email:</label>
                 <input type="email" id="email" name="email" required>
             </div>
+
             <div class="form-group">
                 <label for="password">Choose Password:</label>
                 <input type="password" id="password" name="password" required>
             </div>
+
+            <!-- Phone Number and Address Side by Side -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="phone_number">Phone Number:</label>
+                    <input type="text" id="phone_number" name="phone_number" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+            </div>
+
+            <!-- Gender and Date of Birth Side by Side -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="gender">Gender:</label>
+                    <select id="gender" name="gender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date_of_birth">Date of Birth:</label>
+                    <input type="date" id="date_of_birth" name="date_of_birth" required>
+                </div>
+            </div>
+
             <div class="checkbox-container">
                 <input type="checkbox" id="terms" name="terms">
                 <label for="terms">Choose to be a member?</label>
             </div>
+
             <div class="button-group">
                 <button type="submit" name="reg">Register</button>
                 <button type="button" onclick="window.location.href='../login/'">Login</button>
@@ -172,4 +166,61 @@
         </form>
     </div>
 </body>
+<script>
+function handleRegister(event) {
+    event.preventDefault();  // Prevent default form submission
+
+    const firstName = document.getElementById('firstName').value;
+    const lastName = document.getElementById('lastName').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const terms = document.getElementById('terms').checked ? 'on' : 'off';
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    const url = `../insertUser/`;  // This is the server-side URL
+    const formData = new URLSearchParams();
+    formData.append('firstName', firstName);
+    formData.append('lastName', lastName);
+    formData.append('email', email);
+    formData.append('password', password);
+    formData.append('terms', terms);
+
+    // Add other fields if necessary
+    formData.append('phone_number', document.getElementById('phone_number').value);
+    formData.append('address', document.getElementById('address').value);
+    formData.append('gender', document.getElementById('gender').value);
+    formData.append('date_of_birth', document.getElementById('date_of_birth').value);
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrfToken
+        },
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            if (response.redirected) {
+                // If the response is a redirect, handle it manually
+                window.location.href = response.url;  // Redirect to the new page
+                return null;
+            }
+            return response.text();
+        }
+        return response.json().then(errorData => {
+            throw new Error(errorData.message);
+        });
+    })
+    .then(data => {
+        // You can handle successful responses here if needed
+        if (data) {
+            console.log("Form submitted successfully", data);
+        }
+    })
+    .catch(error => {
+        alert(`Unexpected error: ${error.message}`);
+    });
+}
+</script>
 </html>
