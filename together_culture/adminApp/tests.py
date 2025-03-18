@@ -1,11 +1,6 @@
-from loginRegistrationApp.models import Users, UserTypes
-from loginRegistrationApp.models import Users
 from django.test import TestCase, Client
-import json
-from django.http import JsonResponse
-from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests
+from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests, Interests
 from django.urls import reverse
-from django.test import TestCase
 from .models import EventTag, EventLabel
 from django.db import IntegrityError
 import json
@@ -96,7 +91,7 @@ class InsightsViewTest(TestCase):
             startTime="18:00",
             endTime="22:00",
             location="Stadium",
-            numberOfAttenders=100,
+            numberOfAttendees=100,
             shortDescription="A live concert",
             longDescription="A great live music experience",
             eventType="HA"
@@ -107,7 +102,7 @@ class InsightsViewTest(TestCase):
             startTime="15:00",
             endTime="17:00",
             location="Sports Arena",
-            numberOfAttenders=200,
+            numberOfAttendees=200,
             shortDescription="A local match",
             longDescription="A thrilling football match",
             eventType="SP"
@@ -128,35 +123,42 @@ class InsightsViewTest(TestCase):
         )
 
         self.attending1 = UserAttendingEvent.objects.create(
-            userId=self.user1.user_id, eventId=self.event1.eventId, isUserAttended=True
+            user_id=self.user1.user_id, event=self.event1, isUserAttended=True
         )
         self.attending2 = UserAttendingEvent.objects.create(
-            userId=self.user2.user_id, eventId=self.event2.eventId, isUserAttended=True
+            user_id=self.user2.user_id, event=self.event2, isUserAttended=True
+        )
+        
+        self.interest1 = Interests.objects.create(
+            interestId = 998, name = "stuff 1"
+        )
+        self.interest2 = Interests.objects.create(
+            interestId = 999, name = "stuff 2"
         )
 
-        self.interest1 = UserInterests.objects.create(
-            userId=self.user1.user_id, interestId=1)
-        self.interest2 = UserInterests.objects.create(
-            userId=self.user2.user_id, interestId=2)
+        self.userinterest1 = UserInterests.objects.create(
+            user_id=self.user1.user_id, interest=self.interest1)
+        self.userinterest2 = UserInterests.objects.create(
+            user_id=self.user2.user_id, interest=self.interest2)
 
         self.event3 = Events.objects.create(
             eventName="New Year Party", eventDate=timezone.make_aware(datetime.datetime(2025, 1, 5)),
             startTime="18:00", endTime="23:00", location="Club A",
-            numberOfAttenders=20, shortDescription="Celebration",
+            numberOfAttendees=20, shortDescription="Celebration",
             longDescription="New Year Event", eventType="HA"
         )
         self.event4 = Events.objects.create(
             eventName="Spring Fest", eventDate=timezone.make_aware(datetime.datetime(2025, 3, 15)),
             startTime="14:00", endTime="20:00", location="Park B",
-            numberOfAttenders=50, shortDescription="Spring Celebration",
+            numberOfAttendees=50, shortDescription="Spring Celebration",
             longDescription="Spring Festival Event", eventType="ML"
         )
 
         self.attending1 = UserAttendingEvent.objects.create(
-            userId=self.user1.user_id, eventId=self.event3.eventId, isUserAttended=True
+            user_id=self.user1.user_id, event=self.event3, isUserAttended=True
         )
         self.attending2 = UserAttendingEvent.objects.create(
-            userId=self.user2.user_id, eventId=self.event4.eventId, isUserAttended=True
+            user_id=self.user2.user_id, event=self.event4, isUserAttended=True
         )
 
     def test_insights_view(self):
@@ -279,7 +281,7 @@ class EventSearchViewTest(TestCase):
             startTime=time(10, 0),      # event start time: 10:00 AM
             endTime=time(12, 0),        # event end time: 12:00 PM
             location="Test Venue",
-            numberOfAttenders=1,        # initial number of attendees
+            numberOfAttendees=1,        # initial number of attendees
             shortDescription="A short description for testing.",
             longDescription="A longer, detailed description for the test event.",
             eventType=Events.EventType.HAPPENING,  # using the defined text choice
@@ -457,7 +459,7 @@ class UpdateCardViewTest(TestCase):
             startTime=time(10, 0),      # event start time: 10:00 AM
             endTime=time(12, 0),        # event end time: 12:00 PM
             location="Test Venue",
-            numberOfAttenders=1,        # initial number of attendees
+            numberOfAttendees=1,        # initial number of attendees
             shortDescription="A short description for testing.",
             longDescription="A longer, detailed description for the test event.",
             eventType=Events.EventType.HAPPENING,  # using the defined text choice
@@ -470,7 +472,7 @@ class UpdateCardViewTest(TestCase):
             startTime=time(10, 0),      # event start time: 10:00 AM
             endTime=time(12, 0),        # event end time: 12:00 PM
             location="Test Venue",
-            numberOfAttenders=1,        # initial number of attendees
+            numberOfAttendees=1,        # initial number of attendees
             shortDescription="A short description for testing.",
             longDescription="A longer, detailed description for the test event.",
             eventType=Events.EventType.HAPPENING,  # using the defined text choice

@@ -7,15 +7,23 @@ from django.utils.text import slugify
 
 
 class Users(models.Model):
-    user_id = models.CharField(primary_key=True, max_length=36, default=uuid.uuid4, editable=False)  # Set user_id as primary key
+    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Set user_id as primary key
     user_name = models.CharField(max_length=45)
     first_name = models.CharField(max_length=45)
     last_name = models.CharField(max_length=45)
-    email = models.CharField(max_length=45, unique=True)  # Ensure email is unique
+    email = models.EmailField(max_length=255, unique=True)   # Ensure email is unique
     password = models.CharField(max_length=255)  # Ensure enough length for hashed password
     current_user_type = models.CharField(max_length=45)
     have_interest_membership = models.BooleanField(default=False)
     userSlug = models.SlugField(unique=True)
+
+     # New Fields
+    address = models.TextField(null=True, blank=True)  # Allowing null and blank values
+    phone_number = models.CharField(max_length=15, null=True, blank=True)  
+    gender = models.CharField(max_length=10, choices=[("Male", "Male"), ("Female", "Female"), ("Other", "Other")], null=True, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)  
+    profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)  # Upload profile pictures to profile_pictures folder
+
     class Meta:
         db_table = 'users'
 
