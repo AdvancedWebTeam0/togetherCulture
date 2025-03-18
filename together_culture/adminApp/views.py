@@ -22,7 +22,7 @@ nav_items = [
     {'name': '📅 Manage Events', 'url': 'manage-events', 'submenu': None},
     {'name': '👥 Manage Members', 'url': '#', 'submenu': [
         {'name': '➕ Add Member', 'url': 'add-members'},
-        {'name': '📋 Members List', 'url': 'manage-members'},
+        {'name': '📋 Members List', 'url': 'members-list'},
     ]},
     {'name': '🎟 Membership', 'url': 'manage-membership', 'submenu': None},
 ]
@@ -332,10 +332,27 @@ def add_members(request):
     return render(request, 'add_members.html', {'title': title, 'nav_items': nav_items})
 
 
-def manage_members(request):
+def members_list(request):
     # define the title for page
-    title = "Manage Members"
-    return render(request, 'manage_members.html', {'title': title, 'nav_items': nav_items})
+    title = "Members List"
+    
+    curr_members = Users.objects.exclude(current_user_type="Nonmember")
+    curr_members_info = []
+
+    for member in curr_members:
+        member_info = {
+            'first_name': member.first_name,
+            'last_name': member.last_name,
+            'user_name': member.user_name,
+            'user_type': member.current_user_type,
+            'user_slug': member.userSlug,
+        }
+        curr_members_info.append(member_info)
+
+    context = {
+        'members': curr_members_info,
+    }
+    return render(request=request, template_name='members_list.html', context=context)
 
 
 def manage_membership(request):

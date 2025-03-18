@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if members %}
+    <div class="list_of_members">
+        <h2>The members list is:</h2>
+
+        <div class="headers">  
+            <h3> First Name, Last Name, Username, Membership Type </h3>
+        </div>
+        
+        <ul>
+            {% for member in members %}
+                <li> {{ member.first_name }} , {{ member.last_name }} , {{ member.user_name }}, {{ member.user_type }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% else %}
+    <p>No members</p>
+{% endif %}
+
+{% endblock %}
