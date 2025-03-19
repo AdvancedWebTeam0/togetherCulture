@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
 {% if members %}
     <div class="list_of_members">
         <h2>The members list is:</h2>
@@ -12,7 +11,7 @@
         
         <ul>
             {% for member in members %}
-                <li> {{ member.first_name }} , {{ member.last_name }} , {{ member.user_name }}, {{ member.user_type }}</li>
+                <li> {{ member.first_name }} , {{ member.last_name }} , {{ member.user_name }}, {{ member.membership_type }}</li>
             {% endfor %}
         </ul>
     </div>

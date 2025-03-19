@@ -5,6 +5,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import EventTag, EventLabel
 from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests
+from memberApp.models import Membership
 from .forms import EventSearchForm
 import json
 from django.utils import timezone
@@ -336,20 +337,24 @@ def members_list(request):
     # define the title for page
     title = "Members List"
     
-    curr_members = Users.objects.exclude(current_user_type="Nonmember")
+    curr_members = Users.objects.filter(current_user_type="Member")
     curr_members_info = []
 
     for member in curr_members:
+        curr_member_membership = Membership.objects.get(user = member, active = True)
         member_info = {
             'first_name': member.first_name,
             'last_name': member.last_name,
             'user_name': member.user_name,
             'user_type': member.current_user_type,
+            'membership_type': curr_member_membership.membership_type,
             'user_slug': member.userSlug,
         }
         curr_members_info.append(member_info)
 
     context = {
+        'title': title,
+        'nav_items': nav_items,
         'members': curr_members_info,
     }
     return render(request=request, template_name='members_list.html', context=context)
