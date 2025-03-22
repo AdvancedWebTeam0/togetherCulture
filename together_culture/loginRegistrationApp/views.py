@@ -21,6 +21,8 @@ def validate_user(request):
     try:
         user = Users.objects.get(email=email)
         if check_password(password, user.password):
+            request.session['user_slug'] = user.userSlug  # Store userSlug in session
+            request.session.modified = True  # Ensure session is saved
             logger.info('User authenticated successfully. User Email: ' + email)
             return redirect('/member')
         else:
