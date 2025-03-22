@@ -9,6 +9,7 @@ urlpatterns = [
     path('digital-content/', views.digital_content, name='digital-content'),
     path('digital-content/book/<int:module_id>/',
          views.book_module, name='book-module'),
-    path('profile/', views.profile, name='profile'),
+    path('my_membership/', views.my_membership, name='my_membership'),
     path('settings/', views.settings, name='settings'),
+    path('buy-membership/', views.buy_membership, name='buy_membership'),
 ]

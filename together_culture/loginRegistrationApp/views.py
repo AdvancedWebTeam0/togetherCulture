@@ -93,6 +93,7 @@ def membership(request):
     return render(request, 'membership.html')
 
 def logout(request):
+    request.session.flush()
     return render(request, 'Login.html')
 
 
