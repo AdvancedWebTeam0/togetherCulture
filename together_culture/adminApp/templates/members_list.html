@@ -1,19 +1,25 @@
 {% extends 'base.html' %}
 
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'adminApp/css/member_row_card.css' %}">
+<link rel="stylesheet" href="{% static 'adminApp/css/style_member_list.css' %}">
+{% endblock %}
+
 {% block content %}
 {% if members %}
     <div class="list_of_members">
-        <h2>The members list is:</h2>
-
         <div class="headers">  
-            <h3> First Name, Last Name, Username, Membership Type </h3>
+            <h3>Name</h3>
+            <h3>Membership Type</h3>
         </div>
-        
-        <ul>
+
+        <div class="member-list">
             {% for member in members %}
-                <li> {{ member.first_name }} , {{ member.last_name }} , {{ member.user_name }}, {{ member.membership_type }}</li>
+                {% include 'member_information_row_card.html' %}
             {% endfor %}
-        </ul>
+        </div>
+
     </div>
 {% else %}
     <p>No members</p>
