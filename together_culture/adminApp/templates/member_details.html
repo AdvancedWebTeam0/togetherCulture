@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'adminApp/css/style_member_details.css' %}">
+{% endblock %}
+
+{% block content %}
+{% if member %}
+    <div class="member-title">
+        <p> {{ member.first_name }}   {{ member.last_name }} </p>
+    </div>
+
+    <div class="member-details">
+        <p><span class="subtitle">Name:</span>  {{ member.first_name }}   {{ member.last_name }} </p>
+        <p><span class="subtitle">Username:</span>  {{ member.user_name }}</p>
+        <p><span class="subtitle">Email:</span>  {{ member.email }}</p>
+        <p><span class="subtitle">Phone Number:</span>  {{ member.phone_number }}</p>
+        <p><span class="subtitle">Gender:</span>  {{ member.gender }}</p>
+        <p><span class="subtitle">Date of Birth:</span>  {{ member.date_of_birth }}</p>
+        <p><span class="subtitle">User Type:</span>   {{ member.user_type }}</p>
+
+        <p><span class="subtitle">Have an Interest to Become a Member:</span>  
+            {% if member.have_interest_membership == True %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </p>
+
+        <p><span class="subtitle">Membership Type:</span>  {{ member.membership_type }}</p>
+        <p><span class="subtitle">Membership History:</span></p>
+
+        <div class="membership-history-details">
+            {% for history in member.membership_history %}
+                <ul><u>Membership Type:</u>  {{ history.membership_type }} --
+                    <u>Start Date:</u> {{ history.start_date }}, <u>End Date:</u> {{ history.end_date }}</ul>
+            {% endfor %}
+        </div>
+    </div>
+{% else %}
+    <p>Member cannot be found</p>
+{% endif %}
+
+{% endblock %}

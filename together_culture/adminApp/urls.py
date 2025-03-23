@@ -9,6 +9,7 @@ urlpatterns = [
     path('manage-events/', views.manage_events, name='manage-events'),
     path('add-members/', views.add_members, name='add-members'),
     path('members-list/', views.members_list, name='members-list'),
+    path('<slug:slug>/', views.member_detail_view, name='member-detail'),
     path('manage-membership/', views.manage_membership, name='manage-membership'),
     path('save-tag/', views.save_tag, name='save-tag'),
     path('save-label/', views.save_label, name='save-label'),
