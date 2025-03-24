@@ -1,0 +1,181 @@
+{% include 'navigationBar.html' %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Membership</title>
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+        }
+
+        .content {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            color: white;
+            font-size: 28px;
+            font-weight: bold;
+            padding: 15px;
+            text-align: center;
+            border-radius: 8px;
+        }
+
+        .membership-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .membership-card {
+            background: #fff;
+            border: 1px solid #e4e4e4;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .membership-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .membership-card h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .membership-card p {
+            font-size: 16px;
+            margin: 10px 0;
+            color: #555;
+        }
+
+        .membership-card p strong {
+            color: #e74c3c;
+        }
+
+        .membership-card button {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .membership-card button:hover {
+            background: linear-gradient(to right, #ff7eb3, #ff758c);
+        }
+
+        .membership-card .benefits {
+            margin: 20px 0;
+            text-align: left;
+            font-size: 14px;
+        }
+    </style>
+    <script>
+        // Ensure CSRF Token is handled correctly
+        function getCSRFToken() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            console.log('CSRF Token:', csrfToken);  // Debugging line
+            return csrfToken;
+        }
+
+        // Function to handle the membership purchase
+        function buyMembership(membershipType) {
+        fetch('/member/buy-membership/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: 'membership_type=' + encodeURIComponent(membershipType)
+        })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);  // Show the message returned from the server
+            
+            if (data.statusCode === 200) {
+                // After a successful purchase, refresh the page to reflect the updated membership
+                location.reload();  // This reloads the current page
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Something went wrong. Please try again.');
+        });
+    }
+    </script>
+</head>
+<body>
+
+    <div class="content">
+        <div class="header">Membership Plans</div>
+  
+        {% if current_membership %}
+            <p>Current Membership: <strong>{{ current_membership }}</strong></p>
+        {% else %}
+            <p>You don't have any active membership. Choose a plan below to get started.</p>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <div class="membership-options">
+                <!-- Community Membership Card -->
+                <div class="membership-card">
+                    <h3>Community Membership</h3>
+                    <p><strong>£18.50 / month</strong></p>
+                    <div class="benefits">
+                        <p>✔ Participation in Together Culture Democracy</p>
+                        <p>✔ Access to 15 Fitzroy Street</p>
+                        <p>✔ Free or discounted access to activities</p>
+                    </div>
+                    <button type="button" onclick="buyMembership('Community Membership')">Become a Member</button>
+                </div>
+
+                <!-- Workspace Membership: Touchdown Card -->
+                <div class="membership-card">
+                    <h3>Workspace Membership: Touchdown</h3>
+                    <p><strong>£75 / month + £100 joining fee</strong></p>
+                    <div class="benefits">
+                        <p>✔ Includes all benefits of Community Membership</p>
+                        <p>✔ 24/7 access to 15 Fitzroy Street</p>
+                        <p>✔ Inclusive hire for events & meetings</p>
+                    </div>
+                    <button type="button" onclick="buyMembership('Workspace Membership: Touchdown')">Apply Now</button>
+                </div>
+
+                <!-- Workspace Membership: Dedicated Card -->
+                <div class="membership-card">
+                    <h3>Workspace Membership: Dedicated</h3>
+                    <p><strong>£100 / month + £100 joining fee</strong></p>
+                    <div class="benefits">
+                        <p>✔ Includes all benefits of Community Membership</p>
+                        <p>✔ 24/7 access & dedicated workspace</p>
+                        <p>✔ Storage included</p>
+                    </div>
+                    <button type="button" onclick="buyMembership('Workspace Membership: Dedicated')">Apply Now</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</body>
+</html>
