@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import EventTag, EventLabel
 from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests
 from memberApp.models import Membership
-from .forms import EventSearchForm
+from .forms import EventSearchForm, MemberSearchForm
 import json
 from django.utils import timezone
 from django.db.models import Count
@@ -374,8 +374,6 @@ def member_detail_view(request, slug):
             'end_date': history.end_date,
         }
         clicked_member_membership_history.append(history_item)
-    
-    print(clicked_member_membership_history)
 
     member_info = {
         'first_name': clicked_member.first_name,
@@ -401,6 +399,51 @@ def member_detail_view(request, slug):
 
     return render(request=request, template_name='member_details.html', context=context)
 
+
+def member_search(request):
+    title = "Members List"
+
+    print("HERE!")
+
+    members = None
+    results = []
+
+    if request.method == 'GET':
+        member_search_form = MemberSearchForm(request.GET)
+
+        print("Member Search Form: " , member_search_form)
+
+        if member_search_form.is_valid():
+            print("Inside if!")
+            members = member_search_form.cleaned_data['members']
+            print("members: " , members)
+
+            # Using __icontains to search for names without case sensitivity and allow partial matches.
+            results = Users.objects.filter(first_name__icontains=members) | Users.objects.filter(last_nam__icontains=members) | Users.objects.filter(user_name__icontains=members)
+            print("results: " , results)
+
+            results_members_info = []
+            for member in results:
+                curr_member_membership = Membership.objects.get(user = member, active = True)
+                member_info = {
+                    'first_name': member.first_name,
+                    'last_name': member.last_name,
+                    'membership_type': curr_member_membership.membership_type,
+                    'slug': member.userSlug,
+                }
+                results_members_info.append(member_info)
+    
+    else:
+        member_search_form = MemberSearchForm()
+
+
+    context = {
+        'title': title,
+        'nav_items': nav_items,
+        'results': results_members_info,
+    }
+
+    return render(request=request, template_name='members_list.html', context=context)
 
 
 def manage_membership(request):

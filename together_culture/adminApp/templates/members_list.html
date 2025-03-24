@@ -7,20 +7,38 @@
 {% endblock %}
 
 {% block content %}
-{% if members %}
-    <div class="list_of_members">
-        <div class="headers">  
-            <h3>Name</h3>
-            <h3>Membership Type</h3>
-        </div>
 
-        <div class="member-list">
-            {% for member in members %}
-                {% include 'member_information_row_card.html' %}
-            {% endfor %}
-        </div>
-
+<form id="member-search-form", method="GET" action="{% url 'member-search' %}" >
+    <div class="search-container">
+        <span>🔍</span>
+        <input class="search-bar" type="text" placeholder="Search a member.." name="query" value="{{ request.GET.query }}" required>
+        <button type="submit">Search</button>
     </div>
+</form>
+
+{% if members or results %}
+    {% with members as show_members %}
+        {% if results %}
+            {% with results as show_members %}
+            {% endwith %}
+        {% endif %}
+
+        <div class="list_of_members">
+            <div class="headers">  
+                <h3>Name</h3>
+                <h3>Membership Type</h3>
+            </div>
+
+            <div class="member-list">
+                {% for member in show_members %}
+                    {% include 'member_information_row_card.html' %}
+                {% endfor %}
+            </div>
+
+        </div>
+    
+    {% endwith %}
+
 {% else %}
     <p>No members</p>
 {% endif %}
