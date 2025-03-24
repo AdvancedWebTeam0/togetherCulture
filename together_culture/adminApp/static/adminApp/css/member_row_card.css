@@ -1,0 +1,41 @@
+.member-link {
+    text-decoration: none;
+}
+
+.member-info-card {
+    display: inline-grid;
+    grid-template-columns: 1fr 1fr;
+    align-content: center;
+    padding: 20px;
+    border: 1px solid #3d3d3d;
+    width: 600px;
+    border-radius: 10px;
+    height: 30px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+}
+
+.member-name {
+    text-align: left;
+    font-size: 16px;  /* Font size for the name */
+    font-weight: bold; /* Optional: Make the name bold */
+    margin-bottom: 0px;
+    margin-left: 20px;
+    align-items: center;
+    color: black;
+}
+
+.member-info {
+    display: flex;
+    font-size: 14px;
+    align-items: center;
+    color: black;
+}
+
+.member-info p{
+    text-align: right;
+}
+
+.member-link:hover .member-info-card {
+    background-color: rgb(254, 158, 158);
+}

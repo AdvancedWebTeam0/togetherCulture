@@ -1,10 +1,11 @@
 from django.db.models.functions import TruncMonth
 from django.db.models import Count
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import EventTag, EventLabel
 from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests
+from memberApp.models import Membership
 from .forms import EventSearchForm
 import json
 from django.utils import timezone
@@ -22,7 +23,7 @@ nav_items = [
     {'name': '📅 Manage Events', 'url': 'manage-events', 'submenu': None},
     {'name': '👥 Manage Members', 'url': '#', 'submenu': [
         {'name': '➕ Add Member', 'url': 'add-members'},
-        {'name': '📋 Members List', 'url': 'manage-members'},
+        {'name': '📋 Members List', 'url': 'members-list'},
     ]},
     {'name': '🎟 Membership', 'url': 'manage-membership', 'submenu': None},
 ]
@@ -332,10 +333,74 @@ def add_members(request):
     return render(request, 'add_members.html', {'title': title, 'nav_items': nav_items})
 
 
-def manage_members(request):
+def members_list(request):
     # define the title for page
-    title = "Manage Members"
-    return render(request, 'manage_members.html', {'title': title, 'nav_items': nav_items})
+    title = "Members List"
+    
+    curr_members = Users.objects.filter(current_user_type="Member")
+    curr_members_info = []
+
+    for member in curr_members:
+        curr_member_membership = Membership.objects.get(user = member, active = True)
+        member_info = {
+            'first_name': member.first_name,
+            'last_name': member.last_name,
+            'membership_type': curr_member_membership.membership_type,
+            'slug': member.userSlug,
+        }
+        curr_members_info.append(member_info)
+
+    context = {
+        'title': title,
+        'nav_items': nav_items,
+        'members': curr_members_info,
+    }
+    return render(request=request, template_name='members_list.html', context=context)
+
+
+def member_detail_view(request, slug):
+    title = "Member Information"
+
+    clicked_member = get_object_or_404(Users, userSlug=slug)
+    clicked_member_curr_membership = Membership.objects.get(user = clicked_member, active = True)
+    clicked_member_memberships = Membership.objects.filter(user = clicked_member)
+
+    clicked_member_membership_history = []
+
+    for history in clicked_member_memberships:
+        history_item = {
+            'membership_type': history.membership_type,
+            'start_date': history.start_date,
+            'end_date': history.end_date,
+        }
+        clicked_member_membership_history.append(history_item)
+    
+    print(clicked_member_membership_history)
+
+    member_info = {
+        'first_name': clicked_member.first_name,
+        'last_name': clicked_member.last_name,
+        'user_name': clicked_member.user_name,
+        'user_type': clicked_member.current_user_type,
+        'have_interest_membership': clicked_member.have_interest_membership,
+        'address': clicked_member.address,
+        'email': clicked_member.email,
+        'phone_number': clicked_member.phone_number,
+        'gender': clicked_member.gender,
+        'date_of_birth': clicked_member.date_of_birth,
+        'profile_picture': clicked_member.profile_picture,
+        'membership_type': clicked_member_curr_membership.membership_type,
+        'membership_history': clicked_member_membership_history,
+    }
+
+    context = {
+        'title': title,
+        'nav_items': nav_items,
+        'member': member_info,
+    }
+
+    return render(request=request, template_name='member_details.html', context=context)
+
 
 
 def manage_membership(request):
