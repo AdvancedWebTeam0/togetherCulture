@@ -18,4 +18,6 @@ urlpatterns = [
     path('event-label-data/', views.event_label_data, name='event-label-data'),
     path('events-per-month/', views.events_per_month, name='events-per-month'),
     path('event-search-date/', views.event_search_date, name='event-search-date'),
+    path('event-data/', views.event_data, name='event-data'),
+    path('events/<slug:slug>/', views.event_detail, name='event-detail'),
 ]

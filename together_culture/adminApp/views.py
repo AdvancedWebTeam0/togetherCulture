@@ -320,6 +320,34 @@ def event_search_date(request):
             return JsonResponse({'events': data})
 
 
+def event_data(request):
+    events = Events.objects.all()
+    event_list = []
+
+    for event in events:
+        event_list.append({
+            'title': event.eventName,
+            'start': event.eventDate.strftime('%Y-%m-%dT%H:%M:%S'),
+            'end': event.eventDate.strftime('%Y-%m-%dT%H:%M:%S'),
+            'description': event.shortDescription,
+            'location': event.location,
+            'slug': event.eventSlug,
+        })
+
+    return JsonResponse(event_list, safe=False)
+
+def event_detail(request, slug):
+    title = "Event details"
+    event = Events.objects.get(eventSlug=slug)
+    
+    context = {'title': title,
+               'nav_items': nav_items,
+               'cards': cards,
+               'event': event
+               }
+    
+    return render(request, 'event_detail.html', context)
+
 def manage_events(request):
     # define the title for page
     title = "Manage Events"
