@@ -18,7 +18,9 @@ nav_items = [
 
 def member_dashboard(request):
     title = 'Member Dashboard'
-    return render(request, 'member_dashboard.html', {'title': title, 'nav_items': nav_items})
+    username = request.user.username
+    return render(request, 'member_dashboard.html', {'title': title, 'nav_items': nav_items,
+                                                     'username': username})
 
 
 def events(request):
@@ -28,7 +30,7 @@ def events(request):
 def benefits(request):
     title = 'Benefits'
     request.user = Users.objects.get(
-        user_id="d8ac4feb-e18a-4107-9df4-7aa093f38603")  # temp
+        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
     user = request.user
     benefits = Benefit.objects.filter(membership__user=user)
     membership_types = MembershipType.objects.all()  # Fetch all available plans
@@ -39,7 +41,7 @@ def benefits(request):
 
 def use_benefit(request, benefit_id):
     request.user = Users.objects.get(
-        user_id="d8ac4feb-e18a-4107-9df4-7aa093f38603")  # temp
+        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
     user = request.user
 
     # Get user's membership
