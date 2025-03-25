@@ -2,7 +2,7 @@ import uuid
 import logging
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
-from .models import Users, UserInterests
+from .models import Users, UserInterests, Interests
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils.text import slugify
 import json
@@ -21,6 +21,8 @@ def validate_user(request):
     try:
         user = Users.objects.get(email=email)
         if check_password(password, user.password):
+            request.session['user_slug'] = user.userSlug  # Store userSlug in session
+            request.session.modified = True  # Ensure session is saved
             logger.info('User authenticated successfully. User Email: ' + email)
             return redirect('/member')
         else:
@@ -91,6 +93,7 @@ def membership(request):
     return render(request, 'membership.html')
 
 def logout(request):
+    request.session.flush()
     return render(request, 'Login.html')
 
 
@@ -103,8 +106,10 @@ def saveInitialInterests(request):
         try:
             data = json.loads(request.body)  # Parse JSON body
             interests = data.get("interests", [])  # Extract list from request
+            curr_user = Users.objects.first() #update user!
             for interest in interests:
-                curr_initial_interest = UserInterests(userId= 0, interestId=interest['id']) #update user id!
+                curr_interest = Interests.objects.get(interestId=interest['id'])
+                curr_initial_interest = UserInterests(user= curr_user, interest=curr_interest)
                 curr_initial_interest.save()  # This will save the data to the database
 
             return JsonResponse({"message": "success"})

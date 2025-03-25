@@ -4,13 +4,17 @@ from loginRegistrationApp.models import Users
 from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
-
+from loginRegistrationApp.models import UserTypes
+from django.shortcuts import render, redirect
+from datetime import datetime
+from memberApp.models import Membership, MembershipType, Benefit
+from datetime import datetime, timedelta
 nav_items = [
-    {'name': '🎟 My Membership', 'url': 'member-dashboard', 'submenu': None},
+    {'name': '🎟 Dashboard', 'url': 'member-dashboard', 'submenu': None},
     {'name': '🎁 My Benefits', 'url': 'benefits', 'submenu': None},
     {'name': '📅 Events', 'url': 'events', 'submenu': None},
     {'name': '📚 Digital Content', 'url': 'digital-content', 'submenu': None},
-    {'name': '👤 My Profile', 'url': 'profile', 'submenu': None},
+    {'name': '👤 My Membership', 'url': 'my_membership', 'submenu': None},
     {'name': '⚙ Settings', 'url': 'settings', 'submenu': None},
 ]
 
@@ -106,9 +110,65 @@ def book_module(request, module_id):
     return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
 
 
-def profile(request):
-    return render(request, 'profile.html')
+def my_membership(request):
+    return redirect('buy_membership')
 
 
 def settings(request):
     return render(request, 'settings.html')
+
+def buy_membership(request):
+    user_slug = request.session.get("user_slug")  # Get user_slug from session
+    if not user_slug:
+        return redirect('/loginRegistration/login/')  # Redirect if not logged in
+
+    try:
+        user = Users.objects.get(userSlug=user_slug)
+    except Users.DoesNotExist:
+        request.session.flush()  # Ensure session is cleared if the user does not exist
+        return redirect('/loginRegistration/login/')
+
+    if request.method == "GET":
+        latest_membership = UserTypes.objects.filter(user=user).order_by('-date').first()
+        current_membership = latest_membership.userType if latest_membership else None
+
+        return render(request, "buy_membership.html", {
+            'current_membership': current_membership
+        })
+
+    if request.method == "POST":
+        membership_type_name = request.POST.get("membership_type")
+        if not membership_type_name:
+            return JsonResponse({'statusCode': 400, 'message': 'Membership type is required'}, status=400)
+
+        try:
+            membership_type = MembershipType.objects.get(name=membership_type_name)
+        except MembershipType.DoesNotExist:
+            return JsonResponse({'statusCode': 404, 'message': 'Invalid membership type'}, status=404)
+
+        try:
+            # Set previous memberships as inactive
+            Membership.objects.filter(user=user, active=True).update(active=False)
+
+            # Create a new membership entry
+            new_membership = Membership.objects.create(
+                user=user,
+                membership_type=membership_type,
+                start_date=datetime.today(),
+                end_date=datetime.today() + timedelta(days=30),
+                active=True
+            )
+
+            # Update user status to "MEMBER"
+            user.current_user_type = "MEMBER"
+            user.save()
+
+            # Log user membership in UserTypes
+            UserTypes.objects.create(user=user, userType=membership_type.name, date=datetime.now())
+
+            return JsonResponse({'statusCode': 200, 'message': 'Membership purchased successfully'})
+
+        except Exception as e:
+            return JsonResponse({'statusCode': 500, 'message': f'Unexpected error: {e}'}, status=500)
+
+    return JsonResponse({'statusCode': 405, 'message': 'Method not allowed'}, status=405)

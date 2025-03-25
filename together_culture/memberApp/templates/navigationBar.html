@@ -64,17 +64,43 @@
             font-weight: bold;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             border-radius: 10px;
+        } 
+        .logout-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding-top: 50px;
+        }
+        .logout-button {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            padding: 12px 20px;
+            font-size: 18px;
+            border-radius: 8px;
+            text-align: center;
+            width: 90%;
+            font-weight: bold;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            text-decoration: none;
+            color: white;
+        }
+        .logout-button:hover {
+            background-color: rgba(255, 255, 255, 0.4);
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
     <div class="sidebar">
-        <a href="{% url 'memberDashboard' %}">🎟 My Membership</a>
+        <a href="{% url 'member-dashboard' %}">🎟 Dashboard</a>
         <a href="{% url 'benefits' %}">🎁 My Benefits</a>
         <a href="{% url 'events' %}">📅 Events</a>
-        <a href="{% url 'digitalContent' %}">📚 Digital Content</a>
-        <a href="{% url 'profile' %}">👤 My Profile</a>
+        <a href="{% url 'digital-content' %}">📚 Digital Content</a>
+        <a href="{% url 'my_membership' %}">👤 My Membership</a>
         <a href="{% url 'settings' %}">⚙️ Settings</a>
+        <div class="logout-container">
+            <a href="{% url 'logout' %}" class="logout-button">🚪 Logout</a>
+        </div>
     </div>
 </body>
 </html>
