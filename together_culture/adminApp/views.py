@@ -12,6 +12,7 @@ from django.db.models import Count
 from django.db.models.functions import ExtractMonth
 import calendar
 from django.core.paginator import Paginator
+from datetime import datetime
 
 # Create your views here.
 # the url should be the name that is used in urls.py
@@ -324,6 +325,11 @@ def event_data(request):
     events = Events.objects.all()
     event_list = []
 
+    for event in events:
+        # If eventDate is a string, convert it to a datetime object
+        if isinstance(event.eventDate, str):
+            event.eventDate = datetime.strptime(event.eventDate, '%Y-%m-%dT%H:%M:%S')
+    
     for event in events:
         event_list.append({
             'title': event.eventName,
