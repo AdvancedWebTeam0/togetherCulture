@@ -10,6 +10,8 @@ urlpatterns = [
     path('add-members/', views.add_members, name='add-members'),
     path('members-list/', views.members_list, name='members-list'),
     path('member-search/', views.member_search, name='member-search'),
+    path('user-list/', views.user_list, name='user-list'),
+    path('user-search/', views.user_search, name='user-search'),
     path('manage-membership/', views.manage_membership, name='manage-membership'),
     path('save-tag/', views.save_tag, name='save-tag'),
     path('save-label/', views.save_label, name='save-label'),
@@ -19,5 +21,6 @@ urlpatterns = [
     path('event-label-data/', views.event_label_data, name='event-label-data'),
     path('events-per-month/', views.events_per_month, name='events-per-month'),
     path('event-search-date/', views.event_search_date, name='event-search-date'),
-    path('<slug:slug>/', views.member_detail_view, name='member-detail'),
+    path('members-list/<slug:slug>/', views.member_detail_view, name='member-detail'),
+    path('search-user/<slug:slug>/', views.user_attending_event_view, name='user-attending-event-details'),
 ]

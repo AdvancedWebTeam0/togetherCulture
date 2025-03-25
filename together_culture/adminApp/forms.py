@@ -15,8 +15,8 @@ class EventSearchForm(forms.Form):
     )
 
 
-class MemberSearchForm(forms.Form):
-    member = forms.CharField(label='member', 
+class UserSearchForm(forms.Form):
+    user = forms.CharField(label='user', 
                               max_length=50, 
-                              help_text='Member to search'
+                              help_text='User to search'
                               )

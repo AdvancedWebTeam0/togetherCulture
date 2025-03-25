@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'adminApp/css/style_details_user_attending_event.css' %}">
+{% endblock %}
+
+{% block content %}
+{% if user %}
+    <div class="user-title">
+        <p> {{ user.first_name }}   {{ user.last_name }} </p>
+    </div>
+
+    <div class="user-details">
+        <p><span class="subtitle">Name:</span>  {{ user.first_name }}   {{ user.last_name }} </p>
+        <p><span class="subtitle">Username:</span>  {{ user.user_name }}</p>
+        <p><span class="subtitle">User Type:</span>  {{ user.user_type }}</p>
+        <p><span class="subtitle">Membership Type:</span>  {{ user.membership_type }}</p>
+
+        <p><span class="subtitle">Events Booked Before:</span></p>
+        <div class="events-history-details">
+            {% for history in user.events_booked %}
+                <ul><span class="subtitle-event">Event Name:</span>  {{ history.eventName }}</ul>
+                <ul><span class="subtitle-event">Date:</span>  {{ history.eventDate }}</ul>
+                <ul><span class="subtitle-event">Location:</span>  {{ history.location }}</ul>
+                <ul><span class="subtitle-event">Type:</span>  {{ history.eventType }}</ul>
+                <ul><span class="subtitle-event">Is Attended:</span>
+                    {% if history.isUserAttended == True %}
+                        Yes
+                    {% else %}
+                        No
+                    {% endif %}
+                </ul>
+                {% if not forloop.last %}
+                    <div style="border-bottom: 1px dashed rgb(24, 24, 24)"></div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+{% else %}
+    <p>User cannot be found</p>
+{% endif %}
+
+{% endblock %}

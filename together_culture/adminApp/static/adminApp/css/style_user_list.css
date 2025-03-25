@@ -2,7 +2,7 @@
     justify-content: flex-start
 }
 
-.member-list {
+.user-list {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -46,7 +46,7 @@ button {
     padding: 5px 12px;
 }
 
-#see-all-members {
+#see-all-users {
     background-color: rgb(255, 214, 214);
     padding: 10px 12px;
     margin: 25px;
