@@ -258,7 +258,7 @@ def events_per_month(request):
 
     # Get the first day of the current year to limit the query
     first_day_of_year = now.replace(month=1, day=1)
-
+    
     # Aggregate the number of events per month for the current year
     events_per_month = (
         Events.objects.filter(eventDate__gte=first_day_of_year)

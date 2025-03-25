@@ -205,7 +205,7 @@ class MemberDashboardTest(TestCase):
     def setUp(self):
         """Set up a user for testing."""
         self.user = User.objects.create_user(username='testuser', password='testpassword')
-        self.url = reverse('member-dashboard')  # Adjust the URL name as per your URL configuration
+        self.url = reverse('member-dashboard')
 
     def test_member_dashboard_logged_in(self):
         """Test that the member dashboard view works for a logged-in user."""
