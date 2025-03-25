@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 import datetime
 from unittest.mock import patch
 
+
 class EventTagModelTest(TestCase):
     def test_create_event_tag(self):
         # Create an EventTag object
@@ -399,6 +400,97 @@ class CreateTagLabelTest(TestCase):
         self.assertJSONEqual(response.content.decode(
         ), '{"success": false, "error": "Invalid JSON data"}')
 
+    def test_save_tag_non_post_request(self):
+        # Test that a non-POST request (like GET) returns an error
+
+        # Make a GET request instead of a POST request
+        response = self.client.get(reverse('save-tag'))
+
+        # Assert the response status code is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains error message for non-POST requests
+        self.assertEqual(response.json()['success'], False)
+        self.assertEqual(
+            response.json()['error'], 'Only POST requests with JSON data are allowed')
+
+    def test_save_tag_non_json_content_type(self):
+        # Test that a POST request with a non-JSON content type returns an error
+
+        # Prepare the valid data
+        data = {
+            'eventTagName': 'Test Tag'
+        }
+
+        # Make the POST request with a content type that is not 'application/json'
+        response = self.client.post(
+            reverse('save-tag'),
+            data=json.dumps(data),
+            content_type='text/plain'  # Non-JSON content type
+        )
+
+        # Assert the response status code is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains error message for invalid content type
+        self.assertEqual(response.json()['success'], False)
+        self.assertEqual(
+            response.json()['error'], 'Only POST requests with JSON data are allowed')
+
+    def test_save_label_invalid_json(self):
+            # Test that an invalid JSON body returns an error
+
+            # Simulate sending invalid JSON (non-JSON string)
+        response = self.client.post(
+            reverse('save-label'),  # Replace with actual URL name
+            data="invalid_json",  # This is not valid JSON
+            content_type='application/json'
+        )
+
+        # Assert that the response status code is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains error message for invalid JSON
+        self.assertEqual(response.json()['success'], False)
+        self.assertEqual(response.json()['error'], 'Invalid JSON data')
+
+    def test_save_label_non_json_content_type(self):
+        # Test that a POST request with a non-JSON content type returns an error
+
+        # Prepare the valid data
+        data = {
+            'eventLabelName': 'Test Label'
+        }
+
+        # Make the POST request with a non-JSON content type
+        response = self.client.post(
+            reverse('save-label'),
+            data=json.dumps(data),
+            content_type='text/plain'  # Non-JSON content type
+        )
+
+        # Assert the response status code is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains error message for invalid content type
+        self.assertEqual(response.json()['success'], False)
+        self.assertEqual(
+            response.json()['error'], 'Only POST requests with JSON data are allowed')
+
+    def test_save_label_non_post_request(self):
+        # Test that a non-POST request (like GET) returns an error
+
+        # Make a GET request instead of a POST request
+        response = self.client.get(reverse('save-label'))
+
+        # Assert the response status code is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains error message for non-POST requests
+        self.assertEqual(response.json()['success'], False)
+        self.assertEqual(
+            response.json()['error'], 'Only POST requests with JSON data are allowed')
+
 
 class UpdateCardViewTest(TestCase):
 
@@ -419,6 +511,37 @@ class UpdateCardViewTest(TestCase):
                    email=f'admin{i}@example.com', password='password', current_user_type='admin',
                    userSlug=f'userb{i}') for i in range(5)]
         )
+
+        # Setup for card_id == 3 (EventTag)
+        EventTag.objects.create(eventTagName="Tag 1")
+        EventTag.objects.create(eventTagName="Tag 2")
+
+        # Setup for card_id == 4 (EventLabel)
+        EventLabel.objects.create(eventLabelName="Label 1")
+        EventLabel.objects.create(eventLabelName="Label 2")
+        EventLabel.objects.create(eventLabelName="Label 3")
+
+    def test_update_card_event_tag_count(self):
+        # Simulate a request to the `update_card` view with card_id = 3 (EventTag)
+        response = self.client.get(reverse('update-card', args=[3]))
+
+        # Assert the response status is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains the correct count for EventTag
+        self.assertEqual(
+            response.json()['new_value'], EventTag.objects.count())
+
+    def test_update_card_event_label_count(self):
+        # Simulate a request to the `update_card` view with card_id = 4 (EventLabel)
+        response = self.client.get(reverse('update-card', args=[4]))
+
+        # Assert the response status is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains the correct count for EventLabel
+        self.assertEqual(
+            response.json()['new_value'], EventLabel.objects.count())
 
     def test_update_card_view_valid(self):
         """

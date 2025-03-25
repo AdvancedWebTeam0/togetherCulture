@@ -135,11 +135,8 @@ def event_search(request):
     labels = request.GET.get('labels', '').split(',')
 
     # Convert string values to integers (if they are supposed to be IDs)
-    try:
-        tags = [int(tag) for tag in tags if tag.strip().isdigit()]
-        labels = [int(label) for label in labels if label.strip().isdigit()]
-    except ValueError:
-        return JsonResponse({'error': 'Invalid tag or label ID'}, status=400)
+    tags = [int(tag) for tag in tags if tag.strip().isdigit()]
+    labels = [int(label) for label in labels if label.strip().isdigit()]
 
     # Rebuild the GET data with properly split values
     request.GET = request.GET.copy()

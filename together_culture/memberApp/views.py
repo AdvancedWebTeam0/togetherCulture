@@ -3,6 +3,7 @@ from .models import DigitalContentModule, ModuleBooking, Membership, Benefit, Me
 from loginRegistrationApp.models import Users
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 nav_items = [
     {'name': '🎟 My Membership', 'url': 'member-dashboard', 'submenu': None},
@@ -15,7 +16,7 @@ nav_items = [
 
 # Create your views here.
 
-
+@login_required
 def member_dashboard(request):
     title = 'Member Dashboard'
     username = request.user.username
@@ -26,7 +27,7 @@ def member_dashboard(request):
 def events(request):
     return render(request, 'events.html')
 
-
+@login_required
 def benefits(request):
     title = 'Benefits'
     request.user = Users.objects.get(
