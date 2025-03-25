@@ -353,6 +353,7 @@ def members_list(request):
     context = {
         'title': title,
         'nav_items': nav_items,
+        'form': MemberSearchForm(),
         'members': curr_members_info,
     }
     return render(request=request, template_name='members_list.html', context=context)
@@ -402,29 +403,27 @@ def member_detail_view(request, slug):
 
 def member_search(request):
     title = "Members List"
-
-    print("HERE!")
-
-    members = None
     results = []
 
-    if request.method == 'GET':
+    if request.method == "GET":
         member_search_form = MemberSearchForm(request.GET)
 
-        print("Member Search Form: " , member_search_form)
-
         if member_search_form.is_valid():
-            print("Inside if!")
-            members = member_search_form.cleaned_data['members']
-            print("members: " , members)
+            memberString = member_search_form.cleaned_data['member']
+
+            search_detail = "Search results for: \t" + memberString
 
             # Using __icontains to search for names without case sensitivity and allow partial matches.
-            results = Users.objects.filter(first_name__icontains=members) | Users.objects.filter(last_nam__icontains=members) | Users.objects.filter(user_name__icontains=members)
+            results = Users.objects.filter(first_name__icontains=memberString, current_user_type="Member") | \
+                    Users.objects.filter(last_name__icontains=memberString, current_user_type="Member") | \
+                    Users.objects.filter(user_name__icontains=memberString, current_user_type="Member")
+            
             print("results: " , results)
 
             results_members_info = []
             for member in results:
                 curr_member_membership = Membership.objects.get(user = member, active = True)
+
                 member_info = {
                     'first_name': member.first_name,
                     'last_name': member.last_name,
@@ -432,18 +431,35 @@ def member_search(request):
                     'slug': member.userSlug,
                 }
                 results_members_info.append(member_info)
+                print("Member info: ", results_members_info)
+            
+            context = {
+                'title': title,
+                'nav_items': nav_items,
+                'form': MemberSearchForm(),
+                'members': results_members_info,
+                'search_detail': search_detail,
+            }
+
+        else:
+            context = {
+                'title': title,
+                'nav_items': nav_items,
+                'form': MemberSearchForm(),
+            }
     
     else:
-        member_search_form = MemberSearchForm()
-
-
-    context = {
-        'title': title,
-        'nav_items': nav_items,
-        'results': results_members_info,
-    }
+        context = {
+            'title': title,
+            'nav_items': nav_items,
+            'form': MemberSearchForm(),
+        }
 
     return render(request=request, template_name='members_list.html', context=context)
+
+
+def see_all_members():
+    return redirect(members_list)
 
 
 def manage_membership(request):

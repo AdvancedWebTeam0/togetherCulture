@@ -7,22 +7,33 @@
 {% endblock %}
 
 {% block content %}
+<script>
+    var fullUrl = window.location.origin + "{% url 'members-list' %}";
 
-<form id="member-search-form", method="GET" action="{% url 'member-search' %}" >
-    <div class="search-container">
-        <span>🔍</span>
-        <input class="search-bar" type="text" placeholder="Search a member.." name="query" value="{{ request.GET.query }}" required>
-        <button type="submit">Search</button>
-    </div>
-</form>
+    function goToMembersList() {
+        window.location.href = fullUrl;
+    }
+</script>
 
-{% if members or results %}
-    {% with members as show_members %}
-        {% if results %}
-            {% with results as show_members %}
-            {% endwith %}
-        {% endif %}
 
+<div class="search-section">
+    <form id="member-search-form", method="GET" action="{% url 'member-search' %}" >
+        <div class="search-container">
+            <span>🔍</span>
+            <input class="search-bar" id="id_member" type="text" placeholder="Search a member.." name="member" value="{{ request.GET.query }}" required>
+            <button type="submit">Search</button>
+        </div>
+    </form>
+
+    <button id="see-all-members" onclick="goToMembersList();">See all Members</button>
+</div>
+
+
+{% if search_detail %}
+    <p class="search-detail">{{ search_detail }}</p>
+{% endif %}
+
+{% if members %}
         <div class="list_of_members">
             <div class="headers">  
                 <h3>Name</h3>
@@ -30,17 +41,14 @@
             </div>
 
             <div class="member-list">
-                {% for member in show_members %}
+                {% for member in members %}
                     {% include 'member_information_row_card.html' %}
                 {% endfor %}
             </div>
-
         </div>
-    
-    {% endwith %}
 
 {% else %}
-    <p>No members</p>
+    <p>No members found</p>
 {% endif %}
 
 {% endblock %}

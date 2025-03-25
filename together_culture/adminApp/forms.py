@@ -16,8 +16,7 @@ class EventSearchForm(forms.Form):
 
 
 class MemberSearchForm(forms.Form):
-    members = forms.CharField(label='members', max_length=50, help_text='Member name to search')
-
-    def clean_members(self):
-        return self.cleaned_data['members']
-
+    member = forms.CharField(label='member', 
+                              max_length=50, 
+                              help_text='Member to search'
+                              )
