@@ -122,8 +122,11 @@
             <button type="submit">Search</button>
         </form>
 
-        <h2>Results</h2>
-        <table id="resultsTable" class="table">
+        <!-- Initially hidden Results Header -->
+        <h2 id="resultsHeader" style="display: none;">Results</h2>
+
+        <!-- Initially hidden table -->
+        <table id="resultsTable" class="table" style="display: none;">
             <thead>
                 <tr>
                     <th>Event Name</th>
@@ -134,14 +137,26 @@
                 </tr>
             </thead>
             <tbody id="resultsBody">
-                
+                <!-- Results will be inserted here -->
             </tbody>
         </table>
     </section>
 </div>
+
+<div class="main-content">
+    <section class="cards-container">
+        <h2>Event Calendar</h2>
+
+        <!-- The container where the calendar will be rendered -->
+        <div id="calendar"></div>
+    </section>
+</div>
+
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const form = document.getElementById("eventSearchDateForm");
+        const resultsHeader = document.getElementById("resultsHeader"); // Get the results header
+        const resultsTable = document.getElementById("resultsTable"); // Get the table
         const resultsBody = document.getElementById("resultsBody");
 
         form.addEventListener("submit", function (event) {
@@ -155,6 +170,10 @@
                 return;
             }
 
+            // Hide the results header and table initially before fetching
+            resultsHeader.style.display = "none";
+            resultsTable.style.display = "none";
+
             fetch(`/admin/event-search-date/?start_date=${startDate}&end_date=${endDate}`, {
                 headers: { "X-Requested-With": "XMLHttpRequest" } // Identifies this as an AJAX request
             })
@@ -164,27 +183,95 @@
 
                     if (data.events.length === 0) {
                         resultsBody.innerHTML = "<tr><td colspan='5'>No events found.</td></tr>";
-                        return;
+                    } else {
+                        // Populate the table with new data
+                        data.events.forEach(event => {
+                            const row = document.createElement("tr");
+
+                            row.innerHTML = `
+                                <td>${event.eventName}</td>
+                                <td>${event.eventDate}</td>
+                                <td>${event.location}</td>
+                                <td>${event.totalAttendees}</td>
+                                <td>
+                                    <ul>${event.attendees.map(a => `<li>${a.name} (${a.email})</li>`).join("")}</ul>
+                                </td>
+                            `;
+
+                            resultsBody.appendChild(row);
+                        });
                     }
 
-                    data.events.forEach(event => {
-                        const row = document.createElement("tr");
-
-                        row.innerHTML = `
-                        <td>${event.eventName}</td>
-                        <td>${event.eventDate}</td>
-                        <td>${event.location}</td>
-                        <td>${event.totalAttendees}</td>
-                        <td>
-                            <ul>${event.attendees.map(a => `<li>${a.name} (${a.email})</li>`).join("")}</ul>
-                        </td>
-                    `;
-
-                        resultsBody.appendChild(row);
-                    });
+                    // After data is loaded, show the results header and table
+                    resultsHeader.style.display = "block"; // Show the results header
+                    resultsTable.style.display = "table";  // Show the table
                 })
-                .catch(error => console.error("Error fetching data:", error));
+                .catch(error => {
+                    console.error("Error fetching data:", error);
+                    resultsBody.innerHTML = "<tr><td colspan='5'>Error fetching events. Please try again later.</td></tr>";
+                    resultsHeader.style.display = "block"; // Show the results header even if there is an error
+                    resultsTable.style.display = "table";  // Show the table even if there's an error
+                });
         });
+    });
+</script>
+
+
+
+<!-- Include FullCalendar v4 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.4.0/main.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@4.4.0/main.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@4.4.0/main.min.css" rel="stylesheet">
+
+<!-- Include FullCalendar v4 JS and Plugins -->
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.4.0/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@4.4.0/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@4.4.0/main.min.js"></script>
+
+<script type="text/javascript">
+    // URL to fetch events from Django backend
+    const eventsDataUrl = "{% url 'event-data' %}";
+
+    // Function to initialize the calendar
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+
+        // Initialize FullCalendar v4
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            plugins: ['dayGrid', 'interaction'],  // Add dayGrid and interaction plugins here
+            header: {
+                left: 'prev,next today',           // Left side of header
+                center: 'title',                   // Centered title
+                right: 'dayGridMonth,dayGridWeek,dayGridDay' // Show month, week, and day views on the right
+            },
+            events: async function (fetchInfo, successCallback, failureCallback) {
+                try {
+                    // Fetch event data from the Django backend
+                    const response = await fetch(eventsDataUrl);
+                    const events = await response.json();
+
+                    // Format events for FullCalendar
+                    const formattedEvents = events.map(event => ({
+                        title: event.title,
+                        start: event.start,    // Event start date/time
+                        end: event.end,        // Event end date/time
+                        description: event.description,
+                        location: event.location,
+                        url: '/admin/events/' + event.slug  // Link to event detail page
+                    }));
+
+                    // Callback to populate events on the calendar
+                    successCallback(formattedEvents);
+                } catch (error) {
+                    failureCallback(error); // Handle failure in fetching events
+                }
+            },
+            editable: true,  // Allow events to be edited
+            droppable: true, // Allow events to be dropped
+        });
+
+        // Render the calendar
+        calendar.render();
     });
 </script>
 {% endblock %}

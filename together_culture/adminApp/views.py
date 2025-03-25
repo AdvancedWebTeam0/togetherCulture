@@ -13,6 +13,7 @@ from django.db.models import Count
 from django.db.models.functions import ExtractMonth
 import calendar
 from django.core.paginator import Paginator
+from datetime import datetime
 
 # Create your views here.
 # the url should be the name that is used in urls.py
@@ -135,11 +136,8 @@ def event_search(request):
     labels = request.GET.get('labels', '').split(',')
 
     # Convert string values to integers (if they are supposed to be IDs)
-    try:
-        tags = [int(tag) for tag in tags if tag.strip().isdigit()]
-        labels = [int(label) for label in labels if label.strip().isdigit()]
-    except ValueError:
-        return JsonResponse({'error': 'Invalid tag or label ID'}, status=400)
+    tags = [int(tag) for tag in tags if tag.strip().isdigit()]
+    labels = [int(label) for label in labels if label.strip().isdigit()]
 
     # Rebuild the GET data with properly split values
     request.GET = request.GET.copy()
@@ -261,7 +259,7 @@ def events_per_month(request):
 
     # Get the first day of the current year to limit the query
     first_day_of_year = now.replace(month=1, day=1)
-
+    
     # Aggregate the number of events per month for the current year
     events_per_month = (
         Events.objects.filter(eventDate__gte=first_day_of_year)
@@ -320,6 +318,39 @@ def event_search_date(request):
 
             return JsonResponse({'events': data})
 
+
+def event_data(request):
+    events = Events.objects.all()
+    event_list = []
+
+    for event in events:
+        # If eventDate is a string, convert it to a datetime object
+        if isinstance(event.eventDate, str):
+            event.eventDate = datetime.strptime(event.eventDate, '%Y-%m-%dT%H:%M:%S')
+    
+    for event in events:
+        event_list.append({
+            'title': event.eventName,
+            'start': event.eventDate.strftime('%Y-%m-%dT%H:%M:%S'),
+            'end': event.eventDate.strftime('%Y-%m-%dT%H:%M:%S'),
+            'description': event.shortDescription,
+            'location': event.location,
+            'slug': event.eventSlug,
+        })
+
+    return JsonResponse(event_list, safe=False)
+
+def event_detail(request, slug):
+    title = "Event details"
+    event = Events.objects.get(eventSlug=slug)
+    
+    context = {'title': title,
+               'nav_items': nav_items,
+               'cards': cards,
+               'event': event
+               }
+    
+    return render(request, 'event_detail.html', context)
 
 def manage_events(request):
     # define the title for page

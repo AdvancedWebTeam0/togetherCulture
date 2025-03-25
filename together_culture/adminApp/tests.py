@@ -8,6 +8,7 @@ from django.utils import timezone
 from datetime import time
 from django.contrib.auth.models import User
 import datetime
+from unittest.mock import patch
 
 
 class EventTagModelTest(TestCase):
@@ -94,7 +95,8 @@ class InsightsViewTest(TestCase):
             numberOfAttendees=100,
             shortDescription="A live concert",
             longDescription="A great live music experience",
-            eventType="HA"
+            eventType="HA",
+            eventSlug='event1'
         )
         self.event2 = Events.objects.create(
             eventName="Football Match",
@@ -105,7 +107,8 @@ class InsightsViewTest(TestCase):
             numberOfAttendees=200,
             shortDescription="A local match",
             longDescription="A thrilling football match",
-            eventType="SP"
+            eventType="SP",
+            eventSlug='event2'
         )
 
         self.event1.tags.add(self.tag1)
@@ -114,12 +117,14 @@ class InsightsViewTest(TestCase):
         self.event2.labels.add(self.label2)
 
         self.user1 = Users.objects.create(
-            user_id="1", user_name="testuser1", first_name="John", last_name="Doe",
-            email="john@example.com", password="password", current_user_type="Admin"
+            user_id="8d36c361-6392-46ff-a755-5f27ca33c773", user_name="testuser1", first_name="John", last_name="Doe",
+            email="john@example.com", password="password", current_user_type="Admin",
+            userSlug="user1"
         )
         self.user2 = Users.objects.create(
-            user_id="2", user_name="testuser2", first_name="Jane", last_name="Doe",
-            email="jane@example.com", password="password", current_user_type="Member"
+            user_id="38683b82-ff63-4db7-b1f3-bd475adfb75f", user_name="testuser2", first_name="Jane", last_name="Doe",
+            email="jane@example.com", password="password", current_user_type="Member",
+            userSlug="user2"
         )
 
         self.attending1 = UserAttendingEvent.objects.create(
@@ -128,12 +133,12 @@ class InsightsViewTest(TestCase):
         self.attending2 = UserAttendingEvent.objects.create(
             user_id=self.user2.user_id, event=self.event2, isUserAttended=True
         )
-        
+
         self.interest1 = Interests.objects.create(
-            interestId = 998, name = "stuff 1"
+            interestId=998, name="stuff 1"
         )
         self.interest2 = Interests.objects.create(
-            interestId = 999, name = "stuff 2"
+            interestId=999, name="stuff 2"
         )
 
         self.userinterest1 = UserInterests.objects.create(
@@ -145,13 +150,15 @@ class InsightsViewTest(TestCase):
             eventName="New Year Party", eventDate=timezone.make_aware(datetime.datetime(2025, 1, 5)),
             startTime="18:00", endTime="23:00", location="Club A",
             numberOfAttendees=20, shortDescription="Celebration",
-            longDescription="New Year Event", eventType="HA"
+            longDescription="New Year Event", eventType="HA",
+            eventSlug='event3'
         )
         self.event4 = Events.objects.create(
             eventName="Spring Fest", eventDate=timezone.make_aware(datetime.datetime(2025, 3, 15)),
             startTime="14:00", endTime="20:00", location="Park B",
             numberOfAttendees=50, shortDescription="Spring Celebration",
-            longDescription="Spring Festival Event", eventType="ML"
+            longDescription="Spring Festival Event", eventType="ML",
+            eventSlug='eventSlug4'
         )
 
         self.attending1 = UserAttendingEvent.objects.create(
@@ -285,6 +292,7 @@ class EventSearchViewTest(TestCase):
             shortDescription="A short description for testing.",
             longDescription="A longer, detailed description for the test event.",
             eventType=Events.EventType.HAPPENING,  # using the defined text choice
+            eventSlug='events666'
         )
 
         event.tags.add(self.tag1)
@@ -392,6 +400,97 @@ class CreateTagLabelTest(TestCase):
         self.assertJSONEqual(response.content.decode(
         ), '{"success": false, "error": "Invalid JSON data"}')
 
+    def test_save_tag_non_post_request(self):
+        # Test that a non-POST request (like GET) returns an error
+
+        # Make a GET request instead of a POST request
+        response = self.client.get(reverse('save-tag'))
+
+        # Assert the response status code is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains error message for non-POST requests
+        self.assertEqual(response.json()['success'], False)
+        self.assertEqual(
+            response.json()['error'], 'Only POST requests with JSON data are allowed')
+
+    def test_save_tag_non_json_content_type(self):
+        # Test that a POST request with a non-JSON content type returns an error
+
+        # Prepare the valid data
+        data = {
+            'eventTagName': 'Test Tag'
+        }
+
+        # Make the POST request with a content type that is not 'application/json'
+        response = self.client.post(
+            reverse('save-tag'),
+            data=json.dumps(data),
+            content_type='text/plain'  # Non-JSON content type
+        )
+
+        # Assert the response status code is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains error message for invalid content type
+        self.assertEqual(response.json()['success'], False)
+        self.assertEqual(
+            response.json()['error'], 'Only POST requests with JSON data are allowed')
+
+    def test_save_label_invalid_json(self):
+            # Test that an invalid JSON body returns an error
+
+            # Simulate sending invalid JSON (non-JSON string)
+        response = self.client.post(
+            reverse('save-label'),  # Replace with actual URL name
+            data="invalid_json",  # This is not valid JSON
+            content_type='application/json'
+        )
+
+        # Assert that the response status code is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains error message for invalid JSON
+        self.assertEqual(response.json()['success'], False)
+        self.assertEqual(response.json()['error'], 'Invalid JSON data')
+
+    def test_save_label_non_json_content_type(self):
+        # Test that a POST request with a non-JSON content type returns an error
+
+        # Prepare the valid data
+        data = {
+            'eventLabelName': 'Test Label'
+        }
+
+        # Make the POST request with a non-JSON content type
+        response = self.client.post(
+            reverse('save-label'),
+            data=json.dumps(data),
+            content_type='text/plain'  # Non-JSON content type
+        )
+
+        # Assert the response status code is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains error message for invalid content type
+        self.assertEqual(response.json()['success'], False)
+        self.assertEqual(
+            response.json()['error'], 'Only POST requests with JSON data are allowed')
+
+    def test_save_label_non_post_request(self):
+        # Test that a non-POST request (like GET) returns an error
+
+        # Make a GET request instead of a POST request
+        response = self.client.get(reverse('save-label'))
+
+        # Assert the response status code is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert that the response contains error message for non-POST requests
+        self.assertEqual(response.json()['success'], False)
+        self.assertEqual(
+            response.json()['error'], 'Only POST requests with JSON data are allowed')
+
 
 class UpdateCardViewTest(TestCase):
 
@@ -403,13 +502,46 @@ class UpdateCardViewTest(TestCase):
         # Create users with 'member' as current_user_type
         Users.objects.bulk_create(
             [Users(user_name=f'User{i}', first_name=f'First{i}', last_name=f'Last{i}',
-                   email=f'user{i}@example.com', password='password', current_user_type='member') for i in range(130)]
+                   email=f'user{i}@example.com', password='password', current_user_type='member',
+                   userSlug=f'usera{i}') for i in range(130)]
         )
         # Create a few users with non-'member' user_type (e.g., 'admin')
         Users.objects.bulk_create(
             [Users(user_name=f'Admin{i}', first_name=f'AdminFirst{i}', last_name=f'AdminLast{i}',
-                   email=f'admin{i}@example.com', password='password', current_user_type='admin') for i in range(5)]
+                   email=f'admin{i}@example.com', password='password', current_user_type='admin',
+                   userSlug=f'userb{i}') for i in range(5)]
         )
+
+        # Setup for card_id == 3 (EventTag)
+        EventTag.objects.create(eventTagName="Tag 1")
+        EventTag.objects.create(eventTagName="Tag 2")
+
+        # Setup for card_id == 4 (EventLabel)
+        EventLabel.objects.create(eventLabelName="Label 1")
+        EventLabel.objects.create(eventLabelName="Label 2")
+        EventLabel.objects.create(eventLabelName="Label 3")
+
+    def test_update_card_event_tag_count(self):
+        # Simulate a request to the `update_card` view with card_id = 3 (EventTag)
+        response = self.client.get(reverse('update-card', args=[3]))
+
+        # Assert the response status is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains the correct count for EventTag
+        self.assertEqual(
+            response.json()['new_value'], EventTag.objects.count())
+
+    def test_update_card_event_label_count(self):
+        # Simulate a request to the `update_card` view with card_id = 4 (EventLabel)
+        response = self.client.get(reverse('update-card', args=[4]))
+
+        # Assert the response status is 200 OK
+        self.assertEqual(response.status_code, 200)
+
+        # Assert the response contains the correct count for EventLabel
+        self.assertEqual(
+            response.json()['new_value'], EventLabel.objects.count())
 
     def test_update_card_view_valid(self):
         """
@@ -463,7 +595,8 @@ class UpdateCardViewTest(TestCase):
             shortDescription="A short description for testing.",
             longDescription="A longer, detailed description for the test event.",
             eventType=Events.EventType.HAPPENING,  # using the defined text choice
-            eventDate=timezone.now() + timezone.timedelta(days=1)  # Tomorrow's date
+            eventDate=timezone.now() + timezone.timedelta(days=1),  # Tomorrow's date
+            eventSlug='event1'
         )
 
         # Create an event that is in the past
@@ -476,7 +609,8 @@ class UpdateCardViewTest(TestCase):
             shortDescription="A short description for testing.",
             longDescription="A longer, detailed description for the test event.",
             eventType=Events.EventType.HAPPENING,  # using the defined text choice
-            eventDate=timezone.now() - timezone.timedelta(days=1)  # Yesterday's date
+            eventDate=timezone.now() - timezone.timedelta(days=1),  # Yesterday's date
+            eventSlug="pastevent"
         )
 
         # Test card 2 (Number of upcoming events)
@@ -492,3 +626,78 @@ class UpdateCardViewTest(TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertJSONEqual(response.content.decode(),
                              '{"error": "Invalid card ID"}')
+
+
+class EventDataViewTest(TestCase):
+
+    @patch('adminApp.views.Events.objects.all')
+    def test_event_data(self, mock_events_all):
+        # Mock the event data
+        mock_events_all.return_value = [
+            Events(eventName="Event 1", eventDate="2025-03-25T10:00:00",
+                   shortDescription="Test Event 1", location="Location 1", eventSlug="event-1"),
+            Events(eventName="Event 2", eventDate="2025-03-26T14:00:00",
+                   shortDescription="Test Event 2", location="Location 2", eventSlug="event-2"),
+        ]
+
+        # Make a GET request to the 'event_data' view
+        response = self.client.get(reverse('event-data'))
+
+        # Check the response status code
+        self.assertEqual(response.status_code, 200)
+
+        # Check that the response is a JSON response
+        self.assertEqual(response['Content-Type'], 'application/json')
+
+        # Check the structure and data of the JSON response
+        response_data = response.json()
+        self.assertEqual(len(response_data), 2)  # Should have two events
+
+        # Check first event data
+        self.assertEqual(response_data[0]['title'], "Event 1")
+        self.assertEqual(response_data[0]['start'], "2025-03-25T10:00:00")
+        self.assertEqual(response_data[0]['end'], "2025-03-25T10:00:00")
+        self.assertEqual(response_data[0]['description'], "Test Event 1")
+        self.assertEqual(response_data[0]['location'], "Location 1")
+        self.assertEqual(response_data[0]['slug'], "event-1")
+
+        # Check second event data
+        self.assertEqual(response_data[1]['title'], "Event 2")
+        self.assertEqual(response_data[1]['start'], "2025-03-26T14:00:00")
+        self.assertEqual(response_data[1]['end'], "2025-03-26T14:00:00")
+        self.assertEqual(response_data[1]['description'], "Test Event 2")
+        self.assertEqual(response_data[1]['location'], "Location 2")
+        self.assertEqual(response_data[1]['slug'], "event-2")
+
+
+class EventDetailViewTest(TestCase):
+
+    @patch('adminApp.views.Events.objects.get')
+    def test_event_detail(self, mock_events_get):
+        # Mock the event data
+        mock_event = Events(
+            eventName="Event 1",
+            eventDate="2025-03-25T10:00:00",
+            shortDescription="Test Event 1",
+            location="Location 1",
+            eventSlug="event-1"
+        )
+        mock_events_get.return_value = mock_event
+
+        # Make a GET request to the 'event_detail' view
+        response = self.client.get(reverse('event-detail', args=['event-1']))
+
+        # Check the response status code
+        self.assertEqual(response.status_code, 200)
+
+        # Check that the correct template is used
+        self.assertTemplateUsed(response, 'event_detail.html')
+
+        # Check that the context contains the correct event data
+        context = response.context
+        self.assertEqual(context['event'], mock_event)
+
+        # Test if the title and other context variables are also correct
+        self.assertEqual(context['title'], "Event details")
+        self.assertTrue('nav_items' in context)
+        self.assertTrue('cards' in context)

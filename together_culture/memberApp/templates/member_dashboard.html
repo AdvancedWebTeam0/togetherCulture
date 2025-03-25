@@ -1,8 +1,19 @@
 {% extends 'base.html' %}
 
-<!--you can remove belove code  -->
+
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cards.css' %}">
+{% endblock %}
+{% block js %}
+{% endblock %}
+<!-- greet user by username -->
+{% block title %}Hello {{ username }}! Welcome to your dashboard.{% endblock %}
+
 {% block content %}
-<h1>Welcome to Your Dashboard</h1>
-<p>Explore events, track your benefits, and manage your profile seamlessly.</p>
-</div>
+
+<!-- membership tier/type -->
+
+<!-- upcoming events that user have booked -->
+
 {% endblock %}

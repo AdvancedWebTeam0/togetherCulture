@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h2>{{ event.eventName }}</h2>
+  <p><strong>Location:</strong> {{ event.location }}</p>
+  <p><strong>Description:</strong> {{ event.longDescription }}</p>
+  <p><strong>Start Time:</strong> {{ event.eventDate }}</p>
+  <p><strong>End Time:</strong> {{ event.endTime }}</p>
+{% endblock %}
