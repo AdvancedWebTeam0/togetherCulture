@@ -337,7 +337,6 @@ def event_data(request):
             'location': event.location,
             'slug': event.eventSlug,
         })
-
     return JsonResponse(event_list, safe=False)
 
 def event_detail(request, slug):
