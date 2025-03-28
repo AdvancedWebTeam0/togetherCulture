@@ -1,8 +1,8 @@
-.member-link {
+.user-link {
     text-decoration: none;
 }
 
-.member-info-card {
+.user-info-card {
     display: inline-grid;
     grid-template-columns: 1fr 1fr;
     align-content: center;
@@ -15,27 +15,27 @@
     transition: background-color 0.3s ease;
 }
 
-.member-name {
+.user-name {
     text-align: left;
-    font-size: 16px;  /* Font size for the name */
-    font-weight: bold; /* Optional: Make the name bold */
+    font-size: 16px;
+    font-weight: bold;
     margin-bottom: 0px;
     margin-left: 20px;
     align-items: center;
     color: black;
 }
 
-.member-info {
+.user-info {
     display: flex;
     font-size: 14px;
     align-items: center;
     color: black;
 }
 
-.member-info p{
+.user-info p{
     text-align: right;
 }
 
-.member-link:hover .member-info-card {
+.user-link:hover .user-info-card {
     background-color: rgb(254, 158, 158);
 }
