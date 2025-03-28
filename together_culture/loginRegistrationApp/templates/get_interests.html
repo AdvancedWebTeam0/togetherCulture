@@ -5,24 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enter Initial Interests</title>
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/pop_up_style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/initial_interests_form.css' %}">
 </head>
 <body>
-    <div class="popup-form">
-        <p id="popup-text">Please select the interests you are <br> initially interested in below.</p>
-        <form name="initial_interests" method="post" onsubmit="handleInitialInterests(event);">
+    {% if messages %}
+        {% for message in messages %}
+            <div class="messages">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="initial-interests-form">
+        <p id="form-title-text">Please select the interests you are <br> initially interested in below.</p>
+        <form name="initial_interests" method="post" action="{% url 'get_interests' %}">
             {% csrf_token %}
             <div class="form-container">
                 <div class="form-group">
-                    <label><input type="checkbox" name="interest_checkbox" value=1> Happening</label>
-                    <label><input type="checkbox" name="interest_checkbox" value=3> Caring</label>
-                    <label><input type="checkbox" name="interest_checkbox" value=5> Learning</label>
-                    <label><input type="checkbox" name="interest_checkbox" value=7> Democracy</label>
+                    <label><input type="checkbox" name="interests" value="Happening"> Happening</label>
+                    <label><input type="checkbox" name="interests" value="Caring"> Caring</label>
+                    <label><input type="checkbox" name="interests" value="Learning"> Learning</label>
+                    <label><input type="checkbox" name="interests" value="Democracy"> Democracy</label>
                 </div>
                 <div class="form-group">
-                    <label><input type="checkbox" name="interest_checkbox" value=2> Member Led</label>
-                    <label><input type="checkbox" name="interest_checkbox" value=4> Sharing</label>
-                    <label><input type="checkbox" name="interest_checkbox" value=6> Working</label>
+                    <label><input type="checkbox" name="interests" value="Member Led"> Member Led</label>
+                    <label><input type="checkbox" name="interests" value="Sharing"> Sharing</label>
+                    <label><input type="checkbox" name="interests" value="Working"> Working</label>
                 </div>
             </div>
             <div class="button-group">
@@ -31,7 +37,5 @@
         </form>
     </div>
 
-    {% load static %}
-    <script src="{% static 'js/function_popup.js' %}"></script>
 </body>
 </html>

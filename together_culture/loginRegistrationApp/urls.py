@@ -10,6 +10,5 @@ urlpatterns = [
     path('manage-member/', views.manage_member, name='manage_member'),
     path('membership/', views.membership, name='membership'),
     path('logout/', views.logout, name='logout'),
-    path('get_interests/', views.getInitialInterests, name='getInitialInterests'),
-    path('saveInitialInterests/', views.saveInitialInterests, name='saveInitialInterests'),
+    path('get_interests/', views.getInitialInterests, name='get_interests'),
 ]
