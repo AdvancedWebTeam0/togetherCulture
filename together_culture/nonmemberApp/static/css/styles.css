@@ -10,16 +10,20 @@ body {
 }
 
 .container {
-    max-width: 1200px;
+    /* max-width: 1200px; */
     margin: 0 auto;
 }
 
 /* Header styles */
+.logo-container img {
+    max-width: 150px; /* Set a specific width for the logo */
+    height: auto;
+}
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 0;
+    padding: 10px 0;
     background-color: white;
 }
 
@@ -67,12 +71,12 @@ main {
 
 /* Events carousel section */
 .events-carousel {
-    padding: 40px;
+    padding: 20px;
     text-align: center;
 }
 
 .events-carousel h2 {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     font-size: 24px;
 }
 
@@ -109,7 +113,7 @@ main {
 
 .info-box {
     width: 50%;
-    padding: 40px;
+    padding: 20px;
     text-align: center;
 }
 
@@ -124,7 +128,7 @@ main {
 /* Footer styles */
 footer {
     background-color: #aaa;
-    padding: 20px;
+    padding: 10px;
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -168,6 +172,6 @@ footer {
 .footer-tagline {
     width: 100%;
     text-align: right;
-    margin-top: 20px;
+    margin-top: 10px;
     font-style: italic;
 }
