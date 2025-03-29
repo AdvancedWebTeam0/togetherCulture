@@ -1,8 +1,91 @@
 {% extends 'base.html' %}
 
-<!--you can remove belove code  -->
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/cards.css' %}">
+{% endblock %}
+{% block js %}
+{% endblock %}
+<!-- greet user by username -->
+{% block title %}Hello {{ username }}! Welcome to your dashboard.{% endblock %}
+
 {% block content %}
-<h1>Welcome to Your Dashboard</h1>
-<p>Explore events, track your benefits, and manage your profile seamlessly.</p>
+
+<!-- membership tier/type -->
+<h2>Your membership type</h2>
+<div class="main-content">
+    <section class="cards-container">
+        <p><strong>Membership Type:</strong> {{ membership_type }}</p>
+        <p><strong>Start Date:</strong> {{ start_date }}</p>
+        <p><strong>End Date:</strong> {{ end_date }}</p>
+    </section>
 </div>
+
+<!-- upcoming events that user have booked -->
+<div class="main-content">
+    <section class="cards-container">
+        <h2>Upcoming Events</h2>
+
+        <!-- The container where the calendar will be rendered -->
+        <div id="calendar"></div>
+    </section>
+</div>
+
+<!-- Include FullCalendar v4 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.4.0/main.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@4.4.0/main.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@4.4.0/main.min.css" rel="stylesheet">
+
+<!-- Include FullCalendar v4 JS and Plugins -->
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@4.4.0/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@4.4.0/main.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@4.4.0/main.min.js"></script>
+
+<script type="text/javascript">
+    // URL to fetch events from Django backend
+    const eventsDataUrl = "{% url 'member-event-data' %}";
+
+    // Function to initialize the calendar
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+
+        // Initialize FullCalendar v4
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            plugins: ['dayGrid', 'interaction'],  // Add dayGrid and interaction plugins here
+            header: {
+                left: 'prev,next today',           // Left side of header
+                center: 'title',                   // Centered title
+                right: 'dayGridMonth,dayGridWeek,dayGridDay' // Show month, week, and day views on the right
+            },
+            events: async function (fetchInfo, successCallback, failureCallback) {
+                try {
+                    // Fetch event data from the Django backend
+                    const response = await fetch(eventsDataUrl);
+                    const events = await response.json();
+
+                    // Format events for FullCalendar
+                    const formattedEvents = events.map(event => ({
+                        title: event.title,
+                        start: event.start,    // Event start date/time
+                        end: event.end,        // Event end date/time
+                        description: event.description,
+                        location: event.location,
+                        url: '/member/events/' + event.slug  // Link to event detail page
+                    }));
+
+                    // Callback to populate events on the calendar
+                    successCallback(formattedEvents);
+                } catch (error) {
+                    failureCallback(error); // Handle failure in fetching events
+                }
+            },
+            editable: true,  // Allow events to be edited
+            droppable: true, // Allow events to be dropped
+        });
+
+        // Render the calendar
+        calendar.render();
+    });
+</script>
+
 {% endblock %}
