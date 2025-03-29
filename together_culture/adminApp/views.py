@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import EventTag, EventLabel
 from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests
 from memberApp.models import Membership
-from .forms import EventSearchForm
+from .forms import EventSearchForm, UserSearchForm
 import json
 from django.utils import timezone
 from django.db.models import Count
@@ -22,6 +22,7 @@ nav_items = [
     {'name': 'Dashboard', 'url': 'admin-dashboard', 'submenu': None},
     {'name': '📊 Insights', 'url': 'insights', 'submenu': None},
     {'name': '📅 Manage Events', 'url': 'manage-events', 'submenu': None},
+    {'name': '🔍 Search Users', 'url': 'user-list', 'submenu': None},
     {'name': '👥 Manage Members', 'url': '#', 'submenu': [
         {'name': '➕ Add Member', 'url': 'add-members'},
         {'name': '📋 Members List', 'url': 'members-list'},
@@ -351,23 +352,23 @@ def event_detail(request, slug):
     
     return render(request, 'event_detail.html', context)
 
-def manage_events(request):
-    # define the title for page
-    title = "Manage Events"
-    return render(request, 'manage_events.html', {'title': title, 'nav_items': nav_items})
+def __get_users(user_type: str):
+    user_list = Users.objects.filter(current_user_type = user_type)
+    return user_list
 
 
-def add_members(request):
-    # define the title for page
-    title = "Add Members"
-    return render(request, 'add_members.html', {'title': title, 'nav_items': nav_items})
+def __get_user_search_result(user_type: str, searched_string: str):
+    # Using __icontains to search for names without case sensitivity and allow partial matches.
+    results = Users.objects.filter(first_name__icontains=searched_string, current_user_type=user_type) | \
+                    Users.objects.filter(last_name__icontains=searched_string, current_user_type=user_type) | \
+                    Users.objects.filter(user_name__icontains=searched_string, current_user_type=user_type)
+    return results
 
 
 def members_list(request):
-    # define the title for page
     title = "Members List"
     
-    curr_members = Users.objects.filter(current_user_type="Member")
+    curr_members = __get_users(user_type = "Member")
     curr_members_info = []
 
     for member in curr_members:
@@ -383,6 +384,7 @@ def members_list(request):
     context = {
         'title': title,
         'nav_items': nav_items,
+        'form': UserSearchForm(),
         'members': curr_members_info,
     }
     return render(request=request, template_name='members_list.html', context=context)
@@ -404,8 +406,6 @@ def member_detail_view(request, slug):
             'end_date': history.end_date,
         }
         clicked_member_membership_history.append(history_item)
-    
-    print(clicked_member_membership_history)
 
     member_info = {
         'first_name': clicked_member.first_name,
@@ -431,6 +431,169 @@ def member_detail_view(request, slug):
 
     return render(request=request, template_name='member_details.html', context=context)
 
+
+def member_search(request):
+    title = "Members List"
+
+    context = {
+                'title': title,
+                'nav_items': nav_items,
+                'form': UserSearchForm(),
+            }
+
+    if request.method == "GET":
+        member_search_form = UserSearchForm(request.GET)
+
+        if member_search_form.is_valid():
+            memberString = member_search_form.cleaned_data['user']
+
+            search_detail = "Search results for: \t" + memberString
+            results = __get_user_search_result(user_type="Member", searched_string=memberString)
+
+            results_members_info = []
+            for member in results:
+                curr_member_membership = Membership.objects.get(user = member, active = True)
+
+                member_info = {
+                    'first_name': member.first_name,
+                    'last_name': member.last_name,
+                    'membership_type': curr_member_membership.membership_type,
+                    'slug': member.userSlug,
+                }
+                results_members_info.append(member_info)
+            
+            context = {
+                'title': title,
+                'nav_items': nav_items,
+                'form': UserSearchForm(),
+                'members': results_members_info,
+                'search_detail': search_detail,
+            }
+
+    return render(request=request, template_name='members_list.html', context=context)
+
+
+def user_list(request):
+    title = "User Search"
+    
+    curr_members = __get_users(user_type = "Member")
+    curr_nonmembers = __get_users(user_type = "Nonmember")
+    curr_users = curr_members | curr_nonmembers
+    curr_users_info = []
+
+    for user in curr_users:
+        user_info = {
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'user_type': user.current_user_type,
+            'slug': user.userSlug,
+        }
+        curr_users_info.append(user_info)
+
+    context = {
+        'title': title,
+        'nav_items': nav_items,
+        'form': UserSearchForm(),
+        'users': curr_users_info,
+    }
+
+    return render(request=request, template_name='search_users.html', context=context)
+
+
+def user_search(request):
+    title = "User Search"
+
+    context = {
+                'title': title,
+                'nav_items': nav_items,
+                'form': UserSearchForm(),
+            }
+
+    if request.method == "GET":
+        user_search_form = UserSearchForm(request.GET)
+
+        if user_search_form.is_valid():
+            userString = user_search_form.cleaned_data['user']
+            membership_type = None
+            search_detail = "Search results for: \t" + userString
+
+            results_members = __get_user_search_result(user_type="Member", searched_string=userString)
+            results_nonmembers = __get_user_search_result(user_type="Nonmember", searched_string=userString)
+            results = results_members | results_nonmembers 
+
+            results_users_info = []
+            for user in results:
+                user_info = {
+                    'first_name': user.first_name,
+                    'last_name': user.last_name,
+                    'user_type': user.current_user_type,
+                    'slug': user.userSlug,
+                }
+                results_users_info.append(user_info)
+
+            context = {
+                'title': title,
+                'nav_items': nav_items,
+                'form': UserSearchForm(),
+                'users': results_users_info,
+            }
+
+    return render(request=request, template_name='search_users.html', context=context)
+
+
+def user_attending_event_view(request, slug):
+    title = "User Information"
+
+    clicked_user = get_object_or_404(Users, userSlug=slug)
+    clicked_user_curr_membership = None
+
+    if clicked_user.current_user_type == "Member":
+        clicked_user_curr_membership = Membership.objects.get(user = clicked_user, active = True).membership_type
+
+    events_history = UserAttendingEvent.objects.filter(user = clicked_user)
+    events_booked = []
+    for entry in events_history:
+        curr_event = entry.event
+        event_info = {
+            'eventName': curr_event.eventName,
+            'eventDate': curr_event.eventDate,
+            'location': curr_event.location,
+            'eventType': curr_event.get_eventType_display(),
+            'isUserAttended': entry.isUserAttended,
+        }
+
+        events_booked.append(event_info)
+
+    user_info = {
+        'first_name': clicked_user.first_name,
+        'last_name': clicked_user.last_name,
+        'user_name': clicked_user.user_name,
+        'user_type': clicked_user.current_user_type,
+        'membership_type': clicked_user_curr_membership,
+        'events_booked': events_booked,
+        'slug': clicked_user.userSlug,
+    }
+
+    context = {
+                'title': title,
+                'nav_items': nav_items,
+                'form': UserSearchForm(),
+                'user': user_info,
+    }
+
+    return render(request=request, template_name='details_user_attending_event.html', context=context)
+
+
+def manage_events(request):
+    # define the title for page
+    title = "Manage Events"
+    return render(request, 'manage_events.html', {'title': title, 'nav_items': nav_items})
+
+
+def add_members(request):
+    # define the title for page
+    title = "Add Members"
+    return render(request, 'add_members.html', {'title': title, 'nav_items': nav_items})
 
 
 def manage_membership(request):

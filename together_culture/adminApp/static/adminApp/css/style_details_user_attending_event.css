@@ -1,0 +1,35 @@
+.user-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: left;
+    font-size: 15px;
+}
+
+.user-title {
+    display: flex;
+    text-align: left;
+    font-size: 20px;
+    font-weight: bolder;
+    background-color: rgb(255 231 231);
+    margin: 10px;
+}
+
+.subtitle {
+    color: rgba(0, 97, 74, 0.852);
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.events-history-details{
+    display: inline;
+    margin-right: 15px;
+}
+
+.subtitle-event{
+    color: rgba(255, 161, 11, 0.852);
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 10px;
+}

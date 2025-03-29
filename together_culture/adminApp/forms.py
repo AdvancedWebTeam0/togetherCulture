@@ -13,3 +13,10 @@ class EventSearchForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         required=False
     )
+
+
+class UserSearchForm(forms.Form):
+    user = forms.CharField(label='user', 
+                              max_length=50, 
+                              help_text='User to search'
+                              )
