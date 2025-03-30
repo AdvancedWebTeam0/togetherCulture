@@ -3,16 +3,12 @@
 {% block style %}
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/cards.css' %}">
+<link rel="stylesheet" href="{% static 'memberApp/css/member_activity_information_style.css' %}">
 {% endblock %}
 {% block js %}
 {% endblock %}
 <!-- greet user by username -->
 {% block title %}Hello {{ username }}! Welcome to your dashboard.{% endblock %}
-
-{% block style %}
-{% load static %}
-<link rel="stylesheet" href="{% static 'memberApp/css/member_activity_information_style.css' %}">
-{% endblock %}
 
 {% block content %}
 
@@ -34,11 +30,9 @@
         <!-- The container where the calendar will be rendered -->
         <div id="calendar"></div>
     </section>
-<!-- membership tier/type -->
-<!-- upcoming events that user have booked -->
 
 
-
+    
 <div class="general-information">
     <p class="title-events-info">Total Number of Booked Events: {{ total_num_of_events }}</p>
 </div>
