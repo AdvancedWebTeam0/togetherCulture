@@ -1,8 +1,96 @@
 {% extends 'base.html' %}
 
-<!--you can remove belove code  -->
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'memberApp/css/member_activity_information_style.css' %}">
+{% endblock %}
+
 {% block content %}
-<h1>Welcome to Your Dashboard</h1>
-<p>Explore events, track your benefits, and manage your profile seamlessly.</p>
+<!-- membership tier/type -->
+<!-- upcoming events that user have booked -->
+
+
+
+<div class="general-information">
+    <p class="title-events-info">Total Number of Booked Events: {{ total_num_of_events }}</p>
 </div>
+
+<!-- events data related to member interests -->
+<div class="main-container">
+    <div class="activity-container">
+        {% if activity_count_dict_interest %}
+            <p class="info-subheader">Activity Related to Your Interests</p>
+            {% for interest_name, count in activity_count_dict_interest.items %}
+                <div class="activity-count">
+                    <p class="subheader">{{ interest_name }}:</p>
+                    <p class="event-count">{{ count }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="info-subheader">No Activity Related to Your Interests</p>
+        {% endif %}
+
+        {% if in_interests_events %}
+            <table class="list-events-booked">
+                <tr>
+                    <th>Events Booked Related to<br>Your Initial Interests</th>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="max-height: 170px; overflow-y: auto; width: 300px;">
+                            <ul class="table-context">
+                                {% for event in in_interests_events %}
+                                    <li class="event-item">
+                                        <span class="event-name">{{ event.eventName }}</span>
+                                        <span class="event-type">{{ event.get_eventType_display }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        {% endif %}
+    </div>
+
+    <!-- events data NOT in interests -->
+    <div class="activity-container">
+        {% if activity_count_dict_others %}
+            <p class="info-subheader">Activity in Other Areas</p>
+            {% for interest_name, count in activity_count_dict_others.items %}
+                <div class="activity-count">
+                    <p class="subheader">{{ interest_name }}:</p>
+                    <p class="event-count">{{ count }}</p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="info-subheader">No Activity in Other Areas</p>
+        {% endif %}
+
+
+        {% if not_in_interests_events %}
+            <table class="list-events-booked">
+                <tr>
+                    <th>Other Events</th>
+                </tr>
+                <tr>
+                    <td>
+                        <div style="max-height: 170px; overflow-y: auto; width: 300px;">
+                            <ul class="table-context">
+                                {% for event in not_in_interests_events %}
+                                    <li class="event-item">
+                                        <span class="event-name">{{ event.eventName }}</span>
+                                        <span class="event-type">{{ event.get_eventType_display }}</span>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        {% endif %}
+    </div>
+</div>
+
+
 {% endblock %}
