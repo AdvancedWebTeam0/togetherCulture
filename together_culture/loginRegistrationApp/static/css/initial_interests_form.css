@@ -1,0 +1,77 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    flex-direction: column;
+}
+
+.form-container {
+    display: flex;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    margin: 20px;
+    border-radius: 15px;
+    text-align: center;
+    align-items: center;
+}
+
+.initial-interests-form {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    width: 450px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-bottom: 15px;
+    margin-left: 40px;
+    margin-top: 15px;
+}
+
+.form-group label {
+    color: rgb(41, 41, 41);
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.button-group {
+    display: flex;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+button {
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 16px;
+    margin: 5px;
+    background-color: #e58f0b;
+    width: 150px;
+    border-radius: 10px;
+}
+
+#form-title-text {
+    color: white;
+    font-size: 20px;
+}
+
+.messages{
+    display: flex;
+    color: rgb(0 0 0 / 76%);
+    font-weight: bold;
+    background-color: rgb(255, 70, 70);
+    font-size: 20px;
+    margin: 20px;
+}

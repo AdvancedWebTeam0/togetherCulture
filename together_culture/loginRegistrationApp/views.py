@@ -1,11 +1,13 @@
 import uuid
 import logging
+import json
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from .models import Users, UserInterests, Interests
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils.text import slugify
-import json
+from .forms import GetInitialInterest
+from django.contrib import messages
 
 logger = logging.getLogger('landing')
 
@@ -97,24 +99,36 @@ def logout(request):
     return render(request, 'Login.html')
 
 
-#Will be deleted later, only written to adjust functionality.
 def getInitialInterests(request):
-    return render(request, 'get_interests.html')
+    get_interests_form = GetInitialInterest()
+    context = {
+        'form': get_interests_form
+    }
 
-def saveInitialInterests(request):
     if request.method == "POST":
-        try:
-            data = json.loads(request.body)  # Parse JSON body
-            interests = data.get("interests", [])  # Extract list from request
-            curr_user = Users.objects.first() #update user!
-            for interest in interests:
-                curr_interest = Interests.objects.get(interestId=interest['id'])
-                curr_initial_interest = UserInterests(user= curr_user, interest=curr_interest)
-                curr_initial_interest.save()  # This will save the data to the database
+        get_interests_form = GetInitialInterest(request.POST)
+        if get_interests_form.is_valid():
+            selected_options = get_interests_form.cleaned_data['interests']
+            print("Selected Options:", selected_options)
 
-            return JsonResponse({"message": "success"})
-        
-        except json.JSONDecodeError:
-            return JsonResponse({"error": "Invalid JSON"}, status=400)
+            curr_user = Users.objects.first() #Update user!!
+            response = __saveInitialInterests(user=curr_user, selected_options=selected_options)
 
-    return JsonResponse({"error": "Only POST method allowed"}, status=405)
+            if response == "successfully saved":
+                messages.success(request, "Interests saved successfully! Please log in to continue.")
+                return redirect('login')
+            
+            else:
+                messages.error(request, "Saving unsuccessful. Please try again.")
+                return redirect(request.path)
+
+    return render(request, 'get_interests.html', context=context)
+
+
+def __saveInitialInterests(user:Users, selected_options:list):
+    for interest in selected_options:
+        curr_interest = Interests.objects.get(name=interest)
+        user_interest = UserInterests(user= user, interest=curr_interest)
+        user_interest.save()  # This will save the data to the database
+
+    return "successfully saved"

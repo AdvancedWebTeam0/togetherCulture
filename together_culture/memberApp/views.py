@@ -3,6 +3,7 @@ from .models import DigitalContentModule, ModuleBooking, Membership, Benefit, Me
 from loginRegistrationApp.models import Users
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from loginRegistrationApp.models import UserTypes, UserInterests, UserAttendingEvent, Events, Interests
 from django.contrib.auth.decorators import login_required
 from loginRegistrationApp.models import UserTypes, UserAttendingEvent, Events
 from django.shortcuts import render, redirect
@@ -22,11 +23,11 @@ nav_items = [
 
 # Create your views here.
 
+
 # @login_required
-
-
 def member_dashboard(request):
     title = 'Member Dashboard'
+
     #username = request.user.user_name
     user = request.user = Users.objects.get(
         user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
@@ -40,17 +41,67 @@ def member_dashboard(request):
     # Access the membership type (e.g., 'Premium', 'VIP', etc.)
     membership_type = membership.membership_type.name
 
-    # Create the context to pass to the template
+
+
+    #user = Users.objects.get(userSlug="ela_dogruyol") #Needs to change. Will get the user_slug from session.
+    total_num_of_events, in_interests_events, not_in_interests_events, activity_count_dict_interest, activity_count_dict_others = __get_interest_event_data(user=user)
+
     context = {
         'title': title,
         'nav_items': nav_items,
         'username': username,
         'membership_type': membership_type,
         'start_date': membership.start_date,
-        'end_date': membership.end_date
+        'end_date': membership.end_date,
+        'total_num_of_events': total_num_of_events,
+        'in_interests_events': in_interests_events,
+        'not_in_interests_events': not_in_interests_events,
+        'activity_count_dict_interest': activity_count_dict_interest,
+        'activity_count_dict_others': activity_count_dict_others,
     }
 
-    return render(request, 'member_dashboard.html', context)
+    return render(request=request, template_name='member_dashboard.html', context=context)
+
+
+def __get_interest_event_data(user:Users):
+    all_interests = Interests.objects.all()
+
+    user_interests = UserInterests.objects.filter(user=user)
+
+    curr_interests = []
+    for user_interest in user_interests:
+        curr_interests.append(user_interest.interest.name)
+
+    booked_events = UserAttendingEvent.objects.filter(user=user)
+
+    #get events list booked, with the separation of related to interests or not
+    events_related_to_interests = []
+    events_not_related_to_interests = []
+    for entity in booked_events:
+        curr_event = entity.event
+        if curr_event.get_eventType_display() in curr_interests:
+            events_related_to_interests.append(curr_event)
+        else:
+            events_not_related_to_interests.append(curr_event) 
+
+    #get activity count for interests and other areas
+    activity_count_dict_others = {}
+    activity_count_dict_interests = {}
+    for interest in all_interests:
+        interest_name = interest.name
+        event_count = 0
+
+        for entity in booked_events:
+            event_type = entity.event.get_eventType_display()
+            if interest_name == event_type:
+                event_count = event_count + 1
+
+        if interest_name in curr_interests:
+            activity_count_dict_interests[interest_name] = event_count
+        else:
+            activity_count_dict_others[interest_name] = event_count
+
+    return len(booked_events), events_related_to_interests, events_not_related_to_interests, activity_count_dict_interests, activity_count_dict_others
 
 
 def event_data(request):
@@ -84,7 +135,6 @@ def event_data(request):
     print(event_list)
     # Return the filtered event list as a JSON response
     return JsonResponse(event_list, safe=False)
-
 
 def event_detail(request, slug):
     title = "Event details"

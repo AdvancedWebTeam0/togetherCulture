@@ -368,7 +368,7 @@ def __get_user_search_result(user_type: str, searched_string: str):
 def members_list(request):
     title = "Members List"
     
-    curr_members = __get_users(user_type = "Member")
+    curr_members = __get_users(user_type = "MEMBER")
     curr_members_info = []
 
     for member in curr_members:
@@ -448,7 +448,7 @@ def member_search(request):
             memberString = member_search_form.cleaned_data['user']
 
             search_detail = "Search results for: \t" + memberString
-            results = __get_user_search_result(user_type="Member", searched_string=memberString)
+            results = __get_user_search_result(user_type="MEMBER", searched_string=memberString)
 
             results_members_info = []
             for member in results:
@@ -476,8 +476,8 @@ def member_search(request):
 def user_list(request):
     title = "User Search"
     
-    curr_members = __get_users(user_type = "Member")
-    curr_nonmembers = __get_users(user_type = "Nonmember")
+    curr_members = __get_users(user_type = "MEMBER")
+    curr_nonmembers = __get_users(user_type = "NORMAL_USER")
     curr_users = curr_members | curr_nonmembers
     curr_users_info = []
 
@@ -517,8 +517,8 @@ def user_search(request):
             membership_type = None
             search_detail = "Search results for: \t" + userString
 
-            results_members = __get_user_search_result(user_type="Member", searched_string=userString)
-            results_nonmembers = __get_user_search_result(user_type="Nonmember", searched_string=userString)
+            results_members = __get_user_search_result(user_type="MEMBER", searched_string=userString)
+            results_nonmembers = __get_user_search_result(user_type="NORMAL_USER", searched_string=userString)
             results = results_members | results_nonmembers 
 
             results_users_info = []
@@ -547,7 +547,7 @@ def user_attending_event_view(request, slug):
     clicked_user = get_object_or_404(Users, userSlug=slug)
     clicked_user_curr_membership = None
 
-    if clicked_user.current_user_type == "Member":
+    if clicked_user.current_user_type == "MEMBER":
         clicked_user_curr_membership = Membership.objects.get(user = clicked_user, active = True).membership_type
 
     events_history = UserAttendingEvent.objects.filter(user = clicked_user)
