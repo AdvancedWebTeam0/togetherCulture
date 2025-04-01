@@ -39,4 +39,4 @@ class UserTypeFilterForm(forms.Form):
         ('MEMBER', 'Member'),
     ]
     
-    member_type = forms.ChoiceField(choices=CHOICES, required=True)
+    user_type = forms.ChoiceField(choices=CHOICES, required=True)
