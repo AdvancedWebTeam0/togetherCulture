@@ -11,6 +11,7 @@ from datetime import datetime
 from memberApp.models import Membership, MembershipType, Benefit
 from datetime import datetime, timedelta
 from django.http import Http404
+from django.contrib import messages
 
 nav_items = [
     {'name': '🎟 Dashboard', 'url': 'member-dashboard', 'submenu': None},
@@ -28,14 +29,19 @@ nav_items = [
 def member_dashboard(request):
     title = 'Member Dashboard'
 
-    #username = request.user.user_name
+    # username = request.user.user_name
     user = request.user = Users.objects.get(
-        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
+        user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542")  # temp
     username = request.user.user_name
-    
-    # Fetch the user's active membership
-    membership = Membership.objects.filter(user=user, active=True).latest(
-        'start_date')  # Get the latest active membership
+
+    try:
+        membership = Membership.objects.filter(
+            user=user, active=True).latest('start_date')
+        membership_type = membership.membership_type.name
+    except Membership.DoesNotExist:
+        messages.warning(
+            request, "You don't have an active membership. Please subscribe first.")
+        return redirect('/member/buy-membership/')  # Redirect to membership page
 
     # Retrieve the membership type
     # Access the membership type (e.g., 'Premium', 'VIP', etc.)
@@ -108,7 +114,7 @@ def event_data(request):
     # Get the logged-in user
     user = request.user
     user = request.user = Users.objects.get(
-        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
+        user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542")  # temp
     # Fetch the UserAttendingEvent records for the logged-in user where the user is attending
     user_events = UserAttendingEvent.objects.filter(
         user=user, isUserAttended=False)
@@ -136,6 +142,7 @@ def event_data(request):
     # Return the filtered event list as a JSON response
     return JsonResponse(event_list, safe=False)
 
+
 def event_detail(request, slug):
     title = "Event details"
     event = Events.objects.get(eventSlug=slug)
@@ -157,7 +164,7 @@ def events(request):
 def benefits(request):
     title = 'Benefits'
     request.user = Users.objects.get(
-        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
+        user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542")  # temp
     user = request.user
     benefits = Benefit.objects.filter(membership__user=user)
 
@@ -184,7 +191,7 @@ def benefits(request):
 
 def use_benefit(request, benefit_id):
     request.user = Users.objects.get(
-        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
+        user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542")  # temp
     user = request.user
 
     # Get user's membership
@@ -221,7 +228,7 @@ def digital_content(request):
 
 def book_module(request, module_id):
     request.user = Users.objects.get(
-        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
+        user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542")  # temp
     if request.method == 'POST':
         user = request.user  # Get the logged-in user
         module = get_object_or_404(DigitalContentModule, pk=module_id)
