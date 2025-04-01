@@ -54,7 +54,41 @@ button {
 
 .search-detail{
     color: rgb(0 0 0 / 76%);
-    margin-left: -400px;
     font-weight: bold;
     background-color: rgb(255 182 182);
+}
+
+.filter-title {
+    margin-right: 10px;
+    color: rgba(15, 15, 15, 0.852);
+    font-size: 15px;
+}
+
+#member-type-filter-form {
+    display: flex;
+    border-radius: 5px;
+    padding: 5px 12px;
+    align-items: center;
+    gap: 10px;
+}
+
+.member-type-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#member-type-filter-form p {
+    margin: 0;
+}
+
+#member-type-filter-form label {
+    white-space: nowrap;
+    color: rgb(42, 42, 42);
+}
+
+#member-type-filter-form select {
+    padding: 5px;
+    border: 1px solid #757575;
+    border-radius: 5px;
 }

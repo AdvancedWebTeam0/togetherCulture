@@ -5,8 +5,8 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import EventTag, EventLabel
 from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests, Interests
-from memberApp.models import Membership
-from .forms import EventSearchForm, UserSearchForm
+from memberApp.models import Membership, MembershipType
+from .forms import EventSearchForm, UserSearchForm, MemberTypeFilterForm
 import json
 from django.utils import timezone
 from django.db.models import Count
@@ -385,7 +385,9 @@ def members_list(request):
         'title': title,
         'nav_items': nav_items,
         'form': UserSearchForm(),
+        'filter_form': MemberTypeFilterForm(),
         'members': curr_members_info,
+        'member_types': MembershipType.objects.all(),
     }
     return render(request=request, template_name='members_list.html', context=context)
 
@@ -465,39 +467,88 @@ def member_search(request):
     title = "Members List"
 
     context = {
-                'title': title,
-                'nav_items': nav_items,
-                'form': UserSearchForm(),
-            }
+        'title': title,
+        'nav_items': nav_items,
+        'form': UserSearchForm(),
+        'filter_form': MemberTypeFilterForm(),
+        'member_types': MembershipType.objects.all(),
+    }
+
 
     if request.method == "GET":
-        member_search_form = UserSearchForm(request.GET)
+        #request resource coming from form
+        request_source = request.GET.get('request-source')
 
-        if member_search_form.is_valid():
-            memberString = member_search_form.cleaned_data['user']
+        if request_source == "search-form":
+            member_search_form = UserSearchForm(request.GET)
 
-            search_detail = "Search results for: \t" + memberString
-            results = __get_user_search_result(user_type="MEMBER", searched_string=memberString)
+            if member_search_form.is_valid():
+                memberString = member_search_form.cleaned_data['user']
 
-            results_members_info = []
-            for member in results:
-                curr_member_membership = Membership.objects.get(user = member, active = True)
+                search_detail = "Search results for: \t" + memberString
+                results = __get_user_search_result(user_type="MEMBER", searched_string=memberString)
 
-                member_info = {
-                    'first_name': member.first_name,
-                    'last_name': member.last_name,
-                    'membership_type': curr_member_membership.membership_type,
-                    'slug': member.userSlug,
+                results_members_info = []
+                for member in results:
+                    curr_member_membership = Membership.objects.get(user = member, active = True)
+
+                    member_info = {
+                        'first_name': member.first_name,
+                        'last_name': member.last_name,
+                        'membership_type': curr_member_membership.membership_type,
+                        'slug': member.userSlug,
+                    }
+                    results_members_info.append(member_info)
+                
+                context = {
+                    'title': title,
+                    'nav_items': nav_items,
+                    'form': UserSearchForm(),
+                    'filter_form': MemberTypeFilterForm(),
+                    'members': results_members_info,
+                    'search_detail': search_detail,
+                    'member_types': MembershipType.objects.all(),
                 }
-                results_members_info.append(member_info)
+
+        elif request_source == "filter-form":
+            filter_form = MemberTypeFilterForm(request.GET)
             
-            context = {
-                'title': title,
-                'nav_items': nav_items,
-                'form': UserSearchForm(),
-                'members': results_members_info,
-                'search_detail': search_detail,
-            }
+            if filter_form.is_valid():
+                selected_option = filter_form.cleaned_data['member_type']
+
+                search_detail = "Filtered results for: \t" + selected_option
+
+                print(selected_option)
+
+                users_with_membership = []
+                membership_type = MembershipType.objects.get(name=selected_option)
+                
+                #get users who have this membership type
+                users_with_curr_membership = Users.objects.filter(membership__membership_type=membership_type, membership__active=True)
+                users_with_membership = list(users_with_curr_membership)
+
+                #organise information that will be sent
+                results_members_info = []
+                for member in users_with_membership:
+                    curr_member_membership = Membership.objects.get(user = member, active = True)
+
+                    member_info = {
+                        'first_name': member.first_name,
+                        'last_name': member.last_name,
+                        'membership_type': curr_member_membership.membership_type,
+                        'slug': member.userSlug,
+                    }
+                    results_members_info.append(member_info)
+
+                context = {
+                    'title': title,
+                    'nav_items': nav_items,
+                    'form': UserSearchForm(),
+                    'filter_form': MemberTypeFilterForm(),
+                    'members': results_members_info,
+                    'search_detail': search_detail,
+                    'member_types': MembershipType.objects.all(),
+                }
 
     return render(request=request, template_name='members_list.html', context=context)
 
