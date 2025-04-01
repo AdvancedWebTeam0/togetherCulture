@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from .models import EventTag, EventLabel
-from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests
+from loginRegistrationApp.models import Events, Users, UserAttendingEvent, UserInterests, Interests
 from memberApp.models import Membership
 from .forms import EventSearchForm, UserSearchForm
 import json
@@ -407,6 +407,32 @@ def member_detail_view(request, slug):
         }
         clicked_member_membership_history.append(history_item)
 
+    #get initial interests
+    clicked_member_interests = UserInterests.objects.filter(user=clicked_member)
+    curr_interests = []
+    for user_interest in clicked_member_interests:
+        curr_interests.append(user_interest.interest.name)
+        
+
+    #get interest:activity_count dictionary
+    booked_events = UserAttendingEvent.objects.filter(user=clicked_member)
+    all_interests = Interests.objects.all()
+    activity_count_dict = {}
+    for interest in all_interests:
+        interest_name = interest.name
+        event_count = 0
+
+        for entity in booked_events:
+            event_type = entity.event.get_eventType_display()
+            if interest_name == event_type:
+                event_count = event_count + 1
+        activity_count_dict[interest_name] = event_count
+
+    
+    #get the latest event attended
+    user_events = Events.objects.filter(userattendingevent__user=clicked_member).order_by('-eventDate', '-startTime')
+    latest_event_attended = user_events.first()
+
     member_info = {
         'first_name': clicked_member.first_name,
         'last_name': clicked_member.last_name,
@@ -421,6 +447,9 @@ def member_detail_view(request, slug):
         'profile_picture': clicked_member.profile_picture,
         'membership_type': clicked_member_curr_membership.membership_type,
         'membership_history': clicked_member_membership_history,
+        'initial_interests': curr_interests,
+        'activity_count_dict': activity_count_dict,
+        'latest_event_attended': latest_event_attended,
     }
 
     context = {
