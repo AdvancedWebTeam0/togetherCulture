@@ -6,6 +6,7 @@ from datetime import date
 from datetime import date, timedelta
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 class DigitalContentModuleTestCase(TestCase):
     def setUp(self):
@@ -125,8 +126,8 @@ class MembershipTest(TestCase):
         self.membership = Membership.objects.create(
             user=self.user,
             membership_type=self.membership_type,
-            start_date=date.today(),
-            end_date=date.today(),
+            start_date=timezone.datetime(2025, 3, 25),
+            end_date=timezone.datetime(2025, 4, 20),
             active=True
         )
 
@@ -150,21 +151,21 @@ class MembershipTest(TestCase):
 
     def test_membership_str(self):
         """Test the __str__ method."""
-        self.assertEqual(str(self.membership), "TestUser - Premium (2025-03-25)")
+        self.assertEqual(str(self.membership), "TestUser - Premium (2025-04-20 00:00:00)")
         
 class BenefitTest(TestCase):
     
     def setUp(self):
         """Setup test data."""
-        self.user = Users.objects.create(user_name="TestUser")
+        self.user = Users.objects.create(user_name="TestUser", password="testpassword")
         self.membership_type = MembershipType.objects.create(
             name='Premium', duration_days=30, price=29.99)
         
         self.membership = Membership.objects.create(
             user=self.user,
             membership_type=self.membership_type,
-            start_date=date.today(),
-            end_date=date.today() + timedelta(days=30),
+            start_date=timezone.datetime(2025, 3, 25),
+            end_date=timezone.datetime(2025, 4, 20),
             active=True
         )
 
@@ -204,12 +205,39 @@ class MemberDashboardTest(TestCase):
 
     def setUp(self):
         """Set up a user for testing."""
-        self.user = User.objects.create_user(username='testuser', password='testpassword')
+        self.user = Users.objects.create(
+            user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542", 
+            user_name="testuser1", 
+            first_name="John", 
+            last_name="Doe", 
+            email="john@example.com", 
+            password="password", 
+            current_user_type="Admin",
+            userSlug="user1"
+        )
+        self.membership_type = MembershipType.objects.create(
+            name='Premium', duration_days=30, price=29.99)
+        
+        self.membership = Membership.objects.create(
+            user=self.user,
+            membership_type=self.membership_type,
+            start_date=timezone.datetime(2025, 3, 25),
+            end_date=timezone.datetime(2025, 4, 20),
+            active=True
+        )
+
+        self.benefit = Benefit.objects.create(
+            name="Free Streaming",
+            description="Access to free streaming for members",
+            max_usage=5,
+            used_count=0,
+            membership=self.membership
+        )
         self.url = reverse('member-dashboard')
 
     def test_member_dashboard_logged_in(self):
         """Test that the member dashboard view works for a logged-in user."""
-        self.client.login(username='testuser', password='testpassword')  # Log in the user
+        self.client.login(username='testuser1', password='password')
         response = self.client.get(self.url)
 
         # Check that the response is successful
@@ -230,7 +258,7 @@ class BenefitsViewTest(TestCase):
         """Set up a user and necessary data for the test."""
         # Create the user
         self.user1 = Users.objects.create(
-            user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a", 
+            user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542", 
             user_name="testuser1", 
             first_name="John", 
             last_name="Doe", 
@@ -288,8 +316,8 @@ class BenefitsViewTest(TestCase):
         self.assertEqual(len(response.context['benefits']), 1)  # One benefit associated with the user
         
         # Check that the membership types are in the context
-        self.assertIn('membership_types', response.context)
-        self.assertGreater(len(response.context['membership_types']), 0)  # Ensure there are membership types
+        self.assertIn('membership_type', response.context)
+        self.assertGreater(len(response.context['membership_type']), 0)  # Ensure there are membership types
         
         # Check that the benefit is correctly passed in the context
         benefit = response.context['benefits'][0]
