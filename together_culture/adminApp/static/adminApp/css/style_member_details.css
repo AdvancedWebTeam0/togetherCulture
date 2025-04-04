@@ -26,3 +26,29 @@
     display: inline;
     margin-right: 15px;
 }
+
+.activity-history-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.initial-intersts, .activity, .latest-attended-event {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.activity-subheader {
+    color: rgb(22, 22, 22);
+    font-weight: bold;
+    font-size: 16px;
+    background-color: rgb(255, 229, 177);
+}
+
+ul {
+    margin: 7px;
+    padding: 0px;
+}

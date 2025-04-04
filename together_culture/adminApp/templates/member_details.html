@@ -29,13 +29,47 @@
         </p>
 
         <p><span class="subtitle">Membership Type:</span>  {{ member.membership_type }}</p>
-        <p><span class="subtitle">Membership History:</span></p>
 
+        <p><span class="subtitle">Membership History:</span></p>
         <div class="membership-history-details">
             {% for history in member.membership_history %}
                 <ul><u>Membership Type:</u>  {{ history.membership_type }} --
                     <u>Start Date:</u> {{ history.start_date }}, <u>End Date:</u> {{ history.end_date }}</ul>
             {% endfor %}
+        </div>
+
+        <p><span class="subtitle">Activity History:</span></p>
+        <div class="activity-history-details">
+            <div class="initial-intersts">
+                <p class="activity-subheader">Initial Interests</p>
+                {% if member.initial_interests %}
+                    {% for interest in member.initial_interests %}
+                        <ul class="initial-interest-name">{{ interest }}</ul>
+                    {% endfor %}
+                {% else %}
+                    <ul>No initial interest</ul>
+                {% endif %}
+            </div>
+
+            <div class="activity">
+                <p class="activity-subheader">Events Booked</p>
+                {% if member.activity_count_dict %}
+                    {% for interest_name, count in member.activity_count_dict.items %}
+                        <ul class="activity-count">{{ interest_name }}: {{ count }}</ul>
+                    {% endfor %}
+                {% else %}
+                    <ul>No Activity Found</ul>
+                {% endif %}
+            </div>
+
+            <div class="latest-attended-event">
+                <p class="activity-subheader">Latest Event</p>
+                {% if member.latest_event_attended %}
+                    <ul class="latest-event-info">{{ member.latest_event_attended.eventName }}<br>(Type: {{ member.latest_event_attended.get_eventType_display }})</ul>
+                {% else %}
+                    <ul>"Attended Event" Cannot Found</ul>
+                {% endif %}
+            </div>
         </div>
     </div>
 {% else %}

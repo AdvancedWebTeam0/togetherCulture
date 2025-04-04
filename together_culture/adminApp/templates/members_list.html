@@ -23,11 +23,20 @@
             <input class="search-bar" id="id_member" type="text" placeholder="Search a member.." name="user" value="{{ request.GET.query }}" required>
             <button type="submit">Search</button>
         </div>
+        <input type="hidden" name="request-source" value="search-form">
     </form>
 
     <button id="see-all-users" onclick="goToMembersList();">See all Members</button>
 </div>
 
+<div class="member-type-filter-container">
+    <form id="member-type-filter-form", method="GET" action="{% url 'member-search' %}" >
+        <p><label for="id_member_type">Filter by Member Type:</label></p>
+        {{ filter_form.member_type }}
+        <button id="apply-filter" type="submit">Apply Filter</button>
+        <input type="hidden" name="request-source" value="filter-form">
+    </form>
+</div>
 
 {% if search_detail %}
     <p class="search-detail">{{ search_detail }}</p>
