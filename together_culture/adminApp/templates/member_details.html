@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'adminApp/css/style_member_details.css' %}">
+{% endblock %}
+
+{% block content %}
+{% if member %}
+    <div class="member-title">
+        <p> {{ member.first_name }}   {{ member.last_name }} </p>
+    </div>
+
+    <div class="member-details">
+        <p><span class="subtitle">Name:</span>  {{ member.first_name }}   {{ member.last_name }} </p>
+        <p><span class="subtitle">Username:</span>  {{ member.user_name }}</p>
+        <p><span class="subtitle">Email:</span>  {{ member.email }}</p>
+        <p><span class="subtitle">Phone Number:</span>  {{ member.phone_number }}</p>
+        <p><span class="subtitle">Gender:</span>  {{ member.gender }}</p>
+        <p><span class="subtitle">Date of Birth:</span>  {{ member.date_of_birth }}</p>
+        <p><span class="subtitle">User Type:</span>   {{ member.user_type }}</p>
+
+        <p><span class="subtitle">Have an Interest to Become a Member:</span>  
+            {% if member.have_interest_membership == True %}
+                Yes
+            {% else %}
+                No
+            {% endif %}
+        </p>
+
+        <p><span class="subtitle">Membership Type:</span>  {{ member.membership_type }}</p>
+
+        <p><span class="subtitle">Membership History:</span></p>
+        <div class="membership-history-details">
+            {% for history in member.membership_history %}
+                <ul><u>Membership Type:</u>  {{ history.membership_type }} --
+                    <u>Start Date:</u> {{ history.start_date }}, <u>End Date:</u> {{ history.end_date }}</ul>
+            {% endfor %}
+        </div>
+
+        <p><span class="subtitle">Activity History:</span></p>
+        <div class="activity-history-details">
+            <div class="initial-intersts">
+                <p class="activity-subheader">Initial Interests</p>
+                {% if member.initial_interests %}
+                    {% for interest in member.initial_interests %}
+                        <ul class="initial-interest-name">{{ interest }}</ul>
+                    {% endfor %}
+                {% else %}
+                    <ul>No initial interest</ul>
+                {% endif %}
+            </div>
+
+            <div class="activity">
+                <p class="activity-subheader">Events Booked</p>
+                {% if member.activity_count_dict %}
+                    {% for interest_name, count in member.activity_count_dict.items %}
+                        <ul class="activity-count">{{ interest_name }}: {{ count }}</ul>
+                    {% endfor %}
+                {% else %}
+                    <ul>No Activity Found</ul>
+                {% endif %}
+            </div>
+
+            <div class="latest-attended-event">
+                <p class="activity-subheader">Latest Event</p>
+                {% if member.latest_event_attended %}
+                    <ul class="latest-event-info">{{ member.latest_event_attended.eventName }}<br>(Type: {{ member.latest_event_attended.get_eventType_display }})</ul>
+                {% else %}
+                    <ul>"Attended Event" Cannot Found</ul>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% else %}
+    <p>Member cannot be found</p>
+{% endif %}
+
+{% endblock %}

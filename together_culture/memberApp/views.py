@@ -3,11 +3,15 @@ from .models import DigitalContentModule, ModuleBooking, Membership, Benefit, Me
 from loginRegistrationApp.models import Users
 from django.core.paginator import Paginator
 from django.http import JsonResponse
-from loginRegistrationApp.models import UserTypes
+from loginRegistrationApp.models import UserTypes, UserInterests, UserAttendingEvent, Events, Interests
+from django.contrib.auth.decorators import login_required
+from loginRegistrationApp.models import UserTypes, UserAttendingEvent, Events
 from django.shortcuts import render, redirect
 from datetime import datetime
 from memberApp.models import Membership, MembershipType, Benefit
 from datetime import datetime, timedelta
+from django.http import Http404
+
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -25,9 +29,128 @@ nav_items = [
 # Create your views here.
 
 
+# @login_required
 def member_dashboard(request):
     title = 'Member Dashboard'
-    return render(request, 'member_dashboard.html', {'title': title, 'nav_items': nav_items})
+
+    #username = request.user.user_name
+    user = request.user = Users.objects.get(
+        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
+    username = request.user.user_name
+    
+    # Fetch the user's active membership
+    membership = Membership.objects.filter(user=user, active=True).latest(
+        'start_date')  # Get the latest active membership
+
+    # Retrieve the membership type
+    # Access the membership type (e.g., 'Premium', 'VIP', etc.)
+    membership_type = membership.membership_type.name
+
+
+
+    #user = Users.objects.get(userSlug="ela_dogruyol") #Needs to change. Will get the user_slug from session.
+    total_num_of_events, in_interests_events, not_in_interests_events, activity_count_dict_interest, activity_count_dict_others = __get_interest_event_data(user=user)
+
+    context = {
+        'title': title,
+        'nav_items': nav_items,
+        'username': username,
+        'membership_type': membership_type,
+        'start_date': membership.start_date,
+        'end_date': membership.end_date,
+        'total_num_of_events': total_num_of_events,
+        'in_interests_events': in_interests_events,
+        'not_in_interests_events': not_in_interests_events,
+        'activity_count_dict_interest': activity_count_dict_interest,
+        'activity_count_dict_others': activity_count_dict_others,
+    }
+
+    return render(request=request, template_name='member_dashboard.html', context=context)
+
+
+def __get_interest_event_data(user:Users):
+    all_interests = Interests.objects.all()
+
+    user_interests = UserInterests.objects.filter(user=user)
+
+    curr_interests = []
+    for user_interest in user_interests:
+        curr_interests.append(user_interest.interest.name)
+
+    booked_events = UserAttendingEvent.objects.filter(user=user)
+
+    #get events list booked, with the separation of related to interests or not
+    events_related_to_interests = []
+    events_not_related_to_interests = []
+    for entity in booked_events:
+        curr_event = entity.event
+        if curr_event.get_eventType_display() in curr_interests:
+            events_related_to_interests.append(curr_event)
+        else:
+            events_not_related_to_interests.append(curr_event) 
+
+    #get activity count for interests and other areas
+    activity_count_dict_others = {}
+    activity_count_dict_interests = {}
+    for interest in all_interests:
+        interest_name = interest.name
+        event_count = 0
+
+        for entity in booked_events:
+            event_type = entity.event.get_eventType_display()
+            if interest_name == event_type:
+                event_count = event_count + 1
+
+        if interest_name in curr_interests:
+            activity_count_dict_interests[interest_name] = event_count
+        else:
+            activity_count_dict_others[interest_name] = event_count
+
+    return len(booked_events), events_related_to_interests, events_not_related_to_interests, activity_count_dict_interests, activity_count_dict_others
+
+
+def event_data(request):
+    # Get the logged-in user
+    user = request.user
+    user = request.user = Users.objects.get(
+        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
+    # Fetch the UserAttendingEvent records for the logged-in user where the user is attending
+    user_events = UserAttendingEvent.objects.filter(
+        user=user, isUserAttended=False)
+
+    # Create the list of events the user is attending
+    event_list = []
+    for user_event in user_events:
+        event = user_event.event  # Get the related Event from UserAttendingEvent
+
+        # If eventDate is a string, convert it to a datetime object
+        if isinstance(event.eventDate, str):
+            event.eventDate = datetime.strptime(
+                event.eventDate, '%Y-%m-%dT%H:%M:%S')
+
+        # Add the event details to the event list
+        event_list.append({
+            'title': event.eventName,
+            'start': event.eventDate.strftime('%Y-%m-%dT%H:%M:%S'),
+            'end': event.eventDate.strftime('%Y-%m-%dT%H:%M:%S'),
+            'description': event.shortDescription,
+            'location': event.location,
+            'slug': event.eventSlug,
+        })
+    print(event_list)
+    # Return the filtered event list as a JSON response
+    return JsonResponse(event_list, safe=False)
+
+def event_detail(request, slug):
+    title = "Event details"
+    event = Events.objects.get(eventSlug=slug)
+
+    context = {'title': title,
+               'nav_items': nav_items,
+               'event': event
+               }
+
+    return render(request, 'event_detail.html', context)
 
 
 def events(request):
@@ -38,18 +161,34 @@ def events(request):
 def benefits(request):
     title = 'Benefits'
     request.user = Users.objects.get(
-        user_id="d8ac4feb-e18a-4107-9df4-7aa093f38603")  # temp
+        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
     user = request.user
     benefits = Benefit.objects.filter(membership__user=user)
-    membership_types = MembershipType.objects.all()  # Fetch all available plans
 
-    return render(request, 'benefits.html', {'title': title, 'nav_items': nav_items,
-                                             'benefits': benefits, 'membership_types': membership_types})
+    # Fetch the user's active membership
+    membership = Membership.objects.filter(user=user, active=True).latest(
+        'start_date')  # Get the latest active membership
+
+    # Retrieve the membership type
+    # Access the membership type (e.g., 'Premium', 'VIP', etc.)
+    membership_type = membership.membership_type.name
+
+    # Create the context to pass to the template
+    context = {
+        'title': title,
+        'nav_items': nav_items,
+        'benefits': benefits,
+        'membership_type': membership_type,
+        'start_date': membership.start_date,
+        'end_date': membership.end_date
+    }
+
+    return render(request, 'benefits.html', context)
 
 
 def use_benefit(request, benefit_id):
     request.user = Users.objects.get(
-        user_id="d8ac4feb-e18a-4107-9df4-7aa093f38603")  # temp
+        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
     user = request.user
 
     # Get user's membership
@@ -86,7 +225,7 @@ def digital_content(request):
 
 def book_module(request, module_id):
     request.user = Users.objects.get(
-        user_id="d8ac4feb-e18a-4107-9df4-7aa093f38603")  # temp
+        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
     if request.method == 'POST':
         user = request.user  # Get the logged-in user
         module = get_object_or_404(DigitalContentModule, pk=module_id)
@@ -120,10 +259,12 @@ def my_membership(request):
 def settings(request):
     return render(request, 'settings.html')
 
+
 def buy_membership(request):
     user_slug = request.session.get("user_slug")  # Get user_slug from session
     if not user_slug:
-        return redirect('/loginRegistration/login/')  # Redirect if not logged in
+        # Redirect if not logged in
+        return redirect('/loginRegistration/login/')
 
     try:
         user = Users.objects.get(userSlug=user_slug)
@@ -132,7 +273,8 @@ def buy_membership(request):
         return redirect('/loginRegistration/login/')
 
     if request.method == "GET":
-        latest_membership = UserTypes.objects.filter(user=user).order_by('-date').first()
+        latest_membership = UserTypes.objects.filter(
+            user=user).order_by('-date').first()
         current_membership = latest_membership.userType if latest_membership else None
 
         return render(request, "buy_membership.html", {
@@ -145,13 +287,15 @@ def buy_membership(request):
             return JsonResponse({'statusCode': 400, 'message': 'Membership type is required'}, status=400)
 
         try:
-            membership_type = MembershipType.objects.get(name=membership_type_name)
+            membership_type = MembershipType.objects.get(
+                name=membership_type_name)
         except MembershipType.DoesNotExist:
             return JsonResponse({'statusCode': 404, 'message': 'Invalid membership type'}, status=404)
 
         try:
             # Set previous memberships as inactive
-            Membership.objects.filter(user=user, active=True).update(active=False)
+            Membership.objects.filter(
+                user=user, active=True).update(active=False)
 
             # Create a new membership entry
             new_membership = Membership.objects.create(
@@ -167,7 +311,8 @@ def buy_membership(request):
             user.save()
 
             # Log user membership in UserTypes
-            UserTypes.objects.create(user=user, userType=membership_type.name, date=datetime.now())
+            UserTypes.objects.create(
+                user=user, userType=membership_type.name, date=datetime.now())
 
             return JsonResponse({'statusCode': 200, 'message': 'Membership purchased successfully'})
 

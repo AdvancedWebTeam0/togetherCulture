@@ -1,0 +1,16 @@
+<a href="{% url 'user-details' user.slug %}" class="user-link">
+    <div class="user-info-card">
+        <p class="user-name">
+            {{ user.first_name }}   {{ user.last_name }}
+        </p>
+
+        <div class="user-info">
+            <p class="info">
+                {% if user.user_type == "MEMBER" %}
+                    Member
+                {% elif user.user_type == "NORMAL_USER" %}
+                    Non member
+                {% endif %}
+            </p>
+        </div>
+    </div>
