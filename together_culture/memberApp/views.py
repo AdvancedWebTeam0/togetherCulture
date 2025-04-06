@@ -8,6 +8,11 @@ from django.shortcuts import render, redirect
 from datetime import datetime
 from memberApp.models import Membership, MembershipType, Benefit
 from datetime import datetime, timedelta
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+import json
+from loginRegistrationApp.models import Events, UserAttendingEvent
+
 nav_items = [
     {'name': '🎟 Dashboard', 'url': 'member-dashboard', 'submenu': None},
     {'name': '🎁 My Benefits', 'url': 'benefits', 'submenu': None},
@@ -26,8 +31,9 @@ def member_dashboard(request):
 
 
 def events(request):
-    return render(request, 'events.html')
-
+    events_list = Events.objects.all()
+    print("Fetched Events:", events_list)  # Debugging
+    return render(request, 'events.html', {'events': events_list, 'title': 'Events', 'nav_items': nav_items})
 
 def benefits(request):
     title = 'Benefits'
@@ -169,3 +175,121 @@ def buy_membership(request):
             return JsonResponse({'statusCode': 500, 'message': f'Unexpected error: {e}'}, status=500)
 
     return JsonResponse({'statusCode': 405, 'message': 'Method not allowed'}, status=405)
+
+
+
+# @csrf_exempt  # Only if necessary
+# def book_event(request):
+#     if request.method != "POST":
+#         return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+
+#     try:
+#         # Parse the JSON data from the request body
+#         data = json.loads(request.body.decode("utf-8"))
+#         print("Received data:", data)  # Debugging output
+
+#         # Get eventId from the data
+#         event_id = data.get("eventId")
+#         print("Event ID:", event_id)  # Debugging output
+
+#         if not event_id:
+#             return JsonResponse({"status": "error", "message": "Missing event ID"}, status=400)
+
+#         user_slug = request.session.get("user_slug")
+#         if not user_slug:
+#             return JsonResponse({"status": "error", "message": "User not logged in or session expired."}, status=401)
+
+#         user = get_object_or_404(Users, userSlug=user_slug)
+        
+#         # Important: Use eventId here, not id
+#         event = get_object_or_404(Events, eventId=event_id)
+
+#         # Avoid duplicate bookings
+#         attending, created = UserAttendingEvent.objects.get_or_create(
+#             user=user,
+#             event=event,
+#             defaults={"isUserAttended": False}  # Set default value
+#         )
+
+#         if created:
+#             # Only increment if this is a new booking
+#             event.numberOfAttendees += 1
+#             event.save()
+#             print(f"User {user.userSlug} booked event {event.eventName}, new attendance count: {event.numberOfAttendees}")
+#         else:
+#             print(f"User {user.userSlug} already booked event {event.eventName}")
+
+#         return JsonResponse({
+#             "status": "success",
+#             "message": "Event booked successfully!",
+#             "attendees": event.numberOfAttendees
+#         })
+
+#     except json.JSONDecodeError as e:
+#         print("JSON Decode Error:", str(e))
+#         return JsonResponse({"status": "error", "message": "Invalid JSON data"}, status=400)
+
+#     except Exception as e:
+#         print("Unexpected error:", str(e))
+#         return JsonResponse({"status": "error", "message": f"Unexpected error: {e}"}, status=500)
+
+@csrf_exempt  # Only if necessary
+def book_event(request):
+    if request.method != "POST":
+        return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+
+    try:
+        # Parse the JSON data from the request body
+        data = json.loads(request.body.decode("utf-8"))
+        print("Received data:", data)  # Debugging output
+
+        # Get eventId from the data
+        event_id = data.get("eventId")
+        print("Event ID:", event_id)  # Debugging output
+
+        if not event_id:
+            return JsonResponse({"status": "error", "message": "Missing event ID"}, status=400)
+
+        user_slug = request.session.get("user_slug")
+        if not user_slug:
+            return JsonResponse({"status": "error", "message": "User not logged in or session expired."}, status=401)
+
+        user = get_object_or_404(Users, userSlug=user_slug)
+        
+        # Important: Use eventId here, not id
+        event = get_object_or_404(Events, eventId=event_id)
+
+        # Avoid duplicate bookings
+        attending, created = UserAttendingEvent.objects.get_or_create(
+            user=user,
+            event=event,
+            defaults={"isUserAttended": False}  # Set default value
+        )
+
+        if created:
+            # Only increment if this is a new booking
+            event.numberOfAttendees += 1
+            event.save()
+            print(f"User {user.userSlug} booked event {event.eventName}, new attendance count: {event.numberOfAttendees}")
+            return JsonResponse({
+                "status": "success",
+                "message": "Event booked successfully!",
+                "attendees": event.numberOfAttendees,
+                "is_new_booking": True
+            })
+        else:
+            print(f"User {user.userSlug} already booked event {event.eventName}")
+            return JsonResponse({
+                "status": "already_booked",
+                "message": "You have already booked this event!",
+                "attendees": event.numberOfAttendees,
+                "is_new_booking": False
+            })
+
+    except json.JSONDecodeError as e:
+        print("JSON Decode Error:", str(e))
+        return JsonResponse({"status": "error", "message": "Invalid JSON data"}, status=400)
+
+    except Exception as e:
+        print("Unexpected error:", str(e))
+        return JsonResponse({"status": "error", "message": f"Unexpected error: {e}"}, status=500)

@@ -12,4 +12,5 @@ urlpatterns = [
     path('my_membership/', views.my_membership, name='my_membership'),
     path('settings/', views.settings, name='settings'),
     path('buy-membership/', views.buy_membership, name='buy_membership'),
+    path("book-event/", views.book_event, name="book_event"), 
 ]
