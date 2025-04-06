@@ -1,0 +1,89 @@
+.activity-container{
+    display: flex;
+    flex-direction: column;
+}
+
+.main-container{
+    display: flex;
+    flex-direction: row;
+    gap: 150px;
+}
+
+.list-events-booked{
+    margin-top: 10px;
+    border: 2px solid black;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.list-events-booked th, .list-events-booked td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table-context{
+    text-align: left;
+    margin-inline: 10px;
+    margin-block: 0px;
+    margin-left: -25px;
+    margin-right: 20px;
+}
+
+.event-item {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 8px 0;
+    border-bottom: 1px solid rgb(62, 62, 62);
+    align-items: center;
+}
+
+.activity-count{
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin: -5px;
+    margin-left: 0px;
+}
+
+.title-events-info{
+    display: flex;
+    text-align: left;
+    font-size: 20px;
+    font-weight: bolder;
+    background-color: rgb(255 231 231);
+    margin: 10px;
+}
+
+.subheader{
+    color: rgba(0, 97, 74, 0.852);
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.event-count{
+    font-size: 18px;
+    font-weight: bold;
+    color: rgb(0, 0, 0);
+}
+
+.event-name{
+    font-size: 15px;
+}
+
+.event-type{
+    font-size: 14px;
+    color: rgb(205, 104, 3);
+    text-align: right;
+}
+
+.info-subheader{
+    color: rgb(0, 0, 0);
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+    background-color: rgb(0 76 255 / 16%)
+}

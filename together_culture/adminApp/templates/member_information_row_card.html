@@ -1,0 +1,10 @@
+<a href="{% url 'member-detail' member.slug %}" class="user-link">
+    <div class="user-info-card">
+        <p class="user-name">
+            {{ member.first_name }}   {{ member.last_name }}
+        </p>
+
+        <div class="user-info">
+            <p class="info">{{ member.membership_type }}</p>
+        </div>
+    </div>

@@ -5,6 +5,14 @@
 {% endblock %}
 {% block content %}
 <div class="container mt-5">
+    <h2>Your Membership Type</h2>
+    <div class="main-content">
+        <section class="cards-container">
+            <p><strong>Membership Type:</strong> {{ membership_type }}</p>
+            <p><strong>Start Date:</strong> {{ start_date }}</p>
+            <p><strong>End Date:</strong> {{ end_date }}</p>
+        </section>
+    </div>
     <h2>Your Membership Benefits</h2>
     <div id="benefits-container">
         {% for benefit in benefits %}

@@ -1,0 +1,88 @@
+.content {
+    justify-content: flex-start
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.headers {
+    display: flex;
+    justify-content: flex-start;
+    gap: 235px; /*Space between header elements*/
+    margin-left: 40px;
+    color: rgba(61, 61, 61, 0.852);
+    font-size: 13px;
+    margin-bottom: -5px;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    margin: 10px;
+}
+
+.search-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-bar {
+    border: 2px solid #3d3d3d;
+    border-radius: 8px;
+    padding: 8px 12px;
+    width: 250px;
+    margin: 20px;
+}
+
+button {
+    border: 2px solid #3d3d3d;
+    border-radius: 8px;
+    color: rgb(0, 0, 0);
+    background-color: white;
+    padding: 5px 12px;
+}
+
+#see-all-users {
+    background-color: rgb(255, 214, 214);
+    padding: 10px 12px;
+    margin: 25px;
+}
+
+.search-detail{
+    color: rgb(0 0 0 / 76%);
+    font-weight: bold;
+    background-color: rgb(255 182 182);
+}
+
+#member-type-filter-form, #user-type-filter-form {
+    display: flex;
+    border-radius: 5px;
+    padding: 5px 12px;
+    align-items: center;
+    gap: 10px;
+}
+
+.member-type-filter-container, .user-type-filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#member-type-filter-form p, #user-type-filter-form p {
+    margin: 0;
+}
+
+#member-type-filter-form label, #user-type-filter-form label{
+    white-space: nowrap;
+    color: rgb(42, 42, 42);
+}
+
+#member-type-filter-form select, #user-type-filter-form select {
+    padding: 5px;
+    border: 1px solid #757575;
+    border-radius: 5px;
+}

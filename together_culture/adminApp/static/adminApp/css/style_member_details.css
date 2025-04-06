@@ -1,0 +1,54 @@
+.member-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: left;
+    font-size: 15px;
+}
+
+.member-title {
+    display: flex;
+    text-align: left;
+    font-size: 20px;
+    font-weight: bolder;
+    background-color: rgb(255 231 231);
+    margin: 10px;
+}
+
+.subtitle {
+    color: rgba(0, 97, 74, 0.852);
+    font-size: 18px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.membership-history-details {
+    display: inline;
+    margin-right: 15px;
+}
+
+.activity-history-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.initial-intersts, .activity, .latest-attended-event {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    text-align: left;
+}
+
+.activity-subheader {
+    color: rgb(22, 22, 22);
+    font-weight: bold;
+    font-size: 16px;
+    background-color: rgb(255, 229, 177);
+}
+
+ul {
+    margin: 7px;
+    padding: 0px;
+}
