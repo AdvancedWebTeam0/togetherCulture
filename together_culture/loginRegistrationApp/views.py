@@ -80,6 +80,10 @@ def insert_user(request):
             )
             us.save()
             logger.info('User registered successfully')
+
+             # Add session data for the user(slug)
+            user_slug = request.session.get('user_slug')
+
             return redirect(getInitialInterests)
         except Exception as e:
             logger.error(f'User registration failed: {e}')
