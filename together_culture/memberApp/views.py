@@ -16,6 +16,9 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 import json
 from loginRegistrationApp.models import Events, UserAttendingEvent
+from django.contrib import messages
+from django.utils.text import slugify
+from django.contrib.auth.hashers import make_password
 
 nav_items = [
     {'name': '🎟 Dashboard', 'url': 'member-dashboard', 'submenu': None},
@@ -32,7 +35,6 @@ nav_items = [
 # @login_required
 def member_dashboard(request):
     title = 'Member Dashboard'
-
     #username = request.user.user_name
     user = request.user = Users.objects.get(
         user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
@@ -257,7 +259,57 @@ def my_membership(request):
 
 
 def settings(request):
-    return render(request, 'settings.html')
+    
+    user_slug = request.session.get("user_slug")
+    if not user_slug:
+        messages.error(request, "User not logged in")
+        return redirect('login')  # Redirect to login if session data is missing
+
+    try:
+        user = Users.objects.get(userSlug=user_slug)
+        user_id = user.user_id
+    except Users.DoesNotExist:
+        messages.error(request, "User not found")
+        return redirect('login')
+
+    if request.method == 'POST':
+        # Update user details from form submission
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.phone_number = request.POST.get('phone_number', user.phone_number)
+        user.address = request.POST.get('address', user.address)
+        user.gender = request.POST.get('gender', user.gender)
+
+        # Handle password reset fields
+        new_password = request.POST.get('new_password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+        if new_password or confirm_password:
+            if new_password == confirm_password:
+                user.password = make_password(new_password)
+            else:
+                messages.error(request, "New password and confirmation do not match.")
+                return redirect('settings')
+
+        # Update user_name and regenerate userSlug based on first and last name
+        user.user_name = user.first_name + "$" + user.last_name
+        new_slug = slugify(user.user_name)
+        # Ensure the new slug is unique by checking other records
+        slug_count = Users.objects.filter(userSlug=new_slug).exclude(user_id=user_id).count()
+        if slug_count > 0:
+            new_slug = f"{new_slug}-{slug_count + 1}"
+        user.userSlug = new_slug
+
+        user.save()
+        # Update session variables if needed (e.g., user_slug)
+        request.session['user_slug'] = user.userSlug
+
+        messages.success(request, "Your details have been updated.")
+        return redirect('settings')
+
+    context = {
+        'user': user,
+    }
+    return render(request, 'settings.html', context)
 
 
 def buy_membership(request):
