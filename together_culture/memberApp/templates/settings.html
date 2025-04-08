@@ -104,14 +104,28 @@ Profile Settings
    <div class="settings-form">
      <form method="post">
        {% csrf_token %}
-       <div class="form-group">
-         <label for="first_name">First Name:</label>
-         <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}">
-       </div>
-       <div class="form-group">
-         <label for="last_name">Last Name:</label>
-         <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}">
-       </div>
+        <div class="form-group">
+            <label for="first_name">First Name:</label>
+            <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}">
+        </div>
+        <div class="form-group">
+            <label for="last_name">Last Name:</label>
+            <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}">
+        </div>
+         <!-- Non-editable Fields -->
+         <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" value="{{ user.email }}" disabled>
+          </div>
+          <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" value="{{ user.user_name }}" disabled>
+          </div>
+          <div class="form-group">
+            <label for="date_of_birth">Date of Birth:</label>
+            <input type="date" id="date_of_birth" name="date_of_birth" 
+                   value="{{ user.date_of_birth|date:'Y-m-d' }}" disabled>
+          </div>
        <div class="form-group">
          <label for="phone_number">Phone Number:</label>
          <input type="text" id="phone_number" name="phone_number" value="{{ user.phone_number }}">

@@ -47,7 +47,7 @@ def insert_user(request):
             userId = uuid.uuid4()
             firstName = request.POST['firstName']
             lastName = request.POST['lastName']
-            userName = firstName + "$" + lastName
+            userName = firstName + "." + lastName + "@togetherculture.com"
             email = request.POST['email']
             password = make_password(request.POST['password'])
             currentUserType = "NORMAL_USER"
