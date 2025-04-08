@@ -86,7 +86,8 @@ def insert_user(request):
             logger.info('User registered successfully')
 
              # Add session data for the user(slug)
-            user_slug = request.session.get('user_slug')
+            request.session['user_slug'] = us.userSlug  # Store userSlug in session
+            request.session.modified = True  # Ensure session is saved
 
             return redirect(getInitialInterests)
         except Exception as e:
@@ -113,17 +114,27 @@ def getInitialInterests(request):
         'form': get_interests_form
     }
 
+    #User slug should be in session if the page is viewed after registration form.
+    #Otherwise, user should login (or register). Shouldn't reach this form/save information about interests.
+    user_slug = request.session.get('user_slug')
+    if user_slug == None:
+        messages.error(request, "Please log in or register.")
+        return redirect('login')
+
     if request.method == "POST":
         get_interests_form = GetInitialInterest(request.POST)
         if get_interests_form.is_valid():
             selected_options = get_interests_form.cleaned_data['interests']
             print("Selected Options:", selected_options)
 
-            curr_user = Users.objects.first() #Update user!!
+            user_slug = request.session.get('user_slug')
+            curr_user = Users.objects.get(userSlug=user_slug)
+
             response = __saveInitialInterests(user=curr_user, selected_options=selected_options)
 
             if response == "successfully saved":
                 messages.success(request, "Interests saved successfully! Please log in to continue.")
+                request.session.flush() #session should be deleted/reload after saving the interests.
                 return redirect('login')
             
             else:
