@@ -1,18 +1,119 @@
-{% include 'navigationBar.html' %}  
+{% extends "event_template.html" %}
 
-<!--you can remove below code-->
-<div class="content">
-    <div class="header">📅 Events</div>
-    <h1>Upcoming Events</h1>
-    <p>Check out the latest events and RSVP to save your spot!</p>
-    <div class="events">
-        {% for event in events %}
-        <div class="event">
-            <h2>{{ event.title }}</h2>
-            <p>{{ event.date }}</p>
-            <p>{{ event.location }}</p>
-            <p>{{ event.description }}</p>
-            <button>RSVP</button>
-        </div>
-        {% endfor %}
+{% block content %}
+    <h2>Available Events</h2>
+
+    {% csrf_token %}
+    <div class="events-container">
+        {% if events %}
+            {% for event in events %}
+                <div class="event-card">
+                    <h3 style="color: rgb(32, 72, 175);">{{ event.eventName }}</h3>
+                    <p style="font-style: italic;">{{ event.longDescription }}</p>
+                    <p><strong>Date:</strong> {{ event.eventDate }}</p>
+                    <p><strong>Time:</strong> {{ event.startTime }} - {{ event.endTime }}</p>
+                    <p><strong>Location:</strong> {{ event.location }}</p>
+                    <p>{{ event.shortDescription }}</p>
+                    <p><strong>Attendees:</strong> <span id="event-{{ event.eventId }}-attendees">{{ event.numberOfAttendees }}</span></p>
+                        
+                    <button class="book-btn" onclick="bookEvent('{{ event.eventId }}')">Book Event</button>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No events found!</p>
+        {% endif %}
     </div>
+
+    <script>
+     function bookEvent(eventId) {
+    console.log("Booking event with ID:", eventId);
+
+    if (!eventId) {
+        console.error("Error: Missing event ID");
+        alert("Error: Missing event ID");
+        return;
+    }
+
+    fetch("/member/book-event/", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ eventId: eventId })
+    })
+    .then(response => {
+        console.log("Response status:", response.status);
+        return response.json();
+    })
+    .then(data => {
+        console.log("Response data:", data);
+        if (data.status === "success") {
+            alert("Successfully booked!");
+            
+            // Update attendee count
+            const attendeeCount = document.getElementById(`event-${eventId}-attendees`);
+            if (attendeeCount) {
+                attendeeCount.textContent = data.attendees;
+            }
+            
+            // Disable the button
+            const button = document.querySelector(`button[onclick="bookEvent('${eventId}')"]`);
+            if (button) {
+                button.disabled = true;
+                button.textContent = "Booked";
+            }
+        } else if (data.status === "already_booked") {
+            alert("You have already booked this event!");
+            
+            // Disable the button to prevent further attempts
+            const button = document.querySelector(`button[onclick="bookEvent('${eventId}')"]`);
+            if (button) {
+                button.disabled = true;
+                button.textContent = "Booked";
+            }
+        } else {
+            alert("Booking failed: " + data.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("An error occurred while booking the event");
+    });
+}
+    </script>
+
+    <style>
+        .events-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .event-card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            width: 300px;
+            transition: 0.3s;
+        }
+        .event-card:hover {
+            transform: scale(1.05);
+        }
+        .book-btn {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            padding: 10px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            width: 100%;
+        }
+        .book-btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+{% endblock %}

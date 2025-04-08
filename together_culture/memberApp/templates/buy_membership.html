@@ -1,21 +1,11 @@
-{% include 'navigationBar.html' %}
+{% extends 'navigationBar.html' %}
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+{% block extra_head %}
     <title>Buy Membership</title>
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f4f9;
-            margin: 0;
-        }
-
         .content {
             max-width: 1200px;
-            margin: 50px auto;
+            margin: 20px auto;
             padding: 20px;
             background: #fff;
             border-radius: 8px;
@@ -30,6 +20,7 @@
             padding: 15px;
             text-align: center;
             border-radius: 8px;
+            margin-bottom: 20px;
         }
 
         .membership-options {
@@ -91,47 +82,16 @@
             font-size: 14px;
         }
     </style>
-    <script>
-        // Ensure CSRF Token is handled correctly
-        function getCSRFToken() {
-            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            console.log('CSRF Token:', csrfToken);  // Debugging line
-            return csrfToken;
-        }
+{% endblock %}
 
-        // Function to handle the membership purchase
-        function buyMembership(membershipType) {
-        fetch('/member/buy-membership/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'X-CSRFToken': getCSRFToken()
-            },
-            body: 'membership_type=' + encodeURIComponent(membershipType)
-        })
-        .then(response => response.json())
-        .then(data => {
-            alert(data.message);  // Show the message returned from the server
-            
-            if (data.statusCode === 200) {
-                // After a successful purchase, refresh the page to reflect the updated membership
-                location.reload();  // This reloads the current page
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Something went wrong. Please try again.');
-        });
-    }
-    </script>
-</head>
-<body>
-
+{% block content %}
     <div class="content">
         <div class="header">Membership Plans</div>
   
         {% if current_membership %}
+        <div style="text-align: center;">
             <p>Current Membership: <strong>{{ current_membership }}</strong></p>
+         </div>
         {% else %}
             <p>You don't have any active membership. Choose a plan below to get started.</p>
         {% endif %}
@@ -177,5 +137,37 @@
         </form>
     </div>
 
-</body>
-</html>
+    <script>
+        // Ensure CSRF Token is handled correctly
+        function getCSRFToken() {
+            const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+            console.log('CSRF Token:', csrfToken);  // Debugging line
+            return csrfToken;
+        }
+
+        // Function to handle the membership purchase
+        function buyMembership(membershipType) {
+            fetch('/member/buy-membership/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': getCSRFToken()
+                },
+                body: 'membership_type=' + encodeURIComponent(membershipType)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);  // Show the message returned from the server
+                
+                if (data.statusCode === 200) {
+                    // After a successful purchase, refresh the page to reflect the updated membership
+                    location.reload();  // This reloads the current page
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again.');
+            });
+        }
+    </script>
+{% endblock %}
