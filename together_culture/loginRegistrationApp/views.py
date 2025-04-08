@@ -26,7 +26,11 @@ def validate_user(request):
             request.session['user_slug'] = user.userSlug  # Store userSlug in session
             request.session.modified = True  # Ensure session is saved
             logger.info('User authenticated successfully. User Email: ' + email)
-            return redirect('/member')
+            print(user.current_user_type)
+            if user.current_user_type == "ADMIN":
+                return redirect('/admin')
+            elif user.current_user_type == "NORMAL_USER" or user.current_user_type == "MEMBER":
+                return redirect('/member')
         else:
             logger.warning('User authentication failed. User Email: ' + email)
             return JsonResponse({'statusCode': 401, 'message': 'User authentication failed. Wrong Password!'}, status=401)
