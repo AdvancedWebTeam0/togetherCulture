@@ -22,7 +22,6 @@ urlpatterns = [
     path("", include("nonmemberApp.urls")),
     path("member/", include("memberApp.urls")),
     path("admin/", include("adminApp.urls")),
-    path("loginRegistration/", include("loginRegistrationApp.urls")),
     path('djangoadmin/', admin.site.urls),
-
+    path("loginRegistration/", include("loginRegistrationApp.urls")),
 ]

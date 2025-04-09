@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Membership</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white text-gray-800 font-sans">
+
+  <!-- Navbar -->
+  <header class="flex justify-between items-center px-6 py-4 shadow border-b">
+    <div class="flex items-center space-x-8">
+      <div class="bg-red-600 w-16 h-12"></div>
+      <nav class="flex space-x-6 font-semibold">
+        <a href="{% url 'about' %}" class="hover:underline">About</a>
+        <a href="{% url 'membership' %}" class="hover:underline">Membership</a>
+        <a href="{% url 'events' %}" class="hover:underline">Events</a>
+        <a href="{% url 'resources' %}" class="hover:underline">Resources</a>
+      </nav>
+    </div>
+    <div class="space-x-2">
+      <button class="bg-gray-300 px-4 py-2 rounded">Login</button>
+      <button class="bg-gray-300 px-4 py-2 rounded">Register</button>
+    </div>
+  </header>
+
+  <!-- Membership Types -->
+  <section class="px-8 py-12">
+    <h1 class="text-3xl font-bold mb-8">Membership Types</h1>
+
+    <h2 class="text-2xl font-semibold mb-6">Individual Membership</h2>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 mb-12">
+      <div class="bg-gray-100 rounded-lg p-6 text-center shadow-sm">
+        Community Membership
+      </div>
+      <div class="bg-gray-100 rounded-lg p-6 text-center shadow-sm">
+        Workspace Membership: <br /> Touchdown
+      </div>
+      <div class="bg-gray-100 rounded-lg p-6 text-center shadow-sm">
+        Workspace Membership: <br /> Dedicated
+      </div>
+    </div>
+
+    <h3 class="text-xl font-semibold text-center">
+      Community Membership: Get information from here
+    </h3>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-gray-200 text-sm mt-10">
+    <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 p-6 text-gray-700">
+      <div class="space-y-2">
+        <p><a href="#" class="hover:underline">Our Story</a></p>
+        <p><a href="#" class="hover:underline">Contact</a></p>
+        <p><a href="#" class="hover:underline">Visit Us</a></p>
+      </div>
+      <div class="space-y-2">
+        <p><a href="#" class="hover:underline">Events</a></p>
+        <p><a href="{% url 'membership' %}" class="hover:underline">Individual Membership</a></p>
+        <p><a href="{% url 'membership' %}" class="hover:underline">Organisational Membership</a></p>
+      </div>
+      <div class="space-y-2">
+        <p><a href="#" class="hover:underline">Privacy Policy</a></p>
+        <p><a href="#" class="hover:underline">Complaint Policy</a></p>
+        <div class="flex items-center space-x-2 mt-2">
+          <span class="font-semibold">Follow Us:</span>
+          <div class="flex space-x-2">
+            <div class="w-4 h-4 bg-gray-400"></div>
+            <div class="w-4 h-4 bg-gray-400"></div>
+            <div class="w-4 h-4 bg-gray-400"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="text-center py-4 text-xs text-gray-600">
+      We do what we say on the tin, we build together culture.
+    </div>
+  </footer>
+
+</body>
+</html>
