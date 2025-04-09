@@ -7,7 +7,7 @@ def events_view(request):
     events = Events.objects.all()
 
     # Pass events to the template
-    return render(request, 'event.html', {'events': events})
+    return render(request, 'event_view.html', {'events': events})
 
 # Create your views here.
 
