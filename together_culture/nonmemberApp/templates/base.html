@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Organization Site{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <!-- Red sidebar -->
+        </div>
+        
+        <div class="main-content">
+            <header class="top-nav">
+                <div class="nav-links">
+                    <a href="{% url 'about' %}">About</a>
+                    <a href="{% url 'membership' %}">Membership</a>
+                    <a href="{% url 'events_view' %}">Events</a>
+                    <a href="{% url 'resources' %}">Resources</a>
+                </div>
+                <div class="auth-buttons">
+                    <a href="{% url 'login' %}" class="btn btn-gray">Login</a>
+                    <a href="{% url 'register' %}" class="btn btn-gray">Register</a>
+                </div>
+            </header>
+            
+            <main>
+                {% block content %}
+                <!-- Content will be inserted here -->
+                {% endblock %}
+            </main>
+            
+            <footer>
+                <div class="footer-links">
+                    <div class="footer-col">
+                        <p><a href="#">Our Story</a></p>
+                        <p><a href="#">Contact</a></p>
+                        <p><a href="#">Visit Us</a></p>
+                    </div>
+                    <div class="footer-col">
+                        <p><a href="{% url 'events_view' %}">Events</a></p>
+                        <p><a href="#">Individual Membership</a></p>
+                        <p><a href="#">Organisational Membership</a></p>
+                    </div>
+                    <div class="footer-col">
+                        <p><a href="#">Privacy Policy</a></p>
+                        <p><a href="#">Complaint Policy</a></p>
+                    </div>
+                </div>
+                <div class="social-media">
+                    <p>Follow Us:</p>
+                    <div class="social-icons">
+                        <a href="#" class="social-icon"></a>
+                        <a href="#" class="social-icon"></a>
+                        <a href="#" class="social-icon"></a>
+                    </div>
+                </div>
+                <div class="footer-slogan">
+                    <p>We do what we say on the tin, we build together culture.</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>
