@@ -125,25 +125,44 @@
       <a href="{% url 'resources' %}">Resources</a>
     </nav>
     <div class="auth-buttons">
-      <button class="bg-gray-300 px-4 py-2 rounded"><a href="{% url 'login' %}" class="hover:underline">Login</a></button>
-      <button class="bg-gray-300 px-4 py-2 rounded"><a href="{% url 'register' %}" class="hover:underline">Register</a></button>
+        <button class="bg-gray-300 px-4 py-2 rounded"><a href="{% url 'login' %}" class="hover:underline">Login</a></button>
+        <button class="bg-gray-300 px-4 py-2 rounded"><a href="{% url 'register' %}" class="hover:underline">Register</a></button>
     </div>
   </header>
 
   <div class="main-content">
-    <h1>Upcoming Events</h1>
+    <h1>Resources</h1>
+    <p style="font-size: 18px; color: #444; margin-bottom: 30px;">
+      Explore tools, guides, and downloads to help you connect, collaborate, and grow with Together Culture.
+    </p>
+  
     <div class="event-list">
-      {% for event in events %}
       <div class="event-card">
-        <h3>{{ event.eventName }}</h3>
-        <p><strong>Date:</strong> {{ event.eventDate|date:"Y-m-d H:i" }}</p>
-        <p><strong>Location:</strong> {{ event.location }}</p>
-        <p><strong>Attendees:</strong> {{ event.numberOfAttendees }}</p>
-        <p><strong>Description:</strong> {{ event.shortDescription }}</p>
+        <h3>Community Guidelines</h3>
+        <p>A short guide on how to contribute positively to our events and spaces.</p>
+        <a href="/static/resources/community-guidelines.pdf" download>Download PDF</a>
       </div>
-      {% endfor %}
+  
+      <div class="event-card">
+        <h3>Event Organizer Toolkit</h3>
+        <p>Everything you need to plan, promote, and run successful community events.</p>
+        <a href="/static/resources/event-organizer-toolkit.pdf" download>Download Toolkit</a>
+      </div>
+  
+      <div class="event-card">
+        <h3>Brand Assets</h3>
+        <p>Official Together Culture logos and usage guidelines.</p>
+        <a href="/static/resources/together-culture-brand-assets.zip" download>Download Assets</a>
+      </div>
+  
+      <div class="event-card">
+        <h3>Membership Benefits</h3>
+        <p>A breakdown of benefits for individuals and organizations joining our culture.</p>
+        <a href="/static/resources/membership-benefits.pdf" download>View Benefits</a>
+      </div>
     </div>
   </div>
+  
 
   <footer>
     <div class="footer-column">

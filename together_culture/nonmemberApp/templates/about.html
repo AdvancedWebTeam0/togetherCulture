@@ -125,15 +125,15 @@
       <a href="{% url 'resources' %}">Resources</a>
     </nav>
     <div class="auth-buttons">
-      <button class="bg-gray-300 px-4 py-2 rounded"><a href="{% url 'login' %}" class="hover:underline">Login</a></button>
-      <button class="bg-gray-300 px-4 py-2 rounded"><a href="{% url 'register' %}" class="hover:underline">Register</a></button>
+        <button class="bg-gray-300 px-4 py-2 rounded"><a href="{% url 'login' %}" class="hover:underline">Login</a></button>
+        <button class="bg-gray-300 px-4 py-2 rounded"><a href="{% url 'register' %}" class="hover:underline">Register</a></button>
     </div>
   </header>
 
   <div class="main-content">
-    <h1>Upcoming Events</h1>
+    <h1>Hear about us</h1>
     <div class="event-list">
-      {% for event in events %}
+      <!-- {% for event in events %}
       <div class="event-card">
         <h3>{{ event.eventName }}</h3>
         <p><strong>Date:</strong> {{ event.eventDate|date:"Y-m-d H:i" }}</p>
@@ -141,7 +141,8 @@
         <p><strong>Attendees:</strong> {{ event.numberOfAttendees }}</p>
         <p><strong>Description:</strong> {{ event.shortDescription }}</p>
       </div>
-      {% endfor %}
+      {% endfor %} -->
+      At Together Culture, we believe in the power of community, connection, and collaboration. Our platform is built to bring people together through meaningful events, shared interests, and a commitment to inclusivity. Whether it's a tech meetup, cultural celebration, or a creative workshop, our goal is to foster environments where everyone feels welcomed, inspired, and empowered. We’re more than just events — we’re a movement to create a culture of togetherness, one experience at a time.
     </div>
   </div>
 
