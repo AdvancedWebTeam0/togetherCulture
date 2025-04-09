@@ -8,7 +8,7 @@ urlpatterns = [
     path('dashboard/', views.dashBoard, name='dashboard'),
     path('validateUser/', views.validate_user, name='validate_user'),
     path('manage-member/', views.manage_member, name='manage_member'),
-    path('membership/', views.membership, name='membership'),
+    # path('membership/', views.membership, name='membership'),
     path('logout/', views.logout, name='logout'),
     path('get_interests/', views.getInitialInterests, name='get_interests'),
 ]

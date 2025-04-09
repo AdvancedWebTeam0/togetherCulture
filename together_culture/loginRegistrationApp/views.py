@@ -100,8 +100,8 @@ def dashBoard(request):
 def manage_member(request):
     return render(request, 'manage_member.html')
 
-def membership(request):
-    return render(request, 'membership.html')
+# def membership(request):
+#     return render(request, 'membership.html')
 
 def logout(request):
     request.session.flush()

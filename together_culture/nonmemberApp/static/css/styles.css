@@ -2,172 +2,178 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-}
-
-body {
     font-family: Arial, sans-serif;
-    background-color: #e6e6e6;
 }
 
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
+    display: flex;
+    min-height: 100vh;
 }
 
-/* Header styles */
-header {
+/* Red sidebar */
+.sidebar {
+    width: 230px;
+    background-color: #d13c3c;
+    flex-shrink: 0;
+}
+
+.main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Navigation */
+.top-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 0;
-    background-color: white;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
 }
 
-.logo-container {
-    width: 200px;
-    height: 80px;
-    background-color: #d74141; /* Red logo area */
-}
-
-.main-navigation ul {
-    display: flex;
-    list-style: none;
-}
-
-.main-navigation li {
-    margin: 0 15px;
-}
-
-.main-navigation a {
+.nav-links a {
+    margin-right: 30px;
     text-decoration: none;
-    color: #333;
+    color: #000;
     font-weight: bold;
     font-size: 18px;
 }
 
-.auth-buttons {
-    display: flex;
-}
-
-.btn {
+.auth-buttons .btn {
     padding: 10px 20px;
     margin-left: 10px;
+    text-decoration: none;
     background-color: #aaa;
     color: white;
-    text-decoration: none;
-    border-radius: 3px;
+    border-radius: 5px;
 }
 
-/* Main content styles */
+/* Main Content Areas */
 main {
-    background-color: white;
-    border: 2px solid #4b83db; /* Blue border */
-    margin: 20px 0;
+    flex-grow: 1;
+    padding: 20px;
 }
 
-/* Events carousel section */
-.events-carousel {
-    padding: 40px;
+/* Home Page */
+.events-slider {
     text-align: center;
-}
-
-.events-carousel h2 {
-    margin-bottom: 40px;
-    font-size: 24px;
-}
-
-.carousel-container {
+    padding: 50px 0;
+    border: 1px solid #ddd;
     position: relative;
-    height: 200px; /* Adjust as needed */
-}
-
-.carousel-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: #ddd;
-    border: none;
-    width: 40px;
-    height: 40px;
-    cursor: pointer;
-    font-size: 20px;
-}
-
-.carousel-nav.prev {
-    left: 0;
-}
-
-.carousel-nav.next {
-    right: 0;
-}
-
-/* Info boxes section */
-.info-boxes {
-    display: flex;
-    border-top: 1px solid #ddd;
-}
-
-.info-box {
-    width: 50%;
-    padding: 40px;
-    text-align: center;
-}
-
-.info-box:first-child {
-    border-right: 1px solid #ddd;
-}
-
-.info-box h2 {
     margin-bottom: 20px;
 }
 
-/* Footer styles */
+.slider-controls {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    width: 100%;
+    top: 50%;
+    padding: 0 20px;
+}
+
+.slider-btn {
+    background-color: #eee;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+}
+
+.promotions {
+    display: flex;
+    margin: 20px 0;
+}
+
+.promo-box {
+    flex: 1;
+    border: 1px solid #ddd;
+    padding: 50px;
+    text-align: center;
+}
+
+/* Events Page */
+.events-grid {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.event-card {
+    flex: 0 0 30%;
+    background-color: #f2f2f2;
+    padding: 100px 20px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+/* Membership Page */
+.membership-grid {
+    display: flex;
+    justify-content: space-between;
+    margin: 30px 0;
+}
+
+.membership-card {
+    flex: 0 0 30%;
+    background-color: #f2f2f2;
+    padding: 100px 20px;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.membership-info {
+    margin: 40px 0;
+}
+
+/* Footer */
 footer {
     background-color: #aaa;
     padding: 20px;
+    margin-top: auto;
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
 }
 
 .footer-links {
     display: flex;
-    width: 70%;
+    flex: 3;
 }
 
-.footer-column {
-    margin-right: 40px;
+.footer-col {
+    flex: 1;
 }
 
-.footer-column ul {
-    list-style: none;
+.footer-col p {
+    margin-bottom: 10px;
 }
 
-.footer-column a {
+.footer-col a {
     text-decoration: none;
-    color: #333;
-    line-height: 1.8;
+    color: #000;
 }
 
-.footer-social {
-    display: flex;
-    align-items: center;
+.social-media {
+    flex: 1;
+    text-align: right;
 }
 
 .social-icons {
     display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.social-icon {
+    width: 25px;
+    height: 25px;
+    background-color: #fff;
     margin-left: 10px;
 }
 
-.social-icons a {
-    margin: 0 5px;
-    color: #333;
-    font-size: 20px;
-}
-
-.footer-tagline {
-    width: 100%;
-    text-align: right;
-    margin-top: 20px;
-    font-style: italic;
-}
+.footer-slogan {
+    position: absolute;
+    right: 20px;
+    bottom: 10px;
+    font-size: 14px;
+}   

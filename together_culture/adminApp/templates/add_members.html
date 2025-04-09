@@ -1,6 +1,82 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>Welcome to Add Members</h1>
-<p>Add new members here.</p>
+<h1 style="font-size: 2.5rem; font-weight: 700; color: #2c3e50;">Welcome to Add Members</h1>
+<p style="font-size: 1.2rem; color: #555;">Add new members here.</p>
+
+{% if users %}
+    <div class="user-box" style="
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 30px;
+        background-color: #ffffff;
+        border: 1px solid #e0e0e0;
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    ">
+        <div class="headers" style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #2c3e50;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        ">
+            <span>Name</span>
+            <span>User Type</span>
+        </div>
+
+        <div class="user-list" style="display: flex; flex-direction: column; gap: 14px;">
+            {% for user in users %}
+                <!-- {% include 'user_details_row_card.html' %} -->
+                <div style="
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 20px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f9f9f9, #f0f0f0);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+"
+onmouseover="this.style.transform='scale(1.01)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.1)';"
+onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 6px rgba(0, 0, 0, 0.05)';"
+>
+    <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 1.05rem; font-weight: 600; color: #2d2d2d;">
+            {{ user.first_name }}
+        </span>
+        <span style="font-size: 0.95rem; color: #777;">
+            {{ user.user_type }}
+        </span>
+    </div>
+
+    <form action="{% url 'approve_user' user_id='cd3ac4620a9942a39eeb3132689b579f' %}" method="post" style="margin: 0;">
+        {% csrf_token %}
+        <button type="submit" style="
+            padding: 8px 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        " onmouseover="this.style.backgroundColor='#218838'" onmouseout="this.style.backgroundColor='#28a745'">
+            Approve
+        </button>
+    </form>
+</div>
+            {% endfor %}
+        </div>
+    </div>
+{% else %}
+    <p style="font-size: 1.1rem; color: #999;">No users found</p>
+{% endif %}
+
 {% endblock %}

@@ -718,9 +718,50 @@ def manage_events(request):
 def add_members(request):
     # define the title for page
     title = "Add Members"
-    return render(request, 'add_members.html', {'title': title, 'nav_items': nav_items})
+    #title = "User Search"
+    
+    #curr_members = __get_users(user_type = "MEMBER")
+    curr_users = __get_users(user_type = "NORMAL_USER")
+    curr_users_info = []
 
+    for user in curr_users:
+        if(user.have_interest_membership == 1):
+            user_info = {
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'user_type': user.current_user_type,
+                'slug': user.userSlug,
+            }
+            curr_users_info.append(user_info)
 
+    context = {
+        'title': title,
+        'nav_items': nav_items,
+        'search_user_form': UserSearchForm(),
+        'user_type_filter_form': UserTypeFilterForm(),
+        'users': curr_users_info,
+    }
+
+    return render(request=request, template_name='add_members.html', context=context)
+    #return render(request, 'add_members.html', {'title': title, 'nav_items': nav_items})
+
+def approve_user(request, user_id):
+    if request.method == 'POST':
+        user = get_object_or_404(Users, pk=user_id)
+        user.current_user_type = 'MEMBER'  # or your field that tracks approval
+        user.save()
+        #messages.success(request, f'{user.name} has been approved.')
+
+    context = {
+        'title': "Add Members",
+        'nav_items': nav_items,
+        'search_user_form': UserSearchForm(),
+        'user_type_filter_form': UserTypeFilterForm(),
+        # 'users': curr_users_info,
+    }
+
+    return render(request=request, template_name='add_members.html', context=context)
+    
 def manage_membership(request):
     # define the title for page
     title = "Manage Membership"
