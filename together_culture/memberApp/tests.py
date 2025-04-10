@@ -250,7 +250,7 @@ class MemberDashboardTest(TestCase):
         self.assertContains(response, 'Member Dashboard')
 
         # Check if the context contains the correct username
-        self.assertContains(response, 'testuser')
+        self.assertContains(response, 'testuser1')
         
 class BenefitsViewTest(TestCase):
 
