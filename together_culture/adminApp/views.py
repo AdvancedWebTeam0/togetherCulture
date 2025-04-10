@@ -25,7 +25,8 @@ nav_items = [
     {'name': '🔍 Search Users', 'url': 'user-list', 'submenu': None},
     {'name': '👥 Manage Members', 'url': '#', 'submenu': [
         {'name': '➕ Add Member', 'url': 'add-members'},
-        {'name': '📋 Members List', 'url': 'members-list'},
+        {'name': '📋 Members List', 'url': 'users_list'},
+        {'name': '📋 Members History', 'url': 'users_list'}
     ]},
     {'name': '🎟 Membership', 'url': 'manage-membership', 'submenu': None},
 ]
@@ -750,19 +751,88 @@ def approve_user(request, user_id):
         user = get_object_or_404(Users, pk=user_id)
         user.current_user_type = 'MEMBER'  # or your field that tracks approval
         user.save()
-        #messages.success(request, f'{user.name} has been approved.')
 
-    context = {
-        'title': "Add Members",
-        'nav_items': nav_items,
-        'search_user_form': UserSearchForm(),
-        'user_type_filter_form': UserTypeFilterForm(),
-        # 'users': curr_users_info,
-    }
+    print(user.current_user_type)
 
-    return render(request=request, template_name='add_members.html', context=context)
+    return redirect('add-members')
     
 def manage_membership(request):
     # define the title for page
     title = "Manage Membership"
     return render(request, 'manage_membership.html', {'title': title, 'nav_items': nav_items})
+
+def members_history(request):
+    title = "Manage Membership"
+    return render(request, 'manage_membership.html', {'title': title, 'nav_items': nav_items})
+
+def users_list(request):
+    title = "Members"
+    search_users = Users.objects.filter(have_interest_membership = 1, current_user_type = "MEMBER")
+
+    users = Users.objects.all()
+    return render(request, 'users_list.html', {'users': search_users, 'title': title, 'nav_items': nav_items})
+
+def user_membership_history(request, user_id):
+    title = "Membership History"
+
+    user = get_object_or_404(Users, pk=user_id)
+    memberships = Membership.objects.filter(user='cd3ac4620a9942a39eeb3132689b579f').order_by('-start_date')
+    return render(request, 'user_membership_history.html', {
+        'user': user,
+        'memberships': memberships
+    },  {'title': title, 'nav_items': nav_items})
+
+def handle_add_member(request):
+    print("hi")
+    if request.method == 'POST':
+        try:
+            print(request.POST['firstName'])
+            # userId = uuid.uuid4()
+            # firstName = request.POST['firstName']
+            # lastName = request.POST['lastName']
+            # userName = firstName + "." + lastName + "@togetherculture.com"
+            # email = request.POST['email']
+            # password = make_password(request.POST['password'])
+            # currentUserType = "NORMAL_USER"
+            # haveInterestMembership = request.POST.get('terms') == 'on'
+            # # New Fields
+            # phone_number = request.POST.get('phone_number', '') 
+            # address = request.POST.get('address', '') 
+            # gender = request.POST.get('gender', '')  
+            # date_of_birth = request.POST.get('date_of_birth', None)
+            
+            # # Generate a slug based on the user name
+            # userSlug = slugify(userName)
+
+            # # Ensure the slug is unique
+            # # If the slug already exists, you could append a number to make it unique
+            # slug_count = Users.objects.filter(userSlug=userSlug).count()
+            # if slug_count > 0:
+            #     userSlug = f"{userSlug}-{slug_count + 1}"
+        
+            # us = Users(
+            #     user_id=userId,
+            #     user_name=userName,
+            #     first_name=firstName,
+            #     last_name=lastName,
+            #     email=email,
+            #     password=password,
+            #     current_user_type=currentUserType,
+            #     have_interest_membership=haveInterestMembership,
+            #     userSlug=userSlug,
+            #     phone_number=phone_number,
+            #     address=address,
+            #     gender=gender,
+            #     date_of_birth=date_of_birth
+            # )
+            # us.save()
+            # logger.info('User registered successfully')
+
+            #  # Add session data for the user(slug)
+            # request.session['user_slug'] = us.userSlug  # Store userSlug in session
+            # request.session.modified = True  # Ensure session is saved
+
+            # return redirect(getInitialInterests)
+        except Exception as e:
+            logger.error(f'User registration failed: {e}')
+            return JsonResponse({'statusCode': 500, 'message': 'User registration failed: User with this email already exists.'}, status=500)

@@ -4,6 +4,23 @@
 <h1 style="font-size: 2.5rem; font-weight: 700; color: #2c3e50;">Welcome to Add Members</h1>
 <p style="font-size: 1.2rem; color: #555;">Add new members here.</p>
 
+<!-- Toggle Button -->
+<div style="margin-bottom: 20px;">
+    <button onclick="toggleSection()" style="
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        cursor: pointer;
+    " id="toggleButton">
+        Show Add Member Form
+    </button>
+</div>
+
+<!-- User List Section -->
+<div id="userListSection">
 {% if users %}
     <div class="user-box" style="
         max-width: 900px;
@@ -32,51 +49,172 @@
 
         <div class="user-list" style="display: flex; flex-direction: column; gap: 14px;">
             {% for user in users %}
-                <!-- {% include 'user_details_row_card.html' %} -->
                 <div style="
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 20px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #f9f9f9, #f0f0f0);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-"
-onmouseover="this.style.transform='scale(1.01)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.1)';"
-onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 6px rgba(0, 0, 0, 0.05)';"
->
-    <div style="display: flex; flex-direction: column;">
-        <span style="font-size: 1.05rem; font-weight: 600; color: #2d2d2d;">
-            {{ user.first_name }}
-        </span>
-        <span style="font-size: 0.95rem; color: #777;">
-            {{ user.user_type }}
-        </span>
-    </div>
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    padding: 14px 20px;
+                    border-radius: 10px;
+                    background: linear-gradient(135deg, #f9f9f9, #f0f0f0);
+                    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+                    transition: transform 0.2s ease, box-shadow 0.2s ease;
+                "
+                onmouseover="this.style.transform='scale(1.01)'; this.style.boxShadow='0 4px 12px rgba(0, 0, 0, 0.1)';"
+                onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 6px rgba(0, 0, 0, 0.05)';"
+                >
+                    <div style="display: flex; flex-direction: column;">
+                        <span style="font-size: 1.05rem; font-weight: 600; color: #2d2d2d;">
+                            {{ user.first_name }}
+                        </span>
+                        <span style="font-size: 0.95rem; color: #777;">
+                            {{ user.user_type }}
+                        </span>
+                    </div>
 
-    <form action="{% url 'approve_user' user_id='cd3ac4620a9942a39eeb3132689b579f' %}" method="post" style="margin: 0;">
-        {% csrf_token %}
-        <button type="submit" style="
-            padding: 8px 16px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        " onmouseover="this.style.backgroundColor='#218838'" onmouseout="this.style.backgroundColor='#28a745'">
-            Approve
-        </button>
-    </form>
-</div>
+                    <form action="{% url 'approve_user' user_id='cd3ac4620a9942a39eeb3132689b579f' %}" method="post" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" style="
+                            padding: 8px 16px;
+                            background-color: #28a745;
+                            color: white;
+                            border: none;
+                            border-radius: 6px;
+                            font-weight: 600;
+                            font-size: 0.95rem;
+                            cursor: pointer;
+                            transition: background-color 0.2s ease;
+                        " onmouseover="this.style.backgroundColor='#218838'" onmouseout="this.style.backgroundColor='#28a745'">
+                            Approve
+                        </button>
+                    </form>
+                </div>
             {% endfor %}
         </div>
     </div>
 {% else %}
     <p style="font-size: 1.1rem; color: #999;">No users found</p>
 {% endif %}
+</div>
 
+<!-- Add Member Form Section -->
+<div id="formSection" style="display: none;">
+    <div class="form-container">
+        <h2>New Member</h2>
+        <form name="register" method="POST" onsubmit="handleRegister(event);" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">First Name:</label>
+                    <input type="text" id="firstName" name="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label for="lastName">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Choose Password:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="phone_number">Phone Number:</label>
+                    <input type="text" id="phone_number" name="phone_number" required>
+                </div>
+                <div class="form-group">
+                    <label for="address">Address:</label>
+                    <input type="text" id="address" name="address" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="gender">Gender:</label>
+                    <select id="gender" name="gender">
+                        <option value="">Select Gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date_of_birth">Date of Birth:</label>
+                    <input type="date" id="date_of_birth" name="date_of_birth" required>
+                </div>
+            </div>
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="terms" name="terms">
+                <label for="terms">Choose to be a member?</label>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" name="reg">Add Member</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function handleAddMember(event) {
+    event.preventDefault(); 
+    console.log("handleAddMember");
+
+    const formData = new URLSearchParams();
+    formData.append('firstName', "Harsh");
+
+    fetch('handle-add-member', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': csrfToken
+        },
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            if (response.redirected) {
+                window.location.href = response.url;
+                return null;
+            }
+            return response.text();
+        }
+        return response.json().then(errorData => {
+            throw new Error(errorData.message);
+        });
+    })
+    .then(data => {
+        if (data) {
+            console.log("Form submitted successfully", data);
+        }
+    })
+    .catch(error => {
+        alert(`Unexpected error: ${error.message}`);
+    });
+}
+
+function toggleSection() {
+    const userList = document.getElementById('userListSection');
+    const form = document.getElementById('formSection');
+    const button = document.getElementById('toggleButton');
+
+    if (form.style.display === 'none') {
+        form.style.display = 'block';
+        userList.style.display = 'none';
+        button.textContent = 'Show User List';
+    } else {
+        form.style.display = 'none';
+        userList.style.display = 'block';
+        button.textContent = 'Show Add Member Form';
+    }
+}
+</script>
 {% endblock %}

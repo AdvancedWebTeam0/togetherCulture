@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'adminApp/css/user_row_card.css' %}">
+<link rel="stylesheet" href="{% static 'adminApp/css/style_user_list.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<script>
+    var fullUrl = window.location.origin + "{% url 'user-list' %}";
+
+    function goToUsersList() {
+        window.location.href = fullUrl;
+    }
+</script>
+
+<div class="search-section">
+    <form id="user-search-form" method="GET" action="{% url 'user-search' %}">
+        <div class="search-container">
+            <span>🔍</span>
+            <input class="search-bar" id="id_user" type="text" placeholder="Search a user.." name="user" value="{{ request.GET.query }}" required>
+            <button type="submit">Search</button>
+        </div>
+        <input type="hidden" name="request-source" value="search-form">
+    </form>
+
+    <button id="see-all-users" onclick="goToUsersList();">See all Users</button>
+</div>
+
+<div class="user-type-filter-container">
+    <form id="user-type-filter-form" method="GET" action="{% url 'user-search' %}">
+        <p><label for="id_user_type">Filter by User Type:</label></p>
+        {{ user_type_filter_form.user_type }}
+        <button id="apply-filter" type="submit">Apply Filter</button>
+        <input type="hidden" name="request-source" value="filter-form">
+    </form>
+</div>
+
+{% if search_detail %}
+    <p class="search-detail">{{ search_detail }}</p>
+{% endif %}
+
+{% if users %}
+    <div class="list_of_users">
+        <div class="headers">  
+            <h3>Name</h3>
+            <h3>User Type</h3>
+        </div>
+
+        <div class="user-list">
+            {% for user in users %}
+                <div class="user-row-card">
+                    <div class="user-info">
+                        <p>{{ user.user_name }}</p>
+                        <p>{{ user.user_type }}</p>
+                    </div>
+                    <div class="user-actions">
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% else %}
+    <p>No users found.</p>
+{% endif %}
+
+{% endblock %}
+

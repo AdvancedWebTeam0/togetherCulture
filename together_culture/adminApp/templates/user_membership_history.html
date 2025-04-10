@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block style %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'adminApp/css/style_user_history.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="user-membership-history-container">
+    <button onclick="window.history.back()" class="back-button">← Back to Users</button>
+    <h2>Membership History for {{ user.user_name }}</h2>
+
+    {% if memberships %}
+        <div class="membership-list">
+            {% for membership in memberships %}
+                <div class="membership-card">
+                    <h3>{{ membership.membership_type.name }}</h3>
+                    <p><strong>Start Date:</strong> {{ membership.start_date }}</p>
+                    <p><strong>End Date:</strong> {{ membership.end_date }}</p>
+                    <p><strong>Status:</strong> 
+                        {% if membership.is_active %}
+                            <span class="status-active">Active</span>
+                        {% else %}
+                            <span class="status-inactive">Inactive</span>
+                        {% endif %}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No membership history found for this user.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -35,10 +35,12 @@ nav_items = [
 # @login_required
 def member_dashboard(request):
     title = 'Member Dashboard'
+    user_slug = request.session.get('user_slug')
+    user = Users.objects.get(userSlug=user_slug)
     #username = request.user.user_name
-    user = request.user = Users.objects.get(
-        user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
-    username = request.user.user_name
+    # user = request.user = Users.objects.get(
+    #     user_id="17776ae2-4bc8-47d3-8169-ce46d86e9e7a")  # temp
+    # username = request.user.user_name
     
     # Fetch the user's active membership
     membership = Membership.objects.filter(user=user, active=True).latest(

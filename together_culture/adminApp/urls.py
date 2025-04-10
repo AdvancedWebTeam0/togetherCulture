@@ -26,5 +26,14 @@ urlpatterns = [
     path('members-list/<slug:slug>/', views.member_detail_view, name='member-detail'),
     path('search-user/<slug:slug>/', views.user_details_for_admin_view, name='user-details'),
     path('approve/<str:user_id>/', views.approve_user, name='approve_user'),
+    path('members-history/', views.members_history, name='members-history'),
+    path('users/', views.users_list, name='users_list'),
+    path('users/<str:user_id>/membership-history/', views.user_membership_history, name='user_membership_history'),
+    path('handle-add-member/', views.handle_add_member, name='handle-add-member'),
+
+
+    
+
+    
 
 ]
