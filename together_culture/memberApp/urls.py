@@ -15,4 +15,5 @@ urlpatterns = [
     path('buy-membership/', views.buy_membership, name='buy_membership'),
     path('event-data/', views.event_data, name='member-event-data'),
     path('events/<slug:slug>/', views.event_detail, name='member-event-detail'),
+    path("book-event/", views.book_event, name="book_event"), 
 ]

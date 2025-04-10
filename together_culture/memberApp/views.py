@@ -11,7 +11,14 @@ from datetime import datetime
 from memberApp.models import Membership, MembershipType, Benefit
 from datetime import datetime, timedelta
 from django.http import Http404
+
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
+import json
+from loginRegistrationApp.models import Events, UserAttendingEvent
 from django.contrib import messages
+from django.utils.text import slugify
+from django.contrib.auth.hashers import make_password
 
 nav_items = [
     {'name': '🎟 Dashboard', 'url': 'member-dashboard', 'submenu': None},
@@ -28,13 +35,13 @@ nav_items = [
 # @login_required
 def member_dashboard(request):
     title = 'Member Dashboard'
+    
+    user_slug = request.session.get("user_slug")
+    
+    user = Users.objects.get(userSlug=user_slug)
 
-    # username = request.user.user_name
-    user = request.user = Users.objects.get(
-        user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542")  # temp
-    username = request.user.user_name
-    # Add session data for the user(slug)
-
+    username = user.user_name    
+    
     try:
         membership = Membership.objects.filter(
             user=user, active=True).latest('start_date')
@@ -43,11 +50,6 @@ def member_dashboard(request):
         messages.warning(
             request, "You don't have an active membership. Please subscribe first.")
         return redirect('/member/buy-membership/')  # Redirect to membership page
-
-    # Retrieve the membership type
-    # Access the membership type (e.g., 'Premium', 'VIP', etc.)
-    membership_type = membership.membership_type.name
-
 
 
     #user = Users.objects.get(userSlug="ela_dogruyol") #Needs to change. Will get the user_slug from session.
@@ -156,10 +158,9 @@ def event_detail(request, slug):
 
 
 def events(request):
-    return render(request, 'events.html')
-
-# @login_required
-
+    events_list = Events.objects.all()
+    print("Fetched Events:", events_list)  # Debugging
+    return render(request, 'events.html', {'events': events_list, 'title': 'Events', 'nav_items': nav_items})
 
 def benefits(request):
     title = 'Benefits'
@@ -259,7 +260,57 @@ def my_membership(request):
 
 
 def settings(request):
-    return render(request, 'settings.html')
+    
+    user_slug = request.session.get("user_slug")
+    if not user_slug:
+        messages.error(request, "User not logged in")
+        return redirect('login')  # Redirect to login if session data is missing
+
+    try:
+        user = Users.objects.get(userSlug=user_slug)
+        user_id = user.user_id
+    except Users.DoesNotExist:
+        messages.error(request, "User not found")
+        return redirect('login')
+
+    if request.method == 'POST':
+        # Update user details from form submission
+        user.first_name = request.POST.get('first_name', user.first_name)
+        user.last_name = request.POST.get('last_name', user.last_name)
+        user.phone_number = request.POST.get('phone_number', user.phone_number)
+        user.address = request.POST.get('address', user.address)
+        user.gender = request.POST.get('gender', user.gender)
+
+        # Handle password reset fields
+        new_password = request.POST.get('new_password', '')
+        confirm_password = request.POST.get('confirm_password', '')
+        if new_password or confirm_password:
+            if new_password == confirm_password:
+                user.password = make_password(new_password)
+            else:
+                messages.error(request, "New password and confirmation do not match.")
+                return redirect('settings')
+
+        # Update user_name and regenerate userSlug based on first and last name
+        user.user_name = user.first_name + "$" + user.last_name
+        new_slug = slugify(user.user_name)
+        # Ensure the new slug is unique by checking other records
+        slug_count = Users.objects.filter(userSlug=new_slug).exclude(user_id=user_id).count()
+        if slug_count > 0:
+            new_slug = f"{new_slug}-{slug_count + 1}"
+        user.userSlug = new_slug
+
+        user.save()
+        # Update session variables if needed (e.g., user_slug)
+        request.session['user_slug'] = user.userSlug
+
+        messages.success(request, "Your details have been updated.")
+        return redirect('settings')
+
+    context = {
+        'user': user,
+    }
+    return render(request, 'settings.html', context)
 
 
 def buy_membership(request):
@@ -322,3 +373,65 @@ def buy_membership(request):
             return JsonResponse({'statusCode': 500, 'message': f'Unexpected error: {e}'}, status=500)
 
     return JsonResponse({'statusCode': 405, 'message': 'Method not allowed'}, status=405)
+
+
+@csrf_exempt  # Only if necessary
+def book_event(request):
+    if request.method != "POST":
+        return JsonResponse({"status": "error", "message": "Invalid request method"}, status=400)
+
+    try:
+        # Parse the JSON data from the request body
+        data = json.loads(request.body.decode("utf-8"))
+        print("Received data:", data)  # Debugging output
+
+        # Get eventId from the data
+        event_id = data.get("eventId")
+        print("Event ID:", event_id)  # Debugging output
+
+        if not event_id:
+            return JsonResponse({"status": "error", "message": "Missing event ID"}, status=400)
+
+        user_slug = request.session.get("user_slug")
+        if not user_slug:
+            return JsonResponse({"status": "error", "message": "User not logged in or session expired."}, status=401)
+
+        user = get_object_or_404(Users, userSlug=user_slug)
+        
+        # Important: Use eventId here, not id
+        event = get_object_or_404(Events, eventId=event_id)
+
+        # Avoid duplicate bookings
+        attending, created = UserAttendingEvent.objects.get_or_create(
+            user=user,
+            event=event,
+            defaults={"isUserAttended": False}  # Set default value
+        )
+
+        if created:
+            # Only increment if this is a new booking
+            event.numberOfAttendees += 1
+            event.save()
+            print(f"User {user.userSlug} booked event {event.eventName}, new attendance count: {event.numberOfAttendees}")
+            return JsonResponse({
+                "status": "success",
+                "message": "Event booked successfully!",
+                "attendees": event.numberOfAttendees,
+                "is_new_booking": True
+            })
+        else:
+            print(f"User {user.userSlug} already booked event {event.eventName}")
+            return JsonResponse({
+                "status": "already_booked",
+                "message": "You have already booked this event!",
+                "attendees": event.numberOfAttendees,
+                "is_new_booking": False
+            })
+
+    except json.JSONDecodeError as e:
+        print("JSON Decode Error:", str(e))
+        return JsonResponse({"status": "error", "message": "Invalid JSON data"}, status=400)
+
+    except Exception as e:
+        print("Unexpected error:", str(e))
+        return JsonResponse({"status": "error", "message": f"Unexpected error: {e}"}, status=500)

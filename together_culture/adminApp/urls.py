@@ -24,5 +24,7 @@ urlpatterns = [
     path('event-data/', views.event_data, name='event-data'),
     path('events/<slug:slug>/', views.event_detail, name='event-detail'),
     path('members-list/<slug:slug>/', views.member_detail_view, name='member-detail'),
-    path('search-user/<slug:slug>/', views.user_attending_event_view, name='user-attending-event-details'),
+    path('search-user/<slug:slug>/', views.user_details_for_admin_view, name='user-details'),
+    path('approve/<str:user_id>/', views.approve_user, name='approve_user'),
+
 ]

@@ -26,7 +26,11 @@ def validate_user(request):
             request.session['user_slug'] = user.userSlug  # Store userSlug in session
             request.session.modified = True  # Ensure session is saved
             logger.info('User authenticated successfully. User Email: ' + email)
-            return redirect('/member')
+            print(user.current_user_type)
+            if user.current_user_type == "ADMIN":
+                return redirect('/admin')
+            elif user.current_user_type == "NORMAL_USER" or user.current_user_type == "MEMBER":
+                return redirect('/member')
         else:
             logger.warning('User authentication failed. User Email: ' + email)
             return JsonResponse({'statusCode': 401, 'message': 'User authentication failed. Wrong Password!'}, status=401)
@@ -43,7 +47,7 @@ def insert_user(request):
             userId = uuid.uuid4()
             firstName = request.POST['firstName']
             lastName = request.POST['lastName']
-            userName = firstName + "$" + lastName
+            userName = firstName + "." + lastName + "@togetherculture.com"
             email = request.POST['email']
             password = make_password(request.POST['password'])
             currentUserType = "NORMAL_USER"
@@ -80,6 +84,11 @@ def insert_user(request):
             )
             us.save()
             logger.info('User registered successfully')
+
+             # Add session data for the user(slug)
+            request.session['user_slug'] = us.userSlug  # Store userSlug in session
+            request.session.modified = True  # Ensure session is saved
+
             return redirect(getInitialInterests)
         except Exception as e:
             logger.error(f'User registration failed: {e}')
@@ -91,8 +100,8 @@ def dashBoard(request):
 def manage_member(request):
     return render(request, 'manage_member.html')
 
-def membership(request):
-    return render(request, 'membership.html')
+# def membership(request):
+#     return render(request, 'membership.html')
 
 def logout(request):
     request.session.flush()
@@ -105,17 +114,27 @@ def getInitialInterests(request):
         'form': get_interests_form
     }
 
+    #User slug should be in session if the page is viewed after registration form.
+    #Otherwise, user should login (or register). Shouldn't reach this form/save information about interests.
+    user_slug = request.session.get('user_slug')
+    if user_slug == None:
+        messages.error(request, "Please log in or register.")
+        return redirect('login')
+
     if request.method == "POST":
         get_interests_form = GetInitialInterest(request.POST)
         if get_interests_form.is_valid():
             selected_options = get_interests_form.cleaned_data['interests']
             print("Selected Options:", selected_options)
 
-            curr_user = Users.objects.first() #Update user!!
+            user_slug = request.session.get('user_slug')
+            curr_user = Users.objects.get(userSlug=user_slug)
+
             response = __saveInitialInterests(user=curr_user, selected_options=selected_options)
 
             if response == "successfully saved":
                 messages.success(request, "Interests saved successfully! Please log in to continue.")
+                request.session.flush() #session should be deleted/reload after saving the interests.
                 return redirect('login')
             
             else:

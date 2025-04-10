@@ -22,9 +22,19 @@
             <input class="search-bar" id="id_user" type="text" placeholder="Search a user.." name="user" value="{{ request.GET.query }}" required>
             <button type="submit">Search</button>
         </div>
+        <input type="hidden" name="request-source" value="search-form">
     </form>
 
     <button id="see-all-users" onclick="goToUsersList();">See all Users</button>
+</div>
+
+<div class="user-type-filter-container">
+    <form id="user-type-filter-form", method="GET" action="{% url 'user-search' %}" >
+        <p><label for="id_user_type">Filter by User Type:</label></p>
+        {{ user_type_filter_form.user_type }}
+        <button id="apply-filter" type="submit">Apply Filter</button>
+        <input type="hidden" name="request-source" value="filter-form">
+    </form>
 </div>
 
 
@@ -41,7 +51,7 @@
 
             <div class="user-list">
                 {% for user in users %}
-                    {% include 'user_attending_event_row_card.html' %}
+                    {% include 'user_details_row_card.html' %}
                 {% endfor %}
             </div>
         </div>

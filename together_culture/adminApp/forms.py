@@ -20,3 +20,23 @@ class UserSearchForm(forms.Form):
                               max_length=50, 
                               help_text='User to search'
                               )
+
+
+class MemberTypeFilterForm(forms.Form):
+    CHOICES = [
+        ('Community Membership', 'Community Membership'),
+        ('Workspace Membership: Touchdown', 'Workspace Membership: Touchdown'),
+        ('Workspace Membership: Dedicated', 'Workspace Membership: Dedicated'),
+    ]
+    
+    member_type = forms.ChoiceField(choices=CHOICES, required=True)
+
+
+class UserTypeFilterForm(forms.Form):
+    #first value is the actual value that gets submitted while the second one is visible in UI.
+    CHOICES = [
+        ('NORMAL_USER', 'Non member'),
+        ('MEMBER', 'Member'),
+    ]
+    
+    user_type = forms.ChoiceField(choices=CHOICES, required=True)

@@ -28,7 +28,6 @@
             left: 0;
             top: 0;
             box-sizing: border-box;
-            z-index: 1000; /* Ensure sidebar stays on top */
         }
         .sidebar a {
             display: flex;
@@ -55,9 +54,31 @@
             flex-grow: 1;
             height: 100vh;
             overflow-y: auto; /* Make content area scrollable */
+            padding: 20px;
             box-sizing: border-box;
-            width: calc(100% - 320px); /* Set width to remaining space */
         }
+        .content {
+            background: #ffffff;
+            padding: 50px;
+            text-align: center;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            min-height: calc(100vh - 40px);
+        }
+        .header {
+            width: 100%;
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 26px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            margin-bottom: 30px;
+        } 
         .logout-container {
             width: 100%;
             display: flex;
@@ -82,8 +103,40 @@
             background-color: rgba(255, 255, 255, 0.4);
             transform: scale(1.05);
         }
+        
+        /* Event styles moved from event.html */
+        .events-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .event-card {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: left;
+            width: 300px;
+            transition: 0.3s;
+        }
+        .event-card:hover {
+            transform: scale(1.05);
+        }
+        .book-btn {
+            background: linear-gradient(to right, #ff758c, #ff7eb3);
+            padding: 10px;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            width: 100%;
+        }
+        .book-btn:hover {
+            opacity: 0.8;
+        }
     </style>
-    {% block extra_head %}{% endblock %}
 </head>
 <body>
     <div class="sidebar">
@@ -99,9 +152,12 @@
     </div>
     
     <div class="content-wrapper">
-        {% block content %}
-        <!-- Content from extended templates will appear here -->
-        {% endblock %}
+        <div class="content">
+            <div class="header">Members Dashboard</div>
+            {% block content %}
+            <!-- Content from extended templates will appear here -->
+            {% endblock %}
+        </div>
     </div>
 </body>
 </html>
