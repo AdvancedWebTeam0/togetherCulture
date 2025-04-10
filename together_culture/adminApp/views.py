@@ -70,7 +70,7 @@ def update_card(request, card_id):
         card_id = int(card_id)
     except ValueError:
         return JsonResponse({'error': 'Invalid card ID'}, status=400)
-    # Simulate fetching the updated value for the card from the database
+    # Fetch the updated value for the card from the database
     if card_id == 1:
         new_value = Users.objects.filter(current_user_type='member').count()
     elif card_id == 2:

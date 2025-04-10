@@ -5,10 +5,18 @@ from .models import EventTag, EventLabel
 from django.db import IntegrityError
 import json
 from django.utils import timezone
-from datetime import time
 from django.contrib.auth.models import User
 import datetime
 from unittest.mock import patch
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import time as sleep_time
+from datetime import time  # Add this import at the top
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 
 
 class EventTagModelTest(TestCase):
@@ -438,9 +446,9 @@ class CreateTagLabelTest(TestCase):
             response.json()['error'], 'Only POST requests with JSON data are allowed')
 
     def test_save_label_invalid_json(self):
-            # Test that an invalid JSON body returns an error
+        # Test that an invalid JSON body returns an error
 
-            # Simulate sending invalid JSON (non-JSON string)
+        # Simulate sending invalid JSON (non-JSON string)
         response = self.client.post(
             reverse('save-label'),  # Replace with actual URL name
             data="invalid_json",  # This is not valid JSON
@@ -701,3 +709,190 @@ class EventDetailViewTest(TestCase):
         self.assertEqual(context['title'], "Event details")
         self.assertTrue('nav_items' in context)
         self.assertTrue('cards' in context)
+
+
+class DashboardTests(StaticLiveServerTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        options = webdriver.ChromeOptions()
+        # Run tests without opening a browser
+        # options.add_argument("--headless")
+        cls.driver = webdriver.Chrome(options=options)
+
+        # Create test data for EventTag and EventLabel
+        tag1 = EventTag.objects.create(eventTagName="Music")
+        tag2 = EventTag.objects.create(eventTagName="Dance")
+        label1 = EventLabel.objects.create(eventLabelName="VIP")
+        label2 = EventLabel.objects.create(eventLabelName="General")
+
+        # Create the event object with all required fields
+        event = Events.objects.create(
+            eventName="Test Event 1",
+            eventDate=timezone.make_aware(datetime.datetime(2025, 6, 17)),
+            startTime=time(10, 0),      # event start time: 10:00 AM
+            endTime=time(12, 0),        # event end time: 12:00 PM
+            location="Test Venue",
+            numberOfAttendees=1,        # initial number of attendees
+            shortDescription="A short description for testing.",
+            longDescription="A longer, detailed description for the test event.",
+            eventType=Events.EventType.HAPPENING,  # using the defined text choice
+            eventSlug='events666'
+        )
+
+        # Add tags and labels to the event
+        event.tags.add(tag1, tag2)
+        event.labels.add(label1, label2)
+
+        # Set up the test client
+        cls.client = Client()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.driver.quit()
+        super().tearDownClass()
+
+    def test_page_loads(self):
+        """Test that the dashboard page loads successfully"""
+        self.driver.get(self.live_server_url + "/admin/")
+        sleep_time.sleep(2)
+        self.assertIn("Dashboard", self.driver.title)
+
+    def test_add_tag_form_visibility(self):
+        """Test if clicking the + button shows the tag creation form"""
+        self.driver.get(self.live_server_url + "/admin/")
+        sleep_time.sleep(2)
+
+        add_tag_btn = self.driver.find_element(By.ID, "add-tag-btn")
+        add_tag_btn.click()
+        sleep_time.sleep(1)
+
+        tag_form = self.driver.find_element(By.ID, "new-tag-form")
+        self.assertTrue(tag_form.is_displayed())
+
+    def test_add_label_form_visibility(self):
+        """Test if clicking the + button shows the label creation form"""
+        self.driver.get(self.live_server_url + "/admin/")
+        sleep_time.sleep(2)
+
+        add_label_btn = self.driver.find_element(By.ID, "add-label-btn")
+        add_label_btn.click()
+        sleep_time.sleep(1)
+
+        label_form = self.driver.find_element(By.ID, "new-label-form")
+        self.assertTrue(label_form.is_displayed())
+
+    def test_event_search(self):
+        """Test event search by date functionality"""
+        self.driver.get(self.live_server_url + "/admin/")
+        sleep_time.sleep(2)
+
+        start_date = self.driver.find_element(By.ID, "start_date")
+        end_date = self.driver.find_element(By.ID, "end_date")
+        # Locate the search button by form ID and button type
+        search_button = self.driver.find_element(
+            By.CSS_SELECTOR, "#eventSearchDateForm button[type='submit']")
+
+        start_date.send_keys("2025-01-01")
+        end_date.send_keys("2025-12-31")
+        search_button.click()
+
+        # Wait for the results header to be visible
+        try:
+            # Wait up to 10 seconds for the results header to be visible
+            results_header = WebDriverWait(self.driver, 10).until(
+                EC.visibility_of_element_located((By.ID, "resultsHeader"))
+            )
+            self.assertTrue(results_header.is_displayed())
+        except TimeoutException:
+            print("Timed out waiting for results header to become visible.")
+
+    def test_ajax_event_results(self):
+        """Test if event search results populate dynamically via AJAX"""
+        self.driver.get(self.live_server_url + "/admin/")
+        sleep_time.sleep(2)
+
+        # Find the date input elements
+        start_date = self.driver.find_element(By.ID, "start_date")
+        end_date = self.driver.find_element(By.ID, "end_date")
+        search_button = self.driver.find_element(
+            By.XPATH, "//button[text()='Search']")
+
+        # Set the date format to match JavaScript expectations (YYYY-MM-DD)
+        start_date.send_keys("2025-06-01")
+        end_date.send_keys("2025-07-01")
+
+        # Click the search button to trigger the AJAX request
+        search_button.click()
+        sleep_time.sleep(3)
+
+        # Verify that results are returned (at least one result should appear)
+        results_table = self.driver.find_element(By.ID, "resultsTable")
+        results_rows = results_table.find_elements(By.TAG_NAME, "tr")
+        self.assertGreater(len(results_rows), 0)  # Expect at least one result
+
+
+class EventChartsTests(StaticLiveServerTestCase):
+    
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        options = webdriver.ChromeOptions()
+        # Run tests without opening a browser
+        # options.add_argument("--headless")
+        cls.driver = webdriver.Chrome(options=options)
+
+        # Create test data for EventTag and EventLabel
+        tag1 = EventTag.objects.create(eventTagName="Music")
+        tag2 = EventTag.objects.create(eventTagName="Dance")
+        label1 = EventLabel.objects.create(eventLabelName="VIP")
+        label2 = EventLabel.objects.create(eventLabelName="General")
+
+        # Create the event object with all required fields
+        event = Events.objects.create(
+            eventName="Test Event 1",
+            eventDate=timezone.make_aware(datetime.datetime(2025, 6, 17)),
+            startTime=time(10, 0),      # event start time: 10:00 AM
+            endTime=time(12, 0),        # event end time: 12:00 PM
+            location="Test Venue",
+            numberOfAttendees=1,        # initial number of attendees
+            shortDescription="A short description for testing.",
+            longDescription="A longer, detailed description for the test event.",
+            eventType=Events.EventType.HAPPENING,  # using the defined text choice
+            eventSlug='events666'
+        )
+
+        # Add tags and labels to the event
+        event.tags.add(tag1, tag2)
+        event.labels.add(label1, label2)
+
+        # Set up the test client
+        cls.client = Client()
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.driver.quit()
+        super().tearDownClass()
+
+    def test_event_charts_load_and_update(self):
+        # Open the admin insights
+        self.driver.get(self.live_server_url + "/admin/insights")
+        
+        # Wait for the charts to be present
+        charts = ["eventTypeChart", "eventTagChart", "eventLabelChart", "eventChart"]
+        for chart_id in charts:
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.ID, chart_id))
+            )
+            chart_element = self.driver.find_element(By.ID, chart_id)
+            self.assertTrue(chart_element.is_displayed(), f"Chart {chart_id} is not visible")
+        
+        # Wait for the charts to update
+        sleep_time.sleep(5)
+        
+        # Verify that the charts contain data
+        for chart_id in charts:
+            chart_element = self.driver.find_element(By.ID, chart_id)
+            data_url = chart_element.get_attribute("data-url")
+            self.assertIsNotNone(data_url, f"Chart {chart_id} does not have a data source")

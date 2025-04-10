@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
             method: 'GET',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',  // Ensure this is sent
-                'Content-Type': 'application/json'  // For sending JSON data (optional)
+                'Content-Type': 'application/json'  // For sending JSON data
             }
         })
             .then(response => response.json())

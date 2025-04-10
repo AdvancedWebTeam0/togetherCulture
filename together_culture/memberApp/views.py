@@ -33,6 +33,7 @@ def member_dashboard(request):
     user = request.user = Users.objects.get(
         user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542")  # temp
     username = request.user.user_name
+    # Add session data for the user(slug)
 
     try:
         membership = Membership.objects.filter(
@@ -138,7 +139,6 @@ def event_data(request):
             'location': event.location,
             'slug': event.eventSlug,
         })
-    print(event_list)
     # Return the filtered event list as a JSON response
     return JsonResponse(event_list, safe=False)
 
@@ -237,17 +237,16 @@ def book_module(request, module_id):
         if ModuleBooking.objects.filter(user=user, module=module, is_booked=True).exists():
             return JsonResponse({'status': 'error', 'message': 'You have already booked this module.'})
 
-        # Create a booking for the user
-        ModuleBooking.objects.create(user=user, module=module, is_booked=True)
-
         # Get user's membership
         membership = Membership.objects.filter(user=user).first()
         if not membership:
             return JsonResponse({"status": 'error', 'message': "No active membership found."})
-
+        
         benefit = get_object_or_404(Benefit, id=1, membership=membership)
 
         if benefit.use_benefit():
+            # Create a booking for the user
+            ModuleBooking.objects.create(user=user, module=module, is_booked=True)
             return JsonResponse({'status': 'success', 'message': "You have successfully booked the module!"})
         else:
             return JsonResponse({'status': 'error', 'message': "You have used up this benefit."})
