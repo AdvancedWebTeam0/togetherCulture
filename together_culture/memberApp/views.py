@@ -19,6 +19,7 @@ from loginRegistrationApp.models import Events, UserAttendingEvent
 from django.contrib import messages
 from django.utils.text import slugify
 from django.contrib.auth.hashers import make_password
+from datetime import date
 
 nav_items = [
     {'name': '🎟 Dashboard', 'url': 'member-dashboard', 'submenu': None},
@@ -36,17 +37,28 @@ nav_items = [
 def member_dashboard(request):
     title = 'Member Dashboard'
     
-    user_slug = request.session.get("user_slug")
+    try:
+        user_slug = request.session.get("user_slug")
+        user = Users.objects.get(userSlug=user_slug)
+        
+        # Check the user type
+        if user.current_user_type != "MEMBER": 
+            messages.warning(request, "You do not have permission to access this page.")
+            return redirect('login')
+    except:
+        messages.warning(
+            request, "You are not logged in")
+        return redirect('login')  # Redirect to membership page
     
-    user = Users.objects.get(userSlug=user_slug)
-
-    username = user.user_name    
+    username = user.user_name
+    
+    membership = Membership.objects.filter(
+        user=user, end_date__gte=date.today()
+    ).order_by('-start_date').first()
     
     try:
-        membership = Membership.objects.filter(
-            user=user, active=True).latest('start_date')
         membership_type = membership.membership_type.name
-    except Membership.DoesNotExist:
+    except:
         messages.warning(
             request, "You don't have an active membership. Please subscribe first.")
         return redirect('/member/buy-membership/')  # Redirect to membership page
@@ -115,9 +127,19 @@ def __get_interest_event_data(user:Users):
 
 def event_data(request):
     # Get the logged-in user
-    user = request.user
-    user = request.user = Users.objects.get(
-        user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542")  # temp
+    try:
+        user_slug = request.session.get("user_slug")
+        user = Users.objects.get(userSlug=user_slug)
+        
+        # Check the user type
+        if user.current_user_type != "MEMBER": 
+            messages.warning(request, "You do not have permission to access this page.")
+            return redirect('login')
+    except:
+        messages.warning(
+            request, "You are not logged in")
+        return redirect('login')  # Redirect to membership page
+    
     # Fetch the UserAttendingEvent records for the logged-in user where the user is attending
     user_events = UserAttendingEvent.objects.filter(
         user=user, isUserAttended=False)
@@ -164,9 +186,19 @@ def events(request):
 
 def benefits(request):
     title = 'Benefits'
-    request.user = Users.objects.get(
-        user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542")  # temp
-    user = request.user
+    try:
+        user_slug = request.session.get("user_slug")
+        user = Users.objects.get(userSlug=user_slug)
+        
+        # Check the user type
+        if user.current_user_type != "MEMBER": 
+            messages.warning(request, "You do not have permission to access this page.")
+            return redirect('login')
+    except:
+        messages.warning(
+            request, "You are not logged in")
+        return redirect('login')  # Redirect to membership page
+    
     benefits = Benefit.objects.filter(membership__user=user)
 
     # Fetch the user's active membership
@@ -191,9 +223,18 @@ def benefits(request):
 
 
 def use_benefit(request, benefit_id):
-    request.user = Users.objects.get(
-        user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542")  # temp
-    user = request.user
+    try:
+        user_slug = request.session.get("user_slug")
+        user = Users.objects.get(userSlug=user_slug)
+        
+        # Check the user type
+        if user.current_user_type != "MEMBER": 
+            messages.warning(request, "You do not have permission to access this page.")
+            return redirect('login')
+    except:
+        messages.warning(
+            request, "You are not logged in")
+        return redirect('login')  # Redirect to membership page
 
     # Get user's membership
     membership = Membership.objects.filter(user=user).first()
@@ -228,10 +269,20 @@ def digital_content(request):
 
 
 def book_module(request, module_id):
-    request.user = Users.objects.get(
-        user_id="14bf62e0-d4f1-487c-b71e-2e27726ef542")  # temp
+    try:
+        user_slug = request.session.get("user_slug")
+        user = Users.objects.get(userSlug=user_slug)
+        
+        # Check the user type
+        if user.current_user_type != "MEMBER": 
+            messages.warning(request, "You do not have permission to access this page.")
+            return redirect('login')
+    except:
+        messages.warning(
+            request, "You are not logged in")
+        return redirect('login')  # Redirect to membership page
+    
     if request.method == 'POST':
-        user = request.user  # Get the logged-in user
         module = get_object_or_404(DigitalContentModule, pk=module_id)
 
         # Check if the user has already booked the module

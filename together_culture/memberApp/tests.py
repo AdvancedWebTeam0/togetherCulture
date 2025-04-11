@@ -14,7 +14,7 @@ class DigitalContentModuleTestCase(TestCase):
         # Create a test user
         self.user = Users.objects.create(
             user_id="8d36c361-6392-46ff-a755-5f27ca33c773", user_name="testuser", first_name="John", last_name="Doe",
-            email="john@example.com", password="password", current_user_type="Admin",
+            email="john@example.com", password="password", current_user_type="ADMIN",
             userSlug = 'user'
         )
 
@@ -62,14 +62,14 @@ class DigitalContentViewTestCase(TestCase):
         # Create a test user
         self.user = Users.objects.create(
             user_id="d8ac4feb-e18a-4107-9df4-7aa093f38603", user_name="testuser1", first_name="John", last_name="Doe",
-            email="john@example.com", password="password", current_user_type="Admin",
+            email="john@example.com", password="password", current_user_type="ADMIN",
             userSlug = 'user'
         )
 
         self.user2 = Users.objects.create(
             user_id="d8ac4feb-e18a-4107-9df4-7aa093f38604", user_name="testuser1",
             first_name="John", last_name="Doe", email="memebr@example.com", password="password",
-            current_user_type="member", userSlug = 'user2'
+            current_user_type="MEMBER", userSlug = 'user2'
         )
 
         self.membership = Membership.objects.create(user=self.user2,
@@ -212,7 +212,7 @@ class MemberDashboardTest(TestCase):
             last_name="Doe", 
             email="john@example.com", 
             password="password", 
-            current_user_type="Admin",
+            current_user_type="ADMIN",
             userSlug="user1"
         )
         self.membership_type = MembershipType.objects.create(
@@ -264,7 +264,7 @@ class BenefitsViewTest(TestCase):
             last_name="Doe", 
             email="john@example.com", 
             password="password", 
-            current_user_type="Admin",
+            current_user_type="ADMIN",
             userSlug="user1"
         )
         
@@ -331,4 +331,4 @@ class BenefitsViewTest(TestCase):
         response = self.client.get(self.url)
         
         # Check if it redirects to login
-        self.assertRedirects(response, '/loginRegistration/login/?next=' + self.url)
+        self.assertRedirects(response, '/loginRegistration/login/')

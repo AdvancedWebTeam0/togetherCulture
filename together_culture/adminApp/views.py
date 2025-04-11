@@ -14,6 +14,7 @@ from django.db.models.functions import ExtractMonth
 import calendar
 from django.core.paginator import Paginator
 from datetime import datetime
+from django.contrib import messages
 
 # Create your views here.
 # the url should be the name that is used in urls.py
@@ -25,7 +26,7 @@ nav_items = [
     {'name': '🔍 Search Users', 'url': 'user-list', 'submenu': None},
     {'name': '👥 Manage Members', 'url': '#', 'submenu': [
         {'name': '➕ Add Member', 'url': 'add-members'},
-        {'name': '📋 Members List', 'url': 'members-list'},
+        {'name': '📋 Members List', 'url': 'manage-membership'},
     ]},
     {'name': '🎟 Membership', 'url': 'manage-membership', 'submenu': None},
 ]
@@ -42,7 +43,19 @@ cards = [
 def admin_dashboard(request):
     # define the title for page
     title = "Admin Dashboard"
-
+    try:
+        user_slug = request.session.get("user_slug")
+        user = Users.objects.get(userSlug=user_slug)
+        
+        # Check the user type
+        if user.current_user_type != "ADMIN": 
+            messages.warning(request, "You do not have permission to access this page.")
+            return redirect('login')
+    except:
+        messages.warning(
+            request, "You are not logged in")
+        return redirect('login')  # Redirect to membership page
+    
     # Retrieve all tags and labels to display in the form
     tags = EventTag.objects.all()
     labels = EventLabel.objects.all()
@@ -72,7 +85,7 @@ def update_card(request, card_id):
         return JsonResponse({'error': 'Invalid card ID'}, status=400)
     # Fetch the updated value for the card from the database
     if card_id == 1:
-        new_value = Users.objects.filter(current_user_type='member').count()
+        new_value = Users.objects.filter(current_user_type='MEMBER').count()
     elif card_id == 2:
         current_time = timezone.now()
         new_value = Events.objects.filter(eventDate__gt=current_time).count()
@@ -87,6 +100,19 @@ def update_card(request, card_id):
 
 
 def save_tag(request):
+    try:
+        user_slug = request.session.get("user_slug")
+        user = Users.objects.get(userSlug=user_slug)
+        
+        # Check the user type
+        if user.current_user_type != "ADMIN": 
+            messages.warning(request, "You do not have permission to access this page.")
+            return redirect('login')
+    except:
+        messages.warning(
+            request, "You are not logged in")
+        return redirect('login')  # Redirect to membership page
+    
     if request.method == 'POST' and request.content_type == 'application/json':
         try:
             # Parse the incoming JSON data
@@ -107,6 +133,18 @@ def save_tag(request):
 
 
 def save_label(request):
+    try:
+        user_slug = request.session.get("user_slug")
+        user = Users.objects.get(userSlug=user_slug)
+        
+        # Check the user type
+        if user.current_user_type != "ADMIN": 
+            messages.warning(request, "You do not have permission to access this page.")
+            return redirect('login')
+    except:
+        messages.warning(
+            request, "You are not logged in")
+        return redirect('login')  # Redirect to membership page
     if request.method == 'POST' and request.content_type == 'application/json':
         try:
             # Parse the incoming JSON data
@@ -128,7 +166,7 @@ def save_label(request):
 
 
 def event_search(request):
-
+    
     if request.headers.get('X-Requested-With') != 'XMLHttpRequest':
         return JsonResponse({'error': 'Invalid request, must be AJAX.'}, status=400)
 
@@ -136,7 +174,7 @@ def event_search(request):
     tags = request.GET.get('tags', '').split(',')
     labels = request.GET.get('labels', '').split(',')
 
-    # Convert string values to integers (if they are supposed to be IDs)
+    # Convert string values to integers
     tags = [int(tag) for tag in tags if tag.strip().isdigit()]
     labels = [int(label) for label in labels if label.strip().isdigit()]
 

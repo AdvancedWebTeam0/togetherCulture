@@ -126,12 +126,12 @@ class InsightsViewTest(TestCase):
 
         self.user1 = Users.objects.create(
             user_id="8d36c361-6392-46ff-a755-5f27ca33c773", user_name="testuser1", first_name="John", last_name="Doe",
-            email="john@example.com", password="password", current_user_type="Admin",
+            email="john@example.com", password="password", current_user_type="ADMIN",
             userSlug="user1"
         )
         self.user2 = Users.objects.create(
             user_id="38683b82-ff63-4db7-b1f3-bd475adfb75f", user_name="testuser2", first_name="Jane", last_name="Doe",
-            email="jane@example.com", password="password", current_user_type="Member",
+            email="jane@example.com", password="password", current_user_type="MEMBER",
             userSlug="user2"
         )
 
@@ -450,7 +450,7 @@ class CreateTagLabelTest(TestCase):
 
         # Simulate sending invalid JSON (non-JSON string)
         response = self.client.post(
-            reverse('save-label'),  # Replace with actual URL name
+            reverse('save-label'),
             data="invalid_json",  # This is not valid JSON
             content_type='application/json'
         )
@@ -510,13 +510,13 @@ class UpdateCardViewTest(TestCase):
         # Create users with 'member' as current_user_type
         Users.objects.bulk_create(
             [Users(user_name=f'User{i}', first_name=f'First{i}', last_name=f'Last{i}',
-                   email=f'user{i}@example.com', password='password', current_user_type='member',
+                   email=f'user{i}@example.com', password='password', current_user_type='MEMBER',
                    userSlug=f'usera{i}') for i in range(130)]
         )
-        # Create a few users with non-'member' user_type (e.g., 'admin')
+        # Create a few users with non-'member' user_type
         Users.objects.bulk_create(
             [Users(user_name=f'Admin{i}', first_name=f'AdminFirst{i}', last_name=f'AdminLast{i}',
-                   email=f'admin{i}@example.com', password='password', current_user_type='admin',
+                   email=f'admin{i}@example.com', password='password', current_user_type='ADMIN',
                    userSlug=f'userb{i}') for i in range(5)]
         )
 
@@ -718,7 +718,7 @@ class DashboardTests(StaticLiveServerTestCase):
         super().setUpClass()
         options = webdriver.ChromeOptions()
         # Run tests without opening a browser
-        # options.add_argument("--headless")
+        options.add_argument("--headless")
         cls.driver = webdriver.Chrome(options=options)
 
         # Create test data for EventTag and EventLabel
@@ -840,7 +840,7 @@ class EventChartsTests(StaticLiveServerTestCase):
         super().setUpClass()
         options = webdriver.ChromeOptions()
         # Run tests without opening a browser
-        # options.add_argument("--headless")
+        options.add_argument("--headless")
         cls.driver = webdriver.Chrome(options=options)
 
         # Create test data for EventTag and EventLabel
