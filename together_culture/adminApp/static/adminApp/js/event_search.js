@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', function () {
         fetch("/admin/event-search/?" + queryParams.toString(), {
             method: 'GET',
             headers: {
-                'X-Requested-With': 'XMLHttpRequest',  // Ensure this is sent
-                'Content-Type': 'application/json'  // For sending JSON data (optional)
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json'  // For sending JSON data
             }
         })
             .then(response => response.json())
